@@ -34,6 +34,10 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(chicken_dead_sound);
 	if (chicken_eat_sound != nullptr)
 		Mix_FreeChunk(chicken_eat_sound);
+	if (night_music != nullptr)
+	    Mix_FreeMusic(night_music);
+	if (bird_sounds != nullptr)
+	    Mix_FreeChunk(bird_sounds);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -104,12 +108,16 @@ GLFWwindow* WorldSystem::create_window() {
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
+    night_music = Mix_LoadMUS(audio_path("forest_night.wav").c_str());
+    bird_sounds = Mix_LoadWAV(audio_path("bird_noises.wav").c_str());
 
-	if (background_music == nullptr || chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
+	if (night_music == nullptr || bird_sounds == nullptr || background_music == nullptr || chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
 			audio_path("music.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
-			audio_path("chicken_eat.wav").c_str());
+			audio_path("chicken_eat.wav").c_str(),
+            audio_path("forest_night.wav").c_str(),
+            audio_path("bird_noises.wav").c_str());
 		return nullptr;
 	}
 
@@ -119,7 +127,7 @@ GLFWwindow* WorldSystem::create_window() {
 void WorldSystem::init(RenderSystem* renderer_arg) {
 	this->renderer = renderer_arg;
 	// Playing background music indefinitely
-	Mix_PlayMusic(background_music, -1);
+	Mix_PlayMusic(night_music, -1);
 	fprintf(stderr, "Loaded music\n");
 
 	// Set all states to default

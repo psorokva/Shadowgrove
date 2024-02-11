@@ -62,6 +62,8 @@ private:
 	Mix_Music* background_music;
 	Mix_Chunk* chicken_dead_sound;
 	Mix_Chunk* chicken_eat_sound;
+	Mix_Music* night_music;
+	Mix_Chunk* bird_sounds;
 
 	// C++ random number generator
 	std::default_random_engine rng;
