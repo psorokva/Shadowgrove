@@ -9,13 +9,11 @@
 #include <assert.h>
 
 // Unique identifyer for all entities
-class Entity
-{
+class Entity {
 	unsigned int id;
 	static unsigned int id_count; // starts from 1, entit 0 is the default initialization
 public:
-	Entity()
-	{
+	Entity() {
 		id = id_count++;
 		// Note, indices of already deleted entities arent re-used in this simple implementation.
 	}
@@ -23,8 +21,7 @@ public:
 };
 
 // Common interface to refer to all containers in the ECS registry
-struct ContainerInterface
-{
+struct ContainerInterface {
 	virtual void clear() = 0;
 	virtual size_t size() = 0;
 	virtual void remove(Entity e) = 0;
@@ -32,9 +29,7 @@ struct ContainerInterface
 };
 
 // A container that stores components of type 'Component' and associated entities
-template <typename Component> // A component can be any class
-class ComponentContainer : public ContainerInterface
-{
+template <typename Component> class ComponentContainer : public ContainerInterface {
 private:
 	// The hash map from Entity -> array index.
 	std::unordered_map<unsigned int, unsigned int> map_entity_componentID; // the entity is cast to uint to be hashable.
@@ -47,13 +42,10 @@ public:
 	std::vector<Entity> entities;
 
 	// Constructor that registers the type
-	ComponentContainer()
-	{
-	}
+	ComponentContainer(){ }
 
 	// Inserting a component c associated to entity e
-	inline Component& insert(Entity e, Component c, bool check_for_duplicates = true)
-	{
+	inline Component& insert(Entity e, Component c, bool check_for_duplicates = true) {
 		// Usually, every entity should only have one instance of each component type
 		assert(!(check_for_duplicates && has(e)) && "Entity already contained in ECS registry");
 
@@ -65,7 +57,7 @@ public:
 
 	// The emplace function takes the the provided arguments Args, creates a new object of type Component, and inserts it into the ECS system
 	template<typename... Args>
-	Component& emplace(Entity e, Args &&... args) {
+	Component& emplace(Entity e, Args &&... args) { 
 		return insert(e, Component(std::forward<Args>(args)...));
 	};
 	template<typename... Args>
@@ -85,10 +77,8 @@ public:
 	}
 
 	// Remove an component and pack the container to re-use the empty space
-	void remove(Entity e)
-	{
-		if (has(e))
-		{
+	void remove(Entity e) {
+		if (has(e)) {
 			// Get the current position
 			int cID = map_entity_componentID[e];
 
@@ -107,23 +97,20 @@ public:
 	};
 
 	// Remove all components of type 'Component'
-	void clear()
-	{
+	void clear() {
 		map_entity_componentID.clear();
 		components.clear();
 		entities.clear();
 	}
 
 	// Report the number of components of type 'Component'
-	size_t size()
-	{
+	size_t size() {
 		return components.size();
 	}
 
 	// Sort the components and associated entity assignment structures by the comparisonFunction, see std::sort
 	template <class Compare>
-	void sort(Compare comparisonFunction)
-	{
+	void sort(Compare comparisonFunction) {
 		// First sort the entity list as desired
 		std::sort(entities.begin(), entities.end(), comparisonFunction);
 		// Now re-arrange the components (Note, creates a new vector, which may be slow! Not sure if in-place could be faster: https://stackoverflow.com/questions/63703637/how-to-efficiently-permute-an-array-in-place-using-stdswap)

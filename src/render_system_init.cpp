@@ -14,8 +14,7 @@
 #include <sstream>
 
 // World initialization
-bool RenderSystem::init(GLFWwindow* window_arg)
-{
+bool RenderSystem::init(GLFWwindow* window_arg) {
 	this->window = window_arg;
 
 	glfwMakeContextCurrent(window);
@@ -35,8 +34,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	// https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value
 	int frame_buffer_width_px, frame_buffer_height_px;
 	glfwGetFramebufferSize(window, &frame_buffer_width_px, &frame_buffer_height_px);  // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
-	if (frame_buffer_width_px != window_width_px)
-	{
+	if (frame_buffer_width_px != window_width_px) {
 		printf("WARNING: retina display! https://stackoverflow.com/questions/36672935/why-retina-screen-coordinate-value-is-twice-the-value-of-pixel-value\n");
 		printf("glfwGetFramebufferSize = %d,%d\n", frame_buffer_width_px, frame_buffer_height_px);
 		printf("window width_height = %d,%d\n", window_width_px, window_height_px);
@@ -63,20 +61,17 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	return true;
 }
 
-void RenderSystem::initializeGlTextures()
-{
+void RenderSystem::initializeGlTextures() {
     glGenTextures((GLsizei)texture_gl_handles.size(), texture_gl_handles.data());
 
-    for(uint i = 0; i < texture_paths.size(); i++)
-    {
+    for(uint i = 0; i < texture_paths.size(); i++) {
 		const std::string& path = texture_paths[i];
 		ivec2& dimensions = texture_dimensions[i];
 
 		stbi_uc* data;
 		data = stbi_load(path.c_str(), &dimensions.x, &dimensions.y, NULL, 4);
 
-		if (data == NULL)
-		{
+		if (data == NULL) {
 			const std::string message = "Could not load the file " + path + ".";
 			fprintf(stderr, "%s", message.c_str());
 			assert(false);
@@ -91,10 +86,8 @@ void RenderSystem::initializeGlTextures()
 	gl_has_errors();
 }
 
-void RenderSystem::initializeGlEffects()
-{
-	for(uint i = 0; i < effect_paths.size(); i++)
-	{
+void RenderSystem::initializeGlEffects() {
+	for(uint i = 0; i < effect_paths.size(); i++) {
 		const std::string vertex_shader_name = effect_paths[i] + ".vs.glsl";
 		const std::string fragment_shader_name = effect_paths[i] + ".fs.glsl";
 
@@ -105,8 +98,7 @@ void RenderSystem::initializeGlEffects()
 
 // One could merge the following two functions as a template function...
 template <class T>
-void RenderSystem::bindVBOandIBO(GEOMETRY_BUFFER_ID gid, std::vector<T> vertices, std::vector<uint16_t> indices)
-{
+void RenderSystem::bindVBOandIBO(GEOMETRY_BUFFER_ID gid, std::vector<T> vertices, std::vector<uint16_t> indices) {
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[(uint)gid]);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vertices[0]) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
@@ -118,10 +110,8 @@ void RenderSystem::bindVBOandIBO(GEOMETRY_BUFFER_ID gid, std::vector<T> vertices
 	gl_has_errors();
 }
 
-void RenderSystem::initializeGlMeshes()
-{
-	for (uint i = 0; i < mesh_paths.size(); i++)
-	{
+void RenderSystem::initializeGlMeshes() {
+	for (uint i = 0; i < mesh_paths.size(); i++) {
 		// Initialize meshes
 		GEOMETRY_BUFFER_ID geom_index = mesh_paths[i].first;
 		std::string name = mesh_paths[i].second;
@@ -136,8 +126,7 @@ void RenderSystem::initializeGlMeshes()
 	}
 }
 
-void RenderSystem::initializeGlGeometryBuffers()
-{
+void RenderSystem::initializeGlGeometryBuffers() {
 	// Vertex Buffer creation.
 	glGenBuffers((GLsizei)vertex_buffers.size(), vertex_buffers.data());
 	// Index Buffer creation.
@@ -225,8 +214,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, screen_vertices, screen_indices);
 }
 
-RenderSystem::~RenderSystem()
-{
+RenderSystem::~RenderSystem() {
 	// Don't need to free gl resources since they last for as long as the program,
 	// but it's polite to clean after yourself.
 	glDeleteBuffers((GLsizei)vertex_buffers.size(), vertex_buffers.data());
@@ -249,8 +237,7 @@ RenderSystem::~RenderSystem()
 }
 
 // Initialize the screen texture from a standard sprite
-bool RenderSystem::initScreenTexture()
-{
+bool RenderSystem::initScreenTexture() {
 	registry.screenStates.emplace(screen_state_entity);
 
 	int framebuffer_width, framebuffer_height;
@@ -275,14 +262,12 @@ bool RenderSystem::initScreenTexture()
 	return true;
 }
 
-bool gl_compile_shader(GLuint shader)
-{
+bool gl_compile_shader(GLuint shader) {
 	glCompileShader(shader);
 	gl_has_errors();
 	GLint success = 0;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-	if (success == GL_FALSE)
-	{
+	if (success == GL_FALSE) {
 		GLint log_len;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_len);
 		std::vector<char> log(log_len);
@@ -298,14 +283,11 @@ bool gl_compile_shader(GLuint shader)
 	return true;
 }
 
-bool loadEffectFromFile(
-	const std::string& vs_path, const std::string& fs_path, GLuint& out_program)
-{
+bool loadEffectFromFile( const std::string& vs_path, const std::string& fs_path, GLuint& out_program) {
 	// Opening files
 	std::ifstream vs_is(vs_path);
 	std::ifstream fs_is(fs_path);
-	if (!vs_is.good() || !fs_is.good())
-	{
+	if (!vs_is.good() || !fs_is.good()) {
 		fprintf(stderr, "Failed to load shader files %s, %s", vs_path.c_str(), fs_path.c_str());
 		assert(false);
 		return false;
@@ -329,14 +311,12 @@ bool loadEffectFromFile(
 	gl_has_errors();
 
 	// Compiling
-	if (!gl_compile_shader(vertex))
-	{
+	if (!gl_compile_shader(vertex)) {
 		fprintf(stderr, "Vertex compilation failed");
 		assert(false);
 		return false;
 	}
-	if (!gl_compile_shader(fragment))
-	{
+	if (!gl_compile_shader(fragment)) {
 		fprintf(stderr, "Vertex compilation failed");
 		assert(false);
 		return false;
@@ -352,8 +332,7 @@ bool loadEffectFromFile(
 	{
 		GLint is_linked = GL_FALSE;
 		glGetProgramiv(out_program, GL_LINK_STATUS, &is_linked);
-		if (is_linked == GL_FALSE)
-		{
+		if (is_linked == GL_FALSE) {
 			GLint log_len;
 			glGetProgramiv(out_program, GL_INFO_LOG_LENGTH, &log_len);
 			std::vector<char> log(log_len);

@@ -16,12 +16,27 @@ const size_t MAX_EAGLES = 15;
 const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
+const int TILE_SIZE = 55;
+const int MAZE_SIZE = 12;
+// evetually use pointers for this and add travesal between maps 
+const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
+		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
+		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
+		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
+		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
+		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
+};
+
 
 // Create the bug world
-WorldSystem::WorldSystem()
-	: points(0)
-	, next_eagle_spawn(0.f)
-	, next_bug_spawn(0.f) {
+WorldSystem::WorldSystem() : points(0), next_eagle_spawn(0.f), next_bug_spawn(0.f) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
@@ -152,19 +167,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// Spawning new eagles
-	next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.deadlys.components.size() <= MAX_EAGLES && next_eagle_spawn < 0.f) {
-		// Reset timer
-		next_eagle_spawn = (EAGLE_DELAY_MS / 2) + uniform_dist(rng) * (EAGLE_DELAY_MS / 2);
-		// Create eagle with random initial position
-        createEagle(renderer, vec2(50.f + uniform_dist(rng) * (window_width_px - 100.f), 100.f));
-	}
+	//next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
+	//if (registry.deadlys.components.size() <= MAX_EAGLES && next_eagle_spawn < 0.f) {
+	//	// Reset timer
+	//	next_eagle_spawn = (EAGLE_DELAY_MS / 2) + uniform_dist(rng) * (EAGLE_DELAY_MS / 2);
+	//	// Create eagle with random initial position
+ //       createEagle(renderer, vec2(50.f + uniform_dist(rng) * (window_width_px - 100.f), 100.f));
+	//}
 
 	// Spawning new bug
-	next_bug_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.eatables.components.size() <= MAX_BUG && next_bug_spawn < 0.f) {
-		// !!!  TODO A1: Create new bug with createBug({0,0}), as for the Eagles above
-	}
+	//next_bug_spawn -= elapsed_ms_since_last_update * current_speed;
+	//if (registry.eatables.components.size() <= MAX_BUG && next_bug_spawn < 0.f) {
+	//	// !!!  TODO A1: Create new bug with createBug({0,0}), as for the Eagles above
+	//}
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// TODO A2: HANDLE EGG SPAWN HERE
@@ -217,9 +232,23 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
+
+	// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
+	for (int i = 0; i < MAZE_SIZE; i++) {
+		for (int j = 0; j < MAZE_SIZE; j++) {
+			if (maze_map[j][i] > 0) {
+				createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, maze_map[j][i]);
+			}
+		}
+	}
+
+
 	// Create a new chicken
 	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
 	registry.colors.insert(player_chicken, {1, 0.8f, 0.8f});
+
+
+
 
 	// !! TODO A2: Enable static eggs on the ground, for reference
 	// Create eggs on the floor, use this for reference

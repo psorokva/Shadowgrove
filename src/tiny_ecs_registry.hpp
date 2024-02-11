@@ -4,8 +4,7 @@
 #include "tiny_ecs.hpp"
 #include "components.hpp"
 
-class ECSRegistry
-{
+class ECSRegistry {
 	// Callbacks to remove a particular or all entities in the system
 	std::vector<ContainerInterface*> registry_list;
 
@@ -30,8 +29,7 @@ public:
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
-	ECSRegistry()
-	{
+	ECSRegistry() {
 		// TODO: A1 add a LightUp component
 		registry_list.push_back(&deathTimers);
 		registry_list.push_back(&motions);
