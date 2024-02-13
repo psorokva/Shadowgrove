@@ -20,6 +20,22 @@ public:
 	operator unsigned int() { return id; } // this enables automatic casting to int
 };
 
+//class Chunk {
+//	private:
+//		unsigned int id;
+//		static unsigned int id_count;
+//		//  TODO:
+//		// need to keep refs to all plants and things spawned in here
+//		// vector of plant+ other entity ids to remove all entities with the ids 
+//
+//	public:
+//		Chunk() {
+//			id = id_count++;
+//		}
+//
+//};
+
+
 // Common interface to refer to all containers in the ECS registry
 struct ContainerInterface {
 	virtual void clear() = 0;

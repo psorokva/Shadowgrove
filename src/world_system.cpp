@@ -18,6 +18,7 @@ const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const int TILE_SIZE = 55;
 const int MAZE_SIZE = 12;
+const float CHARACTER_SPEED = 150.0f;
 // evetually use pointers for this and add travesal between maps 
 const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
 		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
@@ -49,6 +50,10 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(chicken_dead_sound);
 	if (chicken_eat_sound != nullptr)
 		Mix_FreeChunk(chicken_eat_sound);
+	if (night_music != nullptr)
+	    Mix_FreeMusic(night_music);
+	if (bird_sounds != nullptr)
+	    Mix_FreeChunk(bird_sounds);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -119,12 +124,16 @@ GLFWwindow* WorldSystem::create_window() {
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
 	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
 	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
+    night_music = Mix_LoadMUS(audio_path("forest_night.wav").c_str());
+    bird_sounds = Mix_LoadWAV(audio_path("bird_noises.wav").c_str());
 
-	if (background_music == nullptr || chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
+	if (night_music == nullptr || bird_sounds == nullptr || background_music == nullptr || chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
 			audio_path("music.wav").c_str(),
 			audio_path("chicken_dead.wav").c_str(),
-			audio_path("chicken_eat.wav").c_str());
+			audio_path("chicken_eat.wav").c_str(),
+            audio_path("forest_night.wav").c_str(),
+            audio_path("bird_noises.wav").c_str());
 		return nullptr;
 	}
 
@@ -134,7 +143,7 @@ GLFWwindow* WorldSystem::create_window() {
 void WorldSystem::init(RenderSystem* renderer_arg) {
 	this->renderer = renderer_arg;
 	// Playing background music indefinitely
-	Mix_PlayMusic(background_music, -1);
+	Mix_PlayMusic(night_music, -1);
 	fprintf(stderr, "Loaded music\n");
 
 	// Set all states to default
@@ -317,6 +326,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//Motion& m = registry.motions.get(player_chicken);
+	//float a = m.angle;
+
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -414,6 +427,55 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		current_speed += 0.1f;
 		printf("Current speed = %f\n", current_speed);
 	}
+
+	if (action == GLFW_REPEAT && key == GLFW_KEY_RIGHT) {
+		m.velocity = CHARACTER_SPEED * vec2{ -sin(a), -cos(a) };
+
+	} //m.velocity[0] = CHICKEN_SPEED; }
+	else if (action == GLFW_REPEAT && key == GLFW_KEY_LEFT) {
+		m.velocity = CHARACTER_SPEED * vec2{ sin(a), cos(a) };
+
+	} // m.velocity[0] = -CHICKEN_SPEED; }
+	else if (action == GLFW_REPEAT && key == GLFW_KEY_UP) {
+		m.velocity = CHARACTER_SPEED * vec2{ -cos(a), sin(a) };
+
+	} //m.velocity[1] = -CHICKEN_SPEED;	}
+	else if (action == GLFW_REPEAT && key == GLFW_KEY_DOWN) {
+		m.velocity = CHARACTER_SPEED * vec2{ cos(a), -sin(a) };
+
+	} //m.velocity[1] = CHICKEN_SPEED; }
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_RIGHT) {
+		m.position += vec2{ sin(a), cos(a) };
+	} else if (action == GLFW_PRESS && key == GLFW_KEY_LEFT) {
+		m.position += vec2{ -cos(a), sin(a) };
+	} else if (action == GLFW_PRESS && key == GLFW_KEY_UP) {
+		m.position += vec2{ cos(a), -sin(a) };
+	} else if (action == GLFW_PRESS && key == GLFW_KEY_DOWN) {
+		m.position += vec2{ -sin(a), -cos(a) };
+
+	}
+
+
+
+	// Control the current speed with `<` `>`
+	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
+		current_speed -= 0.1f;
+		printf("Current speed = %f\n", current_speed);
+	}
+	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
+		current_speed += 0.1f;
+		printf("Current speed = %f\n", current_speed);
+	}
+	current_speed = fmax(0.f, current_speed);
+
+	// ESC key to exit
+	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+		//printf("ESC key pressed, close window");
+		glfwSetWindowShouldClose(window, true);
+	}
+
+
 	current_speed = fmax(0.f, current_speed);
 }
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 project(chicken)
 
 # Set c++11
@@ -7,6 +7,7 @@ if (POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
 endif ()
 set (CMAKE_CXX_STANDARD 14)
+
 
 # nice hierarchichal structure in MSVC
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -56,6 +57,8 @@ file(GLOB SOURCE_FILES src/*.cpp src/*.hpp)
 if (IS_OS_MAC)
   include_directories(/usr/local/include)
   link_directories(/usr/local/lib)
+  include_directories(/opt/homebrew/include) 
+  link_directories(/opt/homebrew/lib)
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
@@ -87,8 +90,8 @@ if (IS_OS_LINUX OR IS_OS_MAC)
 
     pkg_search_module(GLFW REQUIRED glfw3)
 
-    pkg_search_module(SDL2 REQUIRED sdl)
-    pkg_search_module(SDL2MIXER REQUIRED SDL_mixer)
+    pkg_search_module(SDL2 REQUIRED sdl2)
+    pkg_search_module(SDL2MIXER REQUIRED SDL2_mixer)
 
     # Link Frameworks on OSX
     if (IS_OS_MAC)
