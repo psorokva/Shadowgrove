@@ -323,13 +323,13 @@ bool WorldSystem::is_over() const {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A1: HANDLE CHICKEN MOVEMENT HERE
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
+
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	Motion& m = registry.motions.get(player_chicken);
-	float a = m.angle;
+	//Motion& m = registry.motions.get(player_chicken);
+	//float a = m.angle;
+
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -343,12 +343,79 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         restart_game();
 	}
 
+	// Exiting game
+	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+		printf("ESC key pressed, close window");
+		glfwSetWindowShouldClose(window, true);
+	}
+
 	// Debugging
 	if (key == GLFW_KEY_D) {
 		if (action == GLFW_RELEASE)
 			debugging.in_debug_mode = false;
 		else
 			debugging.in_debug_mode = true;
+	}
+
+	if (!registry.deathTimers.has(player_chicken)) {
+
+		Motion& motion = registry.motions.get(player_chicken);
+
+		// A1: Chicken movement
+		// Move Up
+		if (key == GLFW_KEY_UP || key == GLFW_KEY_W)
+		{
+			//motion.position = motion.position + vec2(0, -10);
+			motion.velocity = vec2(0.f, -300.f);
+			if (motion.angle != 0.f)
+			{
+				motion.velocity = vec2(-300.f, -300.f);
+				motion.velocity.x = motion.velocity.x * cos(motion.angle);
+				motion.velocity.y = motion.velocity.y * sin(motion.angle);
+			}
+		}
+
+		// Move Down
+		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S)
+		{
+			motion.velocity = vec2(0.f, 300.f);
+			if (motion.angle != 0.f)
+			{
+				motion.velocity = vec2(300.f, 300.f);
+				motion.velocity.x = motion.velocity.x * cos(motion.angle);
+				motion.velocity.y = motion.velocity.y * sin(motion.angle);
+			}
+		}
+
+		// Move Right
+		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D)
+		{
+			motion.velocity = vec2(300.f, 0.f);
+			if (motion.angle != 0.f)
+			{
+				motion.velocity = vec2(300.f, 300.f);
+				motion.velocity.y = motion.velocity.y * cos(motion.angle);
+				motion.velocity.x = motion.velocity.x * sin(motion.angle);
+			}
+		}
+
+		// Move Left
+		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A)
+		{
+			motion.velocity = vec2(-300.f, 0.f);
+			if (motion.angle != 0.f)
+			{
+				motion.velocity = vec2(-300.f, -300.f);
+				motion.velocity.y = motion.velocity.y * cos(motion.angle);
+				motion.velocity.x = motion.velocity.x * sin(motion.angle);
+			}
+		}
+
+		// Stop moving when key is released
+		if (action == GLFW_RELEASE)
+		{
+			motion.velocity = vec2(0.f, 0.f);
+		}
 	}
 
 	// Control the current speed with `<` `>`
