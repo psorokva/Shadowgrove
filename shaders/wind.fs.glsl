@@ -8,22 +8,29 @@ in vec2 texcoord;
 
 layout(location = 0) out vec4 color;
 
-vec2 distort(vec2 uv) 
-{
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A1: HANDLE THE WIND DISTORTION HERE (you may want to try sin/cos)
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+vec4 color_shift(vec4 in_color) {
+    in_color -= vec4(1.0, 1.0, 1.0, 0.0);
+    vec4 sunset = vec4(0.7, 0.4, 0.6, 0.0);
+    vec4 night = vec4(0.327, 0.185, 0.33, 0.0);
+    vec4 sunrise = vec4(0.5, 0.4, 0.5, 0.0);
 
-	return uv;
-}
+    float duration = 150.0;
+    float sunsetDuration = 50.0;
+    float nightDuration = 100.0;
 
-vec4 color_shift(vec4 in_color) 
-{
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A1: HANDLE THE COLOR SHIFTING HERE (you may want to make it blue-ish)
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (time <= sunsetDuration) {
+        // sunset to night transition
+        float t = time / sunsetDuration;
+        in_color += mix(sunset, night, t);
+    } else if (time <= nightDuration) {
+        in_color += night;
+    } else if (time <= duration) {
+        // night to sunrise transition
+        float t = (time - nightDuration) / (duration - nightDuration);
+        in_color += mix(night, sunrise, t);
+    }
 
-	return in_color;
+    return in_color;
 }
 
 vec4 fade_color(vec4 in_color) 
@@ -35,9 +42,7 @@ vec4 fade_color(vec4 in_color)
 
 void main()
 {
-	vec2 coord = distort(texcoord);
-
-    vec4 in_color = texture(screen_texture, coord);
+    vec4 in_color = texture(screen_texture, texcoord);
     color = color_shift(in_color);
     color = fade_color(color);
 }
