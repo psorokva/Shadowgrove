@@ -16,8 +16,7 @@ const size_t MAX_EAGLES = 15;
 const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
-const int TILE_SIZE = 55;
-const int MAZE_SIZE = 12;
+
 const float CHARACTER_SPEED = 150.0f;
 // evetually use pointers for this and add travesal between maps 
 //const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
@@ -26,7 +25,7 @@ const float CHARACTER_SPEED = 150.0f;
 //		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
 //		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
 //		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 2, 1},
 //		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
 //		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
 //		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
@@ -230,9 +229,15 @@ void WorldSystem::restart_game() {
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
 
+	// Create a new chicken
+	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	registry.colors.insert(player, { 1, 0.8f, 0.8f });
+
+
+
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 2; j++) {
-			createMapChunk(vec2{ i * TILE_SIZE * MAZE_SIZE, j * TILE_SIZE * MAZE_SIZE });
+			createMapChunk(vec2{ i, j });
 		}
 	}
 	createMapChunk(vec2{ 0, 0 });
@@ -245,18 +250,17 @@ void WorldSystem::restart_game() {
 
 	
 	// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
-	for (int i = 0; i < MAZE_SIZE; i++) {
-		for (int j = 0; j < MAZE_SIZE; j++) {
-			if (chunk.grid[j][i] > 0) {
-				createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, chunk.grid[j][i]);
+	for (Chunk& chunk : registry.chunks.components ) {
+		for (int i = 0; i < MAZE_SIZE; i++) {
+			for (int j = 0; j < MAZE_SIZE; j++) {
+				if (chunk.grid[i][j] > 0) {
+					// so arrays do row,col vs on screen x,y so the actual render location is swapped
+					createPlant(renderer, { j * TILE_SIZE +chunk.offset_x, i * TILE_SIZE +chunk.offset_y}, chunk.grid[i][j]);
+				}
 			}
 		}
 	}
 
-
-	// Create a new chicken
-	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
-	registry.colors.insert(player_chicken, {1, 0.8f, 0.8f});
 
 
 
@@ -330,7 +334,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	Motion& m = registry.motions.get(player_chicken);
+	Motion& m = registry.motions.get(player);
 	float a = m.angle;
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
@@ -363,32 +367,35 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		printf("Current speed = %f\n", current_speed);
 	}
 
+	if (action == GLFW_RELEASE) {
+		m.velocity = CHARACTER_SPEED * vec2{ 0.0, 0.0 };
+
+	}
 	if (action == GLFW_REPEAT && key == GLFW_KEY_RIGHT) {
-		m.velocity = CHARACTER_SPEED * vec2{ -sin(a), -cos(a) };
+		m.velocity = CHARACTER_SPEED * vec2{ 1.0, 0.0 };
 
 	} //m.velocity[0] = CHICKEN_SPEED; }
 	else if (action == GLFW_REPEAT && key == GLFW_KEY_LEFT) {
-		m.velocity = CHARACTER_SPEED * vec2{ sin(a), cos(a) };
+		m.velocity = CHARACTER_SPEED * vec2{ -1.0, 0.0 };
 
 	} // m.velocity[0] = -CHICKEN_SPEED; }
 	else if (action == GLFW_REPEAT && key == GLFW_KEY_UP) {
-		m.velocity = CHARACTER_SPEED * vec2{ -cos(a), sin(a) };
+		m.velocity = CHARACTER_SPEED * vec2{ 0.0, -1.0 };
 
 	} //m.velocity[1] = -CHICKEN_SPEED;	}
 	else if (action == GLFW_REPEAT && key == GLFW_KEY_DOWN) {
-		m.velocity = CHARACTER_SPEED * vec2{ cos(a), -sin(a) };
+		m.velocity = CHARACTER_SPEED * vec2{ 0.0, 1.0 };
 
 	} //m.velocity[1] = CHICKEN_SPEED; }
 
 	if (action == GLFW_PRESS && key == GLFW_KEY_RIGHT) {
-		m.position += vec2{ sin(a), cos(a) };
+		m.position += current_speed * vec2{ 1, 0};
 	} else if (action == GLFW_PRESS && key == GLFW_KEY_LEFT) {
-		m.position += vec2{ -cos(a), sin(a) };
+		m.position += current_speed * vec2{ -1, 0};
 	} else if (action == GLFW_PRESS && key == GLFW_KEY_UP) {
-		m.position += vec2{ cos(a), -sin(a) };
+		m.position += current_speed * vec2{ 0, -1};
 	} else if (action == GLFW_PRESS && key == GLFW_KEY_DOWN) {
-		m.position += vec2{ -sin(a), -cos(a) };
-
+		m.position += current_speed * vec2{ 0, 1};
 	}
 
 

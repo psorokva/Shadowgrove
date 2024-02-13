@@ -32,6 +32,9 @@ inline std::string mesh_path(const std::string& name) {return data_path() + "/me
 
 const int window_width_px = 900;
 const int window_height_px = 900;
+const int TILE_SIZE = 55;
+const int MAZE_SIZE = 12;
+static bool DEBUG_PRINT = true;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f

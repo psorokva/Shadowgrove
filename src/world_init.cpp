@@ -1,7 +1,7 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
 
-Entity createChicken(RenderSystem* renderer, vec2 pos) {
+Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
@@ -60,9 +60,10 @@ Entity createMapChunk( vec2 position) {
 	auto entity = Entity();
 
 	auto& chunk = registry.chunks.emplace(entity);
-	chunk.offset_x = position.x;
-	chunk.offset_y = position.y;
-
+	chunk.x = position.x;
+	chunk.y = position.y;
+	chunk.offset_x = position.x * MAZE_SIZE * TILE_SIZE;
+	chunk.offset_y = position.y * MAZE_SIZE * TILE_SIZE;
 	return entity;
 }
 
