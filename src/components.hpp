@@ -4,27 +4,29 @@
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 
+//struct {
+//	int chunk[8][8] = {
+//		{} {} {} {} {} {} {}
+//	};
+//};
+
 // Player component
-struct Player
-{
+struct Player {
 
 };
 
 // Enemy component
-struct Enemy
-{
+struct Enemy {
 
 };
 
 // Healing Potions component
-struct Healer
-{
+struct Healer {
 
 };
 
 // Escape Potions component
-struct Escaper
-{
+struct Escaper {
 
 };
 
@@ -34,14 +36,12 @@ struct Interactable {
 };
 
 // Eagles have a hard shell
-struct Deadly
-{
+struct Deadly {
 
 };
 
 // Bug and Chicken have a soft shell
-struct Eatable
-{
+struct Eatable {
 
 };
 
@@ -54,8 +54,7 @@ struct Motion {
 };
 
 // Stucture to store collision information
-struct Collision
-{
+struct Collision {
 	// Note, the first object is stored in the ECS container.entities
 	Entity other; // the second object involved in the collision
 	Collision(Entity& other) { this->other = other; };
@@ -69,40 +68,34 @@ struct Debug {
 extern Debug debugging;
 
 // Sets the brightness of the screen
-struct ScreenState
-{
+struct ScreenState {
 	float darken_screen_factor = -1;
 };
 
 // A struct to refer to debugging graphics in the ECS
-struct DebugComponent
-{
+struct DebugComponent {
 	// Note, an empty struct has size 1
 };
 
 // A timer that will be associated to dying chicken
-struct DeathTimer
-{
+struct DeathTimer {
 	float counter_ms = 3000;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
-struct ColoredVertex
-{
+struct ColoredVertex {
 	vec3 position;
 	vec3 color;
 };
 
 // Single Vertex Buffer element for textured sprites (textured.vs.glsl)
-struct TexturedVertex
-{
+struct TexturedVertex {
 	vec3 position;
 	vec2 texcoord;
 };
 
 // Mesh datastructure for storing vertex and index buffers
-struct Mesh
-{
+struct Mesh {
 	static bool loadFromOBJFile(std::string obj_path, std::vector<ColoredVertex>& out_vertices, std::vector<uint16_t>& out_vertex_indices, vec2& out_size);
 	vec2 original_size = {1,1};
 	std::vector<ColoredVertex> vertices;
@@ -134,9 +127,14 @@ struct Mesh
  */
 
 enum class TEXTURE_ASSET_ID {
-	BUG = 0,
-	EAGLE = BUG + 1,
-	TEXTURE_COUNT = EAGLE + 1
+	PLAYER_CHAR = 0,
+	PLANT_00 = PLAYER_CHAR + 1,
+	PLANT_01 = PLANT_00 + 1,
+	PLANT_02 = PLANT_01 + 1,
+	PLANT_03 = PLANT_02 + 1,
+	PLANT_04 = PLANT_03 + 1,
+	PLANT_05 = PLANT_04 + 1,
+	TEXTURE_COUNT = PLANT_05 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

@@ -10,28 +10,30 @@
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
 class RenderSystem {
-	/**
-	 * The following arrays store the assets the game will use. They are loaded
-	 * at initialization and are assumed to not be modified by the render loop.
-	 *
-	 * Whenever possible, add to these lists instead of creating dynamic state
-	 * it is easier to debug and faster to execute for the computer.
+	/**The following arrays store the assets the game will use. They are loaded at initialization and are assumed to not be modified by the render loop.
+	 * Whenever possible, add to these lists instead of creating dynamic state it is easier to debug and faster to execute for the computer.
 	 */
 	std::array<GLuint, texture_count> texture_gl_handles;
 	std::array<ivec2, texture_count> texture_dimensions;
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	// Associated id with .obj path
-	const std::vector < std::pair<GEOMETRY_BUFFER_ID, std::string>> mesh_paths =
-	{
+	const std::vector < std::pair<GEOMETRY_BUFFER_ID, std::string>> mesh_paths = {
 		  std::pair<GEOMETRY_BUFFER_ID, std::string>(GEOMETRY_BUFFER_ID::CHICKEN, mesh_path("chicken.obj"))
 		  // specify meshes of other assets here
 	};
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	const std::array<std::string, texture_count> texture_paths = {
-			textures_path("bug.png"),
-			textures_path("eagle.png") };
+			textures_path("keeper_00.png"),
+			textures_path("bush_00.png"),
+			textures_path("bush_01.png"),
+			textures_path("bush_02.png"),
+			textures_path("bush_03.png"),
+			textures_path("bush_04.png"),
+			textures_path("bush_05.png"),
+			
+	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
 
 	std::array<GLuint, effect_count> effects;
 	// Make sure these paths remain in sync with the associated enumerators.

@@ -5,8 +5,7 @@
 #include "tiny_ecs_registry.hpp"
 #include "common.hpp"
 
-class AISystem
-{
+class AISystem {
 public:
 	void step(float elapsed_ms);
 };

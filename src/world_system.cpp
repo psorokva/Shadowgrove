@@ -16,12 +16,28 @@ const size_t MAX_EAGLES = 15;
 const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
+const int TILE_SIZE = 55;
+const int MAZE_SIZE = 12;
+const float CHARACTER_SPEED = 150.0f;
+// evetually use pointers for this and add travesal between maps 
+const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
+		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
+		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
+		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
+		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
+		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
+};
+
 
 // Create the bug world
-WorldSystem::WorldSystem()
-	: points(0)
-	, next_eagle_spawn(0.f)
-	, next_bug_spawn(0.f) {
+WorldSystem::WorldSystem() : points(0), next_eagle_spawn(0.f), next_bug_spawn(0.f) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
@@ -160,19 +176,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// Spawning new eagles
-	next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.deadlys.components.size() <= MAX_EAGLES && next_eagle_spawn < 0.f) {
-		// Reset timer
-		next_eagle_spawn = (EAGLE_DELAY_MS / 2) + uniform_dist(rng) * (EAGLE_DELAY_MS / 2);
-		// Create eagle with random initial position
-        createEagle(renderer, vec2(50.f + uniform_dist(rng) * (window_width_px - 100.f), 100.f));
-	}
+	//next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
+	//if (registry.deadlys.components.size() <= MAX_EAGLES && next_eagle_spawn < 0.f) {
+	//	// Reset timer
+	//	next_eagle_spawn = (EAGLE_DELAY_MS / 2) + uniform_dist(rng) * (EAGLE_DELAY_MS / 2);
+	//	// Create eagle with random initial position
+ //       createEagle(renderer, vec2(50.f + uniform_dist(rng) * (window_width_px - 100.f), 100.f));
+	//}
 
 	// Spawning new bug
-	next_bug_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.eatables.components.size() <= MAX_BUG && next_bug_spawn < 0.f) {
-		// !!!  TODO A1: Create new bug with createBug({0,0}), as for the Eagles above
-	}
+	//next_bug_spawn -= elapsed_ms_since_last_update * current_speed;
+	//if (registry.eatables.components.size() <= MAX_BUG && next_bug_spawn < 0.f) {
+	//	// !!!  TODO A1: Create new bug with createBug({0,0}), as for the Eagles above
+	//}
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// TODO A2: HANDLE EGG SPAWN HERE
@@ -225,9 +241,23 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
+
+	// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
+	for (int i = 0; i < MAZE_SIZE; i++) {
+		for (int j = 0; j < MAZE_SIZE; j++) {
+			if (maze_map[j][i] > 0) {
+				createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, maze_map[j][i]);
+			}
+		}
+	}
+
+
 	// Create a new chicken
 	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
 	registry.colors.insert(player_chicken, {1, 0.8f, 0.8f});
+
+
+
 
 	// !! TODO A2: Enable static eggs on the ground, for reference
 	// Create eggs on the floor, use this for reference
@@ -298,6 +328,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	Motion& m = registry.motions.get(player_chicken);
+	float a = m.angle;
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -328,6 +360,55 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		current_speed += 0.1f;
 		printf("Current speed = %f\n", current_speed);
 	}
+
+	if (action == GLFW_REPEAT && key == GLFW_KEY_RIGHT) {
+		m.velocity = CHARACTER_SPEED * vec2{ -sin(a), -cos(a) };
+
+	} //m.velocity[0] = CHICKEN_SPEED; }
+	else if (action == GLFW_REPEAT && key == GLFW_KEY_LEFT) {
+		m.velocity = CHARACTER_SPEED * vec2{ sin(a), cos(a) };
+
+	} // m.velocity[0] = -CHICKEN_SPEED; }
+	else if (action == GLFW_REPEAT && key == GLFW_KEY_UP) {
+		m.velocity = CHARACTER_SPEED * vec2{ -cos(a), sin(a) };
+
+	} //m.velocity[1] = -CHICKEN_SPEED;	}
+	else if (action == GLFW_REPEAT && key == GLFW_KEY_DOWN) {
+		m.velocity = CHARACTER_SPEED * vec2{ cos(a), -sin(a) };
+
+	} //m.velocity[1] = CHICKEN_SPEED; }
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_RIGHT) {
+		m.position += vec2{ sin(a), cos(a) };
+	} else if (action == GLFW_PRESS && key == GLFW_KEY_LEFT) {
+		m.position += vec2{ -cos(a), sin(a) };
+	} else if (action == GLFW_PRESS && key == GLFW_KEY_UP) {
+		m.position += vec2{ cos(a), -sin(a) };
+	} else if (action == GLFW_PRESS && key == GLFW_KEY_DOWN) {
+		m.position += vec2{ -sin(a), -cos(a) };
+
+	}
+
+
+
+	// Control the current speed with `<` `>`
+	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
+		current_speed -= 0.1f;
+		printf("Current speed = %f\n", current_speed);
+	}
+	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
+		current_speed += 0.1f;
+		printf("Current speed = %f\n", current_speed);
+	}
+	current_speed = fmax(0.f, current_speed);
+
+	// ESC key to exit
+	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+		//printf("ESC key pressed, close window");
+		glfwSetWindowShouldClose(window, true);
+	}
+
+
 	current_speed = fmax(0.f, current_speed);
 }
 

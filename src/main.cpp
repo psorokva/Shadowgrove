@@ -13,8 +13,7 @@
 using Clock = std::chrono::high_resolution_clock;
 
 // Entry point
-int main()
-{
+int main(){
 	// Global systems
 	WorldSystem world;
 	RenderSystem renderer;
