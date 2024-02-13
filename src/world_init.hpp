@@ -18,6 +18,8 @@ Entity createChicken(RenderSystem* renderer, vec2 pos);
 
 Entity createPlant(RenderSystem* renderer, vec2 pos, int type);
 
+void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int tile_type);
+
 // the prey
 //Entity createBug(RenderSystem* renderer, vec2 position);
 //// the enemy

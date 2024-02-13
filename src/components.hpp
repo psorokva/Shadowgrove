@@ -10,6 +10,21 @@
 //	};
 //};
 
+// Tile component
+struct Tile {
+	
+	// "path" is default type 0
+	// "bush" / "forest" / "tree" will be 1 for now
+	int tile_type;
+	
+	Tile(int type) : tile_type(type) {}
+};
+
+// Bushes/Trees/Forest are impenetrable by player
+struct Impenetrable {
+
+};
+
 // Player component
 struct Player {
 

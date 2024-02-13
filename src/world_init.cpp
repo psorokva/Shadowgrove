@@ -13,7 +13,7 @@ Entity createChicken(RenderSystem* renderer, vec2 pos) {
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 300.f;
+	motion.scale = mesh.original_size * 100.f;
 	//motion.scale.y *= -1; // point front to the right
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
@@ -54,6 +54,34 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
 	
 
 	return entity;
+}
+
+void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int type) {
+	maze[row][col].tile_type = type;
+
+	auto entity = Entity();
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// TODO: remove position from motion (almost everything gets position but not motion)
+	// Initialize the position, scale, and physics components
+	auto& motion = registry.motions.emplace(entity);
+	motion.angle = 0.f;
+	motion.velocity = { 0, 0 };
+	motion.position = {row * 55, col * 55};
+
+	// Setting initial values, scale is negative to make it face the opposite way
+	motion.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
+
+	if (type == 1) {
+		registry.impenetrables.emplace(entity);
+		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	}
+	// TODO: add other variations
+	/*else {
+		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	}*/
+
 }
 
 //Entity createEagle(RenderSystem* renderer, vec2 position)
