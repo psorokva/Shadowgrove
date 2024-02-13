@@ -3,8 +3,7 @@
 #include "world_init.hpp"
 
 // Returns the local bounding coordinates scaled by the current size of the entity
-vec2 get_bounding_box(const Motion& motion)
-{
+vec2 get_bounding_box(const Motion& motion) {
 	// abs is to avoid negative scale due to the facing direction.
 	return { abs(motion.scale.x), abs(motion.scale.y) };
 }
@@ -20,8 +19,9 @@ bool collides(const Motion& motion1, const Motion& motion2) {
 	const vec2 my_bonding_box = get_bounding_box(motion2) / 2.f;
 	const float my_r_squared = dot(my_bonding_box, my_bonding_box);
 	const float r_squared = max(other_r_squared, my_r_squared);
-	if (dist_squared < r_squared)
+	if (dist_squared < r_squared) {
 		return true;
+	}
 	return false;
 }
 
@@ -34,10 +34,14 @@ void PhysicsSystem::step(float elapsed_ms) {
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
 		float step_seconds = elapsed_ms / 1000.f;
+		// TODO: check if collide with map
+		// registry.chunks
+
+		// TODO: can still move a bit towards the non passable tile ?? 
 		motion.position = motion.position + step_seconds * motion.velocity;
 
 
-
+	}
 	// Check for collisions between all moving entities
  //   ComponentContainer<Motion> &motion_container = registry.motions;
 	//for(uint i = 0; i<motion_container.components.size(); i++) {
