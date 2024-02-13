@@ -26,21 +26,13 @@ bool collides(const Motion& motion1, const Motion& motion2) {
 	return false;
 }
 
-//returns tiles { x,y chunkx, chunky }
-//ChunkLocation& getPlayerTiles(const Motion& m) {
-//	ChunkLocation cl = ChunkLocation();
-//	cl.offset_x = ( (size_t) (m.position.x / TILE_SIZE) % MAZE_SIZE);
-//	cl.offset_y = ( (size_t) (m.position.y / TILE_SIZE) % MAZE_SIZE);
-//	cl.index_x = ( (size_t) (m.position.x / TILE_SIZE) / MAZE_SIZE);
-//	cl.index_y = ( (size_t) (m.position.y / TILE_SIZE) / MAZE_SIZE);
-//	return cl;
-//}
+//returns chunk and place within chunk
 ChunkLocation* getPlayerTiles(const Motion& m) {
 	ChunkLocation *cl = new ChunkLocation();
-	cl->offset_x = ((size_t)(m.position.x / TILE_SIZE) % MAZE_SIZE);
-	cl->offset_y = ((size_t)(m.position.y / TILE_SIZE) % MAZE_SIZE);
-	cl->index_x = ((size_t)(m.position.x / TILE_SIZE) / MAZE_SIZE);
-	cl->index_y = ((size_t)(m.position.y / TILE_SIZE) / MAZE_SIZE);
+	cl->offset_x = ((size_t)((m.position.x + PLAYER_WIDTH*0.5) / TILE_SIZE) % MAZE_SIZE);
+	cl->offset_y = ((size_t)((m.position.y + PLAYER_WIDTH)/ TILE_SIZE) % MAZE_SIZE);
+	cl->index_x = ((size_t)((m.position.x + PLAYER_WIDTH * 0.5)/ TILE_SIZE) / MAZE_SIZE);
+	cl->index_y = ((size_t)((m.position.y + PLAYER_WIDTH)/ TILE_SIZE) / MAZE_SIZE);
 	return cl;
 }
 
@@ -74,7 +66,7 @@ void PhysicsSystem::step(float elapsed_ms) {
 				// check if future position is legal
 				if (chunk.grid[future_pos->offset_y][future_pos->offset_x] == 0 ) {
 					motion.position = motion.position + step_seconds * motion.velocity;
-					printf("vec4 offset: x %u ,y %u , index: x %u ,y %u \n", future_pos->offset_x, future_pos->offset_y, future_pos->index_x, future_pos->index_y);
+					//printf("vec4 offset: x %u ,y %u , index: x %u ,y %u \n", future_pos->offset_x, future_pos->offset_y, future_pos->index_x, future_pos->index_y);
 				} // else don't update also add checks for previous location after
 				else {
 					// TODO: keep motion going closer if we could get a little closer

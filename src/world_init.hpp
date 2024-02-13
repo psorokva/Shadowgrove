@@ -11,8 +11,8 @@
 //const float EAGLE_BB_HEIGHT = 0.6f * 202.f;
 const float STD_PLANT_WIDTH = 90.0f;
 const float STD_PLANT_HEIGHT = 90.0f;
-const float PLAYER_WIDTH = 120.0f;
-const float PLAYER_HEIGHT = 120.0f;
+const float PLAYER_WIDTH = 80.0f;
+const float PLAYER_HEIGHT = PLAYER_WIDTH * 2.0;
 
 // the player
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
