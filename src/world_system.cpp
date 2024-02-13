@@ -18,11 +18,15 @@ const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
 const int TILE_SIZE = 55;
 const int MAZE_SIZE = 12;
+const int MAZE_WIDTH = MAZE_SIZE;
+const int MAZE_HEIGHT = MAZE_SIZE;
+std::vector<std::pair<int, int>> generated_maze_map;
+
 const float CHARACTER_SPEED = 150.0f;
 // evetually use pointers for this and add travesal between maps 
 const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
 		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
+		{1, 2, 1, 0, 1, 1, 0, 0, 0, 0, 2, 1},
 		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
 		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
 		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
@@ -242,15 +246,35 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 
 
-	// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
-	for (int i = 0; i < MAZE_SIZE; i++) {
-		for (int j = 0; j < MAZE_SIZE; j++) {
-			if (maze_map[j][i] > 0) {
-				createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, maze_map[j][i]);
-			}
+	//// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
+	//for (int i = 0; i < MAZE_SIZE; i++) {
+	//	for (int j = 0; j < MAZE_SIZE; j++) {
+	//		if (maze_map[j][i] > 0) {
+	//			createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, maze_map[j][i]);
+	//		}
+	//	}
+	//}
+
+	// Create empty "path" maze
+	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT, std::vector<Tile>(MAZE_WIDTH, Tile(0)));
+
+	// TODO Add function generateMaze
+	// For now:
+	/*for (int col = 0; col < MAZE_HEIGHT; col++) {
+		for (int row = 0; row < MAZE_WIDTH; row++) {
+			updateTile(renderer, maze, row, col, 1);
 		}
+	}*/
+
+	for (int row = 0; row < MAZE_WIDTH; row++) {
+		updateTile(renderer, maze, row, 0, 1);
+	}
+	for (int row = 0; row < MAZE_WIDTH; row++) {
+		updateTile(renderer, maze, row, 4, 1);
 	}
 
+	//updateTile(renderer, maze, 0, 0, 1);
+	//updateTile(renderer, maze, 1, 0, 1);
 
 	// Create a new chicken
 	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
@@ -286,6 +310,11 @@ void WorldSystem::handle_collisions() {
 		// For now, we are only interested in collisions that involve the chicken
 		if (registry.players.has(entity)) {
 			//Player& player = registry.players.get(entity);
+
+			if (registry.impenetrables.has(entity_other)) {
+				// TODO: stop the player from going through wall
+				printf("Collided with wall");
+			}
 
 			// Checking Player - Deadly collisions
 			if (registry.deadlys.has(entity_other)) {

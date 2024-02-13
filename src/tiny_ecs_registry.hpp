@@ -26,6 +26,9 @@ public:
 	ComponentContainer<Healer> healers;
 	ComponentContainer<Escaper> escapers;
 	ComponentContainer<Interactable> interactables;
+	ComponentContainer<Tile> tiles;
+	ComponentContainer<Impenetrable> impenetrables;
+
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -46,6 +49,8 @@ public:
 		registry_list.push_back(&healers);
 		registry_list.push_back(&escapers);
 		registry_list.push_back(&interactables);
+		registry_list.push_back(&tiles);
+		registry_list.push_back(&impenetrables);
 	}
 
 	void clear_all_components() {
