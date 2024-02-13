@@ -14,7 +14,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
 	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
-
+	
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.players.emplace(entity);
@@ -60,6 +60,17 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
 	return entity;
 }
 
+Entity createMapChunk( vec2 position) {
+	auto entity = Entity();
+
+	auto& chunk = registry.chunks.emplace(entity);
+	chunk.x = position.x;
+	chunk.y = position.y;
+	chunk.offset_x = position.x * MAZE_SIZE * TILE_SIZE;
+	chunk.offset_y = position.y * MAZE_SIZE * TILE_SIZE;
+	return entity;
+}
+
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int type) {
 	maze[row][col].tile_type = type;
 
@@ -85,46 +96,8 @@ void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, in
 	/*else {
 		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	}*/
+
 }
-
-Entity createMapChunk( vec2 position) {
-	auto entity = Entity();
-
-	auto& chunk = registry.chunks.emplace(entity);
-	chunk.x = position.x;
-	chunk.y = position.y;
-	chunk.offset_x = position.x * MAZE_SIZE * TILE_SIZE;
-	chunk.offset_y = position.y * MAZE_SIZE * TILE_SIZE;
-	return entity;
-}
-
-//Entity createEagle(RenderSystem* renderer, vec2 position)
-//{
-//	auto entity = Entity();
-//
-//	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-//	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-//	registry.meshPtrs.emplace(entity, &mesh);
-//
-//	// Initialize the motion
-//	auto& motion = registry.motions.emplace(entity);
-//	motion.angle = 0.f;
-//	motion.velocity = { 0, 100.f };
-//	motion.position = position;
-//
-//	// Setting initial values, scale is negative to make it face the opposite way
-//	motion.scale = vec2({ -EAGLE_BB_WIDTH, EAGLE_BB_HEIGHT });
-//
-//	// Create and (empty) Eagle component to be able to refer to all eagles
-//	registry.deadlys.emplace(entity);
-//	registry.renderRequests.insert(
-//		entity,
-//		{ TEXTURE_ASSET_ID::EAGLE,
-//		 EFFECT_ASSET_ID::TEXTURED,
-//		 GEOMETRY_BUFFER_ID::SPRITE });
-//
-//	return entity;
-//}
 
 Entity createLine(vec2 position, vec2 scale) {
 	Entity entity = Entity();

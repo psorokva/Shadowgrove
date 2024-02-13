@@ -83,7 +83,6 @@ void PhysicsSystem::step(float elapsed_ms) {
 		delete future_pos;
 		// TODO: can still move a bit towards the non passable tile ?? 
 		motion.position = motion.position + step_seconds * motion.velocity;
-		//motion.position = motion.position + step_seconds * motion.velocity;
 
 
 	}

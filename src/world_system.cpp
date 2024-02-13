@@ -32,6 +32,22 @@ Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
 
+// evetually use pointers for this and add travesal between maps 
+const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
+		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
+		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
+		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
+		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
+		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
+};
+
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0), next_eagle_spawn(0.f), next_bug_spawn(0.f) {
@@ -268,19 +284,10 @@ void WorldSystem::restart_game() {
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT, std::vector<Tile>(MAZE_WIDTH, Tile(0)));
 
 	// TODO Add function generateMaze
+	
 	/*for (int col = 0; col < MAZE_HEIGHT; col++) {
 		for (int row = 0; row < MAZE_WIDTH; row++) {
 			updateTile(renderer, maze, row, col, 1);
-	
-	// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
-	for (Chunk& chunk : registry.chunks.components ) {
-		for (int i = 0; i < MAZE_SIZE; i++) {
-			for (int j = 0; j < MAZE_SIZE; j++) {
-				if (chunk.grid[i][j] > 0) {
-					// so arrays do row,col vs on screen x,y so the actual render location is swapped
-					createPlant(renderer, { j * TILE_SIZE +chunk.offset_x, i * TILE_SIZE +chunk.offset_y}, chunk.grid[i][j]);
-				}
-			}
 		}
 	}*/
 
@@ -330,6 +337,10 @@ void WorldSystem::restart_game() {
 			updateTile(renderer, maze, x, y, 1);
 		}
 	}
+
+	//// Create a new chicken
+	//player = createPlayer(renderer, { window_width_px/2, window_height_px - 200 });
+	//registry.colors.insert(player, {1, 0.8f, 0.8f});
 
 
 
@@ -534,12 +545,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			motion.velocity = vec2(0.f, 0.f);
 		}
 	}
-
-	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
-		current_speed += 0.1f;
-		printf("Current speed = %f\n", current_speed);
-	}
-
 
 	// Control the current speed with `<` `>`
 	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {

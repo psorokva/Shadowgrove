@@ -18,10 +18,10 @@ const float PLAYER_HEIGHT = PLAYER_WIDTH * 2.0;
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
 
 Entity createPlant(RenderSystem* renderer, vec2 pos, int type);
+Entity createMapChunk(vec2 position);
 
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int tile_type);
 
-Entity createMapChunk(vec2 position);
 // the prey
 //Entity createBug(RenderSystem* renderer, vec2 position);
 //// the enemy
