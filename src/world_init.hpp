@@ -11,13 +11,14 @@
 //const float EAGLE_BB_HEIGHT = 0.6f * 202.f;
 const float STD_PLANT_WIDTH = 90.0f;
 const float STD_PLANT_HEIGHT = 90.0f;
-
+const float PLAYER_WIDTH = 120.0f;
+const float PLAYER_HEIGHT = 120.0f;
 
 // the player
 Entity createChicken(RenderSystem* renderer, vec2 pos);
 
 Entity createPlant(RenderSystem* renderer, vec2 pos, int type);
-
+Entity createMapChunk(vec2 position);
 // the prey
 //Entity createBug(RenderSystem* renderer, vec2 position);
 //// the enemy

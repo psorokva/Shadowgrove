@@ -5,7 +5,7 @@ Entity createChicken(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	// Setting initial motion values
@@ -13,8 +13,8 @@ Entity createChicken(RenderSystem* renderer, vec2 pos) {
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 300.f;
-	//motion.scale.y *= -1; // point front to the right
+	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+	
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.players.emplace(entity);
@@ -55,6 +55,18 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
 
 	return entity;
 }
+
+Entity createMapChunk( vec2 position) {
+	auto entity = Entity();
+
+	auto& chunk = registry.chunks.emplace(entity);
+	chunk.offset_x = position.x;
+	chunk.offset_y = position.y;
+
+	return entity;
+}
+
+
 
 //Entity createEagle(RenderSystem* renderer, vec2 position)
 //{

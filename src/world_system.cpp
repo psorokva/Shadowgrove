@@ -20,20 +20,20 @@ const int TILE_SIZE = 55;
 const int MAZE_SIZE = 12;
 const float CHARACTER_SPEED = 150.0f;
 // evetually use pointers for this and add travesal between maps 
-const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
-		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
-		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
-		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
-		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
-		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
-};
+//const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
+//		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
+//		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
+//		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+//		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
+//		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
+//};
 
 
 // Create the bug world
@@ -230,15 +230,25 @@ void WorldSystem::restart_game() {
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
 
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 2; j++) {
+			createMapChunk(vec2{ i * TILE_SIZE * MAZE_SIZE, j * TILE_SIZE * MAZE_SIZE });
+		}
+	}
+	createMapChunk(vec2{ 0, 0 });
+
+	Chunk& chunk = registry.chunks.components[0];
+		
+	
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-
+	
 	// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
 	for (int i = 0; i < MAZE_SIZE; i++) {
 		for (int j = 0; j < MAZE_SIZE; j++) {
-			if (maze_map[j][i] > 0) {
-				createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, maze_map[j][i]);
+			if (chunk.grid[j][i] > 0) {
+				createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, chunk.grid[j][i]);
 			}
 		}
 	}
