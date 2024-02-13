@@ -13,7 +13,7 @@ Entity createChicken(RenderSystem* renderer, vec2 pos) {
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 300.f;
+	motion.scale = mesh.original_size * 100.f;
 	//motion.scale.y *= -1; // point front to the right
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
@@ -77,6 +77,7 @@ void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, in
 		registry.impenetrables.emplace(entity);
 		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	}
+	// TODO: add other variations
 	/*else {
 		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	}*/

@@ -22,22 +22,31 @@ const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
 std::vector<std::pair<int, int>> generated_maze_map;
 
-const float CHARACTER_SPEED = 150.0f;
+bool blockedNorth = false;
+bool blockedSouth = false;
+bool blockedEast = false;
+bool blockedWest = false;
+
+enum Direction { UP, DOWN, LEFT, RIGHT};
+Direction playerDirection;
+
+const float CHARACTER_SPEED = 300.0f;
+
 // evetually use pointers for this and add travesal between maps 
-const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
-		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
-		{1, 2, 1, 0, 1, 1, 0, 0, 0, 0, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
-		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
-		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
-		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
-		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
-};
+//const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
+//		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
+//		{1, 2, 1, 0, 1, 1, 0, 0, 0, 0, 2, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
+//		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
+//		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+//		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
+//		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
+//};
 
 
 // Create the bug world
@@ -259,22 +268,59 @@ void WorldSystem::restart_game() {
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT, std::vector<Tile>(MAZE_WIDTH, Tile(0)));
 
 	// TODO Add function generateMaze
-	// For now:
+	
 	/*for (int col = 0; col < MAZE_HEIGHT; col++) {
 		for (int row = 0; row < MAZE_WIDTH; row++) {
 			updateTile(renderer, maze, row, col, 1);
 		}
 	}*/
 
-	for (int row = 0; row < MAZE_WIDTH; row++) {
-		updateTile(renderer, maze, row, 0, 1);
+	// Manually create maze (for now):
+	// Horizontal:
+	// Row 0
+	for (int x = 0; x < MAZE_WIDTH; x++) {
+		updateTile(renderer, maze, x, 0, 1);
 	}
-	for (int row = 0; row < MAZE_WIDTH; row++) {
-		updateTile(renderer, maze, row, 4, 1);
+	// Row 1
+	for (int x = 0; x < 5; x++) {
+		updateTile(renderer, maze, x, 1, 1);
+	}
+	for (int x = 10; x < MAZE_WIDTH; x++) {
+		updateTile(renderer, maze, x, 1, 1);
 	}
 
-	//updateTile(renderer, maze, 0, 0, 1);
-	//updateTile(renderer, maze, 1, 0, 1);
+	// Rows 2-4
+	for (int y = 2; y < 5; y++) {
+		for (int x = 0; x < 2; x++) {
+			updateTile(renderer, maze, x, y, 1);
+		}
+	}
+	updateTile(renderer, maze, MAZE_WIDTH-1, 2, 1);
+
+	// Rows 5-7
+	for (int y = 5; y < 7; y++) {
+		for (int x = 4; x < 8; x++) {
+			updateTile(renderer, maze, x, y, 1);
+		}
+	}
+	for (int x = 4; x < 7; x++) {
+		updateTile(renderer, maze, x, 7, 1);
+	}
+	for (int y = 5; y < MAZE_HEIGHT; y++) {
+		updateTile(renderer, maze, MAZE_WIDTH - 1, y, 1);
+	}
+
+	// Rows 8-12
+	for (int y = 8; y < MAZE_HEIGHT; y++) {
+		for (int x = 0; x < 5; x++) {
+			updateTile(renderer, maze, x, y, 1);
+		}
+	}
+	for (int y = 9; y < MAZE_HEIGHT; y++) {
+		for (int x = 9; x < MAZE_WIDTH; x++) {
+			updateTile(renderer, maze, x, y, 1);
+		}
+	}
 
 	// Create a new chicken
 	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
@@ -283,7 +329,7 @@ void WorldSystem::restart_game() {
 
 
 
-	// !! TODO A2: Enable static eggs on the ground, for reference
+	// A2: Enable static eggs on the ground, for reference
 	// Create eggs on the floor, use this for reference
 	/*
 	for (uint i = 0; i < 20; i++) {
@@ -311,9 +357,34 @@ void WorldSystem::handle_collisions() {
 		if (registry.players.has(entity)) {
 			//Player& player = registry.players.get(entity);
 
+			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
-				// TODO: stop the player from going through wall
-				printf("Collided with wall");
+				
+				Motion& motion = registry.motions.get(entity);
+				// Can adjust this
+				float offset = 10.0f;
+				
+				if (playerDirection == UP) {
+					printf("Collided with North wall");
+					blockedNorth = true;
+					// Offset player position to stop from going through
+					motion.position = motion.position - vec2(0, -offset);
+				}
+				if (playerDirection == DOWN) {
+					printf("Collided with South wall");
+					blockedSouth = true;
+					motion.position = motion.position - vec2(0, offset);
+				}
+				if (playerDirection == LEFT) {
+					printf("Collided with West wall");
+					blockedWest = true;
+					motion.position = motion.position - vec2(-offset, 0);
+				}
+				if (playerDirection == RIGHT) {
+					printf("Collided with East wall");
+					blockedEast = true;
+					motion.position = motion.position - vec2(offset, 0);
+				}
 			}
 
 			// Checking Player - Deadly collisions
@@ -323,8 +394,6 @@ void WorldSystem::handle_collisions() {
 					// Scream, reset timer, and make the chicken sink
 					registry.deathTimers.emplace(entity);
 					Mix_PlayChannel(-1, chicken_dead_sound, 0);
-
-					// !!! TODO A1: change the chicken orientation and color on death
 				}
 			}
 			// Checking Player - Eatable collisions
@@ -334,8 +403,6 @@ void WorldSystem::handle_collisions() {
 					registry.remove_all_components_of(entity_other);
 					Mix_PlayChannel(-1, chicken_eat_sound, 0);
 					++points;
-
-					// !!! TODO A1: create a new struct called LightUp in components.hpp and add an instance to the chicken entity by modifying the ECS registry
 				}
 			}
 		}
@@ -343,6 +410,11 @@ void WorldSystem::handle_collisions() {
 
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
+	// Reset collision flags
+	blockedNorth = false;
+	blockedSouth = false;
+	blockedWest = false;
+	blockedEast = false;
 }
 
 // Should the game be over ?
@@ -390,50 +462,65 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		// Move Up
 		if (key == GLFW_KEY_UP || key == GLFW_KEY_W)
 		{
-			//motion.position = motion.position + vec2(0, -10);
-			motion.velocity = vec2(0.f, -300.f);
-			if (motion.angle != 0.f)
+			playerDirection = UP;
+			if (!blockedNorth && motion.position.y > 30.f) {
+				motion.velocity = vec2(0.f, -CHARACTER_SPEED);
+			}
+			// TODO fix this if using angle
+			/*if (motion.angle != 0.f)
 			{
-				motion.velocity = vec2(-300.f, -300.f);
+				motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
 				motion.velocity.x = motion.velocity.x * cos(motion.angle);
 				motion.velocity.y = motion.velocity.y * sin(motion.angle);
-			}
+			}*/
 		}
 
 		// Move Down
 		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S)
 		{
-			motion.velocity = vec2(0.f, 300.f);
-			if (motion.angle != 0.f)
+			playerDirection = DOWN;
+			if (!blockedSouth && motion.position.y < 750.f) {
+				motion.velocity = vec2(0.f, CHARACTER_SPEED);
+			}
+			
+			/*if (motion.angle != 0.f)
 			{
-				motion.velocity = vec2(300.f, 300.f);
+				motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
 				motion.velocity.x = motion.velocity.x * cos(motion.angle);
 				motion.velocity.y = motion.velocity.y * sin(motion.angle);
-			}
+			}*/
 		}
 
 		// Move Right
 		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D)
 		{
-			motion.velocity = vec2(300.f, 0.f);
-			if (motion.angle != 0.f)
+			playerDirection = RIGHT;
+			if (!blockedEast && motion.position.x < 750.f) {
+				motion.velocity = vec2(CHARACTER_SPEED, 0.f);
+			}
+			
+			/*if (motion.angle != 0.f)
 			{
-				motion.velocity = vec2(300.f, 300.f);
+				motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
 				motion.velocity.y = motion.velocity.y * cos(motion.angle);
 				motion.velocity.x = motion.velocity.x * sin(motion.angle);
-			}
+			}*/
 		}
 
 		// Move Left
 		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A)
 		{
-			motion.velocity = vec2(-300.f, 0.f);
-			if (motion.angle != 0.f)
+			playerDirection = LEFT;
+			if (!blockedWest && motion.position.x > 30.f) {
+				motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
+			}
+			
+			/*if (motion.angle != 0.f)
 			{
-				motion.velocity = vec2(-300.f, -300.f);
+				motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
 				motion.velocity.y = motion.velocity.y * cos(motion.angle);
 				motion.velocity.x = motion.velocity.x * sin(motion.angle);
-			}
+			}*/
 		}
 
 		// Stop moving when key is released
@@ -458,7 +545,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A1: HANDLE CHICKEN ROTATION HERE
+	// A1: HANDLE CHICKEN ROTATION HERE
 	// xpos and ypos are relative to the top-left of the window, the chicken's
 	// default facing direction is (1, 0)
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
