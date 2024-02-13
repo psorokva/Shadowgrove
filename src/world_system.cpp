@@ -16,8 +16,8 @@ const size_t MAX_EAGLES = 15;
 const size_t MAX_BUG = 5;
 const size_t EAGLE_DELAY_MS = 2000 * 3;
 const size_t BUG_DELAY_MS = 5000 * 3;
-const int TILE_SIZE = 55;
-const int MAZE_SIZE = 12;
+//const int TILE_SIZE = 55;
+//const int MAZE_SIZE = 12;
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
 std::vector<std::pair<int, int>> generated_maze_map;
@@ -31,22 +31,6 @@ enum Direction { UP, DOWN, LEFT, RIGHT};
 Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
-
-// evetually use pointers for this and add travesal between maps 
-//const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
-//		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
-//		{1, 2, 1, 0, 1, 1, 0, 0, 0, 0, 2, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
-//		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
-//		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-//		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
-//		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
-//};
 
 
 // Create the bug world
@@ -251,6 +235,22 @@ void WorldSystem::restart_game() {
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
 
+	// Create a new chicken
+	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	registry.colors.insert(player, { 1, 0.8f, 0.8f });
+
+
+
+	for (int i = 0; i < 2; i++) {
+		for (int j = 0; j < 2; j++) {
+			createMapChunk(vec2{ i, j });
+		}
+	}
+	createMapChunk(vec2{ 0, 0 });
+
+	Chunk& chunk = registry.chunks.components[0];
+		
+	
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
@@ -268,10 +268,19 @@ void WorldSystem::restart_game() {
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT, std::vector<Tile>(MAZE_WIDTH, Tile(0)));
 
 	// TODO Add function generateMaze
-	
 	/*for (int col = 0; col < MAZE_HEIGHT; col++) {
 		for (int row = 0; row < MAZE_WIDTH; row++) {
 			updateTile(renderer, maze, row, col, 1);
+	
+	// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
+	for (Chunk& chunk : registry.chunks.components ) {
+		for (int i = 0; i < MAZE_SIZE; i++) {
+			for (int j = 0; j < MAZE_SIZE; j++) {
+				if (chunk.grid[i][j] > 0) {
+					// so arrays do row,col vs on screen x,y so the actual render location is swapped
+					createPlant(renderer, { j * TILE_SIZE +chunk.offset_x, i * TILE_SIZE +chunk.offset_y}, chunk.grid[i][j]);
+				}
+			}
 		}
 	}*/
 
@@ -321,10 +330,6 @@ void WorldSystem::restart_game() {
 			updateTile(renderer, maze, x, y, 1);
 		}
 	}
-
-	// Create a new chicken
-	player_chicken = createChicken(renderer, { window_width_px/2, window_height_px - 200 });
-	registry.colors.insert(player_chicken, {1, 0.8f, 0.8f});
 
 
 
@@ -454,9 +459,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			debugging.in_debug_mode = true;
 	}
 
-	if (!registry.deathTimers.has(player_chicken)) {
+	if (!registry.deathTimers.has(player)) {
 
-		Motion& motion = registry.motions.get(player_chicken);
+		Motion& motion = registry.motions.get(player);
 
 		// Character movement
 		// Move Up
@@ -529,6 +534,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			motion.velocity = vec2(0.f, 0.f);
 		}
 	}
+
+	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
+		current_speed += 0.1f;
+		printf("Current speed = %f\n", current_speed);
+	}
+
 
 	// Control the current speed with `<` `>`
 	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {

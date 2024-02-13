@@ -11,15 +11,17 @@
 //const float EAGLE_BB_HEIGHT = 0.6f * 202.f;
 const float STD_PLANT_WIDTH = 90.0f;
 const float STD_PLANT_HEIGHT = 90.0f;
-
+const float PLAYER_WIDTH = 80.0f;
+const float PLAYER_HEIGHT = PLAYER_WIDTH * 2.0;
 
 // the player
-Entity createChicken(RenderSystem* renderer, vec2 pos);
+Entity createPlayer(RenderSystem* renderer, vec2 pos);
 
 Entity createPlant(RenderSystem* renderer, vec2 pos, int type);
 
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int tile_type);
 
+Entity createMapChunk(vec2 position);
 // the prey
 //Entity createBug(RenderSystem* renderer, vec2 position);
 //// the enemy

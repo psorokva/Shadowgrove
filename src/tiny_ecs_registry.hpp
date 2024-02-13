@@ -13,6 +13,7 @@ public:
 	// TODO: A1 add a LightUp component
 	ComponentContainer<DeathTimer> deathTimers;
 	ComponentContainer<Motion> motions;
+	ComponentContainer<Immobile> immobiles;
 	ComponentContainer<Collision> collisions;
 	ComponentContainer<Player> players;
 	ComponentContainer<Mesh*> meshPtrs;
@@ -28,7 +29,7 @@ public:
 	ComponentContainer<Interactable> interactables;
 	ComponentContainer<Tile> tiles;
 	ComponentContainer<Impenetrable> impenetrables;
-
+	ComponentContainer<Chunk> chunks;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -36,6 +37,7 @@ public:
 		// TODO: A1 add a LightUp component
 		registry_list.push_back(&deathTimers);
 		registry_list.push_back(&motions);
+		registry_list.push_back(&immobiles);
 		registry_list.push_back(&collisions);
 		registry_list.push_back(&players);
 		registry_list.push_back(&meshPtrs);
@@ -51,6 +53,7 @@ public:
 		registry_list.push_back(&interactables);
 		registry_list.push_back(&tiles);
 		registry_list.push_back(&impenetrables);
+		registry_list.push_back(&chunks);
 	}
 
 	void clear_all_components() {
