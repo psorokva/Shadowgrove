@@ -81,9 +81,18 @@ void PhysicsSystem::step(float elapsed_ms) {
 		//DEBUG_PRINT = false;
 		delete current_pos;
 		delete future_pos;
+
 		// TODO: can still move a bit towards the non passable tile ?? 
 		motion.position = motion.position + step_seconds * motion.velocity;
 
+
+		// Bounds checking for player
+		if (registry.players.has(entity)) {
+			motion.position[0] = std::max(motion.position[0], PLAYER_WIDTH / 2);
+			motion.position[0] = std::min(motion.position[0], window_width_px - PLAYER_WIDTH / 2);
+			motion.position[1] = std::max(motion.position[1], PLAYER_HEIGHT / 2);
+			motion.position[1] = std::min(motion.position[1], window_height_px - PLAYER_HEIGHT / 2);
+		}
 
 	}
 	// Check for collisions between all moving entities
