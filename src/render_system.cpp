@@ -10,7 +10,7 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
 	Transform transform;
-	transform.translate(motion.position);
+	transform.translate(motion.camera_position);
 	transform.scale(motion.scale);
 	// !!! TODO A1: add rotation to the chain of transformations, mind the order
 	// of transformations

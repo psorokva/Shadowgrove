@@ -14,6 +14,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
 	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+	motion.camera_position = { window_width_px / 2, window_height_px / 2 };
 	
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
@@ -42,6 +43,8 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
 
 	// Setting initial values, scale is negative to make it face the opposite way
 	motion.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
+
+	registry.impenetrables.emplace(entity);
 
 	//add to animation // choppable // etc registry.emplace(entity);
 	if (type == 1) {
