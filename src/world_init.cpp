@@ -25,6 +25,30 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createKeeper(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+
+
+	// Create and (empty) Chicken component to be able to refer to all eagles
+	registry.enemies.emplace(entity);
+	registry.deadlys.emplace(entity);
+	// TEXTURE_COUNT indicates that no txture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
 	// TODO:
 	// add to create function wich type (what tileset lookup an int) and what subset of tileset (an int)

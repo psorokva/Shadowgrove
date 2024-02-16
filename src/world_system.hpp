@@ -3,6 +3,7 @@
 // internal
 #include "common.hpp"
 #include "camera_system.hpp"
+#include "ai_system.hpp"
 
 // stlib
 #include <vector>
@@ -54,6 +55,7 @@ private:
 
 	// Game state
 	CameraSystem camera;
+	AISystem ai;
 	RenderSystem* renderer;
 	float current_speed;
 	float next_eagle_spawn;

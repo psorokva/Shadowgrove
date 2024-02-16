@@ -183,13 +183,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Remove entities that leave the screen on the left side
 	// Iterate backwards to be able to remove without unterfering with the next object to visit
 	// (the containers exchange the last element with the current)
-	for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
-	    Motion& motion = motions_registry.components[i];
-		if (motion.position.x + abs(motion.scale.x) < 0.f) {
-			if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
-				registry.remove_all_components_of(motions_registry.entities[i]);
-		}
-	}
+	//for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
+	//    Motion& motion = motions_registry.components[i];
+	//	if (motion.position.x + abs(motion.scale.x) < 0.f) {
+	//		if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
+	//			registry.remove_all_components_of(motions_registry.entities[i]);
+	//	}
+	//}
 
 	// Spawning new eagles
 	//next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
@@ -216,6 +216,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     ScreenState &screen = registry.screenStates.components[0];
 
 	camera.step();
+	ai.step();
 
     float min_counter_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
@@ -258,8 +259,10 @@ void WorldSystem::restart_game() {
 
 	// Create a new chicken
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
+	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
 
 	for (int i = 0; i < 2; i++) {

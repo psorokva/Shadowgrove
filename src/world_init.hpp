@@ -16,6 +16,7 @@ const float PLAYER_HEIGHT = PLAYER_WIDTH * 2.0;
 
 // the player
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
+Entity createKeeper(RenderSystem* renderer, vec2 pos);
 
 Entity createPlant(RenderSystem* renderer, vec2 pos, int type);
 Entity createMapChunk(vec2 position);
