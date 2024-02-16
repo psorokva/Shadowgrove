@@ -120,8 +120,11 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwSetWindowUserPointer(window, this);
 	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_key(_0, _1, _2, _3); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_move({ _0, _1 }); };
+	auto mouse_click_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_click(_0, _1, _2); };
+
 	glfwSetKeyCallback(window, key_redirect);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
+	glfwSetMouseButtonCallback(window, mouse_click_redirect);
 
 	//////////////////////////////////////
 	// Loading music and sounds with SDL
@@ -180,13 +183,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Remove entities that leave the screen on the left side
 	// Iterate backwards to be able to remove without unterfering with the next object to visit
 	// (the containers exchange the last element with the current)
-	for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
-	    Motion& motion = motions_registry.components[i];
-		if (motion.position.x + abs(motion.scale.x) < 0.f) {
-			if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
-				registry.remove_all_components_of(motions_registry.entities[i]);
-		}
-	}
+	//for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
+	//    Motion& motion = motions_registry.components[i];
+	//	if (motion.position.x + abs(motion.scale.x) < 0.f) {
+	//		if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
+	//			registry.remove_all_components_of(motions_registry.entities[i]);
+	//	}
+	//}
 
 	// Spawning new eagles
 	//next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
@@ -211,6 +214,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Processing the chicken state
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
+
+	camera.step();
+	ai.step();
 
     float min_counter_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
@@ -253,8 +259,10 @@ void WorldSystem::restart_game() {
 
 	// Create a new chicken
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
+	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
 
 	for (int i = 0; i < 2; i++) {
@@ -479,7 +487,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (key == GLFW_KEY_UP || key == GLFW_KEY_W)
 		{
 			playerDirection = UP;
-			if (!blockedNorth && motion.position.y > 30.f) {
+			if (!blockedNorth) {
 				motion.velocity = vec2(0.f, -CHARACTER_SPEED);
 			}
 			// TODO fix this if using angle
@@ -495,7 +503,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S)
 		{
 			playerDirection = DOWN;
-			if (!blockedSouth && motion.position.y < 750.f) {
+			if (!blockedSouth) {
 				motion.velocity = vec2(0.f, CHARACTER_SPEED);
 			}
 			
@@ -511,7 +519,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D)
 		{
 			playerDirection = RIGHT;
-			if (!blockedEast && motion.position.x < 750.f) {
+			if (!blockedEast) {
 				motion.velocity = vec2(CHARACTER_SPEED, 0.f);
 			}
 			
@@ -527,7 +535,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A)
 		{
 			playerDirection = LEFT;
-			if (!blockedWest && motion.position.x > 30.f) {
+			if (!blockedWest) {
 				motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
 			}
 			
@@ -567,4 +575,23 @@ void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	(vec2)mouse_position; // dummy to avoid compiler warning
+}
+
+void WorldSystem::on_mouse_click(int button, int action, int mods) {
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// A1: HANDLE CHICKEN ROTATION HERE
+	// xpos and ypos are relative to the top-left of the window, the chicken's
+	// default facing direction is (1, 0)
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//std::cout << "x: " << mouse_position[0] << ", y: " << mouse_position[1] << std::endl;
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+
+	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
+		std::cout << "TEST" << std::endl;
+		std::cout << "x: " << xpos << ", y: " << ypos << std::endl;
+		createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+	}
+	
+	
 }

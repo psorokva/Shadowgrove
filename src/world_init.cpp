@@ -14,12 +14,37 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
 	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+	motion.camera_position = { window_width_px / 2, window_height_px / 2 };
 	
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.players.emplace(entity);
 	// TEXTURE_COUNT indicates that no txture is needed
 	registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::PLAYER_CHAR, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createKeeper(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+
+
+	// Create and (empty) Chicken component to be able to refer to all eagles
+	registry.enemies.emplace(entity);
+	registry.deadlys.emplace(entity);
+	// TEXTURE_COUNT indicates that no txture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }
@@ -42,6 +67,8 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
 
 	// Setting initial values, scale is negative to make it face the opposite way
 	motion.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
+
+	registry.impenetrables.emplace(entity);
 
 	//add to animation // choppable // etc registry.emplace(entity);
 	if (type == 1) {
@@ -117,6 +144,28 @@ Entity createLine(vec2 position, vec2 scale) {
 	motion.scale = scale;
 
 	registry.debugComponents.emplace(entity);
+	return entity;
+}
+
+Entity createPotion(RenderSystem* renderer, vec2 position) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
+
+	// Create and (empty) Chicken component to be able to refer to all eagles
+	registry.healers.emplace(entity);
+	// TEXTURE_COUNT indicates that no txture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
 	return entity;
 }
 

@@ -88,6 +88,7 @@ struct Motion {
 	float angle = 0;
 	vec2 velocity = { 0, 0 };
 	vec2 scale = { 10, 10 };
+	vec2 camera_position = { 0, 0 };
 };
 
 struct Immobile {
@@ -177,7 +178,8 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_03 = PLANT_02 + 1,
 	PLANT_04 = PLANT_03 + 1,
 	PLANT_05 = PLANT_04 + 1,
-	TEXTURE_COUNT = PLANT_05 + 1
+	MUSH_00 = PLANT_05 + 1,
+	TEXTURE_COUNT = MUSH_00 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

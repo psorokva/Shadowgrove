@@ -7,5 +7,7 @@
 
 class AISystem {
 public:
-	void step(float elapsed_ms);
+	void step();
+private:
+	const int enemy_velocity_multipler = 80;
 };
