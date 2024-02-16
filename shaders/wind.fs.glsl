@@ -18,15 +18,17 @@ vec4 color_shift(vec4 in_color) {
     float sunsetDuration = 50.0;
     float nightDuration = 100.0;
 
-    if (time <= sunsetDuration) {
+    float time_adjusted = mod(time, duration);
+
+    if (time_adjusted <= sunsetDuration) {
         // sunset to night transition
-        float t = time / sunsetDuration;
+        float t = time_adjusted / sunsetDuration;
         in_color += mix(sunset, night, t);
-    } else if (time <= nightDuration) {
+    } else if (time_adjusted <= nightDuration) {
         in_color += night;
-    } else if (time <= duration) {
+    } else if (time_adjusted <= duration) {
         // night to sunrise transition
-        float t = (time - nightDuration) / (duration - nightDuration);
+        float t = (time_adjusted - nightDuration) / (duration - nightDuration);
         in_color += mix(night, sunrise, t);
     }
 
