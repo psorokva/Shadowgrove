@@ -12,8 +12,6 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 	Transform transform;
 	transform.translate(motion.position);
 	transform.scale(motion.scale);
-	// !!! TODO A1: add rotation to the chain of transformations, mind the order
-	// of transformations
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest &render_request = registry.renderRequests.get(entity);
@@ -63,7 +61,7 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
-	} else if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN || render_request.used_effect == EFFECT_ASSET_ID::EGG) {
+	} else if (render_request.used_effect == EFFECT_ASSET_ID::CHICKEN) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_color_loc = glGetAttribLocation(program, "in_color");
 		gl_has_errors();
@@ -83,7 +81,6 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 			GLint light_up_uloc = glGetUniformLocation(program, "light_up");
 			assert(light_up_uloc >= 0);
 
-			// !!! TODO A1: set the light_up shader variable using glUniform1i,
 			// similar to the glUniform1f call below. The 1f or 1i specified the type, here a single int.
 			gl_has_errors();
 		}
@@ -123,7 +120,7 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 void RenderSystem::drawToScreen() {
 	// Setting shaders
 	// get the wind texture, sprite mesh, and program
-	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::WIND]);
+	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::NIGHT]);
 	gl_has_errors();
 	// Clearing backbuffer
 	int w, h;
@@ -145,17 +142,17 @@ void RenderSystem::drawToScreen() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
 																	 // indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
-	const GLuint wind_program = effects[(GLuint)EFFECT_ASSET_ID::WIND];
+	const GLuint night_program = effects[(GLuint)EFFECT_ASSET_ID::NIGHT];
 	// Set clock
-	GLuint time_uloc = glGetUniformLocation(wind_program, "time");
-	GLuint dead_timer_uloc = glGetUniformLocation(wind_program, "darken_screen_factor");
+	GLuint time_uloc = glGetUniformLocation(night_program, "time");
+	GLuint dead_timer_uloc = glGetUniformLocation(night_program, "darken_screen_factor");
 	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
 	ScreenState &screen = registry.screenStates.get(screen_state_entity);
 	glUniform1f(dead_timer_uloc, screen.darken_screen_factor);
 	gl_has_errors();
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
-	GLint in_position_loc = glGetAttribLocation(wind_program, "in_position");
+	GLint in_position_loc = glGetAttribLocation(night_program, "in_position");
 	glEnableVertexAttribArray(in_position_loc);
 	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void *)0);
 	gl_has_errors();

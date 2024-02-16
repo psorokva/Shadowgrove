@@ -53,8 +53,6 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	float current_speed;
-	float next_eagle_spawn;
-	float next_bug_spawn;
 	Entity player;
 
 	// music references
