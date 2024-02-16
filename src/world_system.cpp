@@ -61,6 +61,8 @@ WorldSystem::~WorldSystem() {
         Mix_FreeChunk(mushroom_sound);
     if (player_death_sound != nullptr)
         Mix_FreeChunk(player_death_sound);
+    if (tree_collision_sound != nullptr)
+        Mix_FreeChunk(tree_collision_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -135,13 +137,16 @@ GLFWwindow* WorldSystem::create_window() {
     bird_sounds = Mix_LoadWAV(audio_path("bird_noises.wav").c_str());
     mushroom_sound = Mix_LoadWAV(audio_path("mushroom.wav").c_str());
     player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
+    tree_collision_sound = Mix_LoadWAV(audio_path("tree_collision.wav").c_str());
 
-	if (night_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr || player_death_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n make sure the data directory is present",
+	if (night_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
+        player_death_sound == nullptr || tree_collision_sound == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
             audio_path("forest_night.wav").c_str(),
             audio_path("bird_noises.wav").c_str(),
             audio_path("mushroom.wav").c_str(),
-            audio_path("player_death.wav").c_str());
+            audio_path("player_death.wav").c_str(),
+            audio_path("tree_collision.wav").c_str());
 
 		return nullptr;
 	}
@@ -360,6 +365,7 @@ void WorldSystem::handle_collisions() {
 				Motion& motion = registry.motions.get(entity);
 				// Can adjust this
 				float offset = 10.0f;
+                Mix_PlayChannel(-1, tree_collision_sound, 0);
 				
 				if (playerDirection == UP) {
 					printf("Collided with North wall");

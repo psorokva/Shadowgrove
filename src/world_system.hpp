@@ -65,6 +65,7 @@ private:
 	Mix_Chunk* bird_sounds;
     Mix_Chunk* mushroom_sound;
     Mix_Chunk* player_death_sound;
+    Mix_Chunk* tree_collision_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;
