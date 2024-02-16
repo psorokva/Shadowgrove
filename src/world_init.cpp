@@ -147,6 +147,28 @@ Entity createLine(vec2 position, vec2 scale) {
 	return entity;
 }
 
+Entity createPotion(RenderSystem* renderer, vec2 position) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+
+	// Create and (empty) Chicken component to be able to refer to all eagles
+	registry.healers.emplace(entity);
+	// TEXTURE_COUNT indicates that no txture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLAYER_CHAR, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 //Entity createEgg(vec2 pos, vec2 size) {
 //	auto entity = Entity();
 //
