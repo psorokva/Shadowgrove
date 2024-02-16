@@ -44,35 +44,30 @@ bool Mesh::loadFromOBJFile(std::string obj_path, std::vector<ColoredVertex>& out
 			ColoredVertex vertex;
 			int matches = fscanf(file, "%f %f %f %f %f %f\n", &vertex.position.x, &vertex.position.y, &vertex.position.z,
 				&vertex.color.x, &vertex.color.y, &vertex.color.z);
-			if (matches == 3)
+			if (matches == 3) {
 				vertex.color = { 1,1,1 };
+			}
 			out_vertices.push_back(vertex);
-		}
-		else if (strcmp(lineHeader, "vt") == 0) {
+		} else if (strcmp(lineHeader, "vt") == 0) {
 			glm::vec2 uv;
 			fscanf(file, "%f %f\n", &uv.x, &uv.y);
 			uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
 			out_uvs.push_back(uv);
-		}
-		else if (strcmp(lineHeader, "vn") == 0) {
+		} else if (strcmp(lineHeader, "vn") == 0) {
 			glm::vec3 normal;
 			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
 			out_normals.push_back(normal);
-		}
-		else if (strcmp(lineHeader, "f") == 0) {
+		} else if (strcmp(lineHeader, "f") == 0) {
 			std::string vertex1, vertex2, vertex3;
 			unsigned int vertexIndex[3], normalIndex[3], uvIndex[3];
 
 			int matches = fscanf(file, "%d %d %d\n", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2]);
-			if (matches == 1) // try again
-			{
+			if (matches == 1) { // try again			
 				// Note first vertex index is already consumed by the first fscanf call (match ==1) since it aborts on the first error
 				matches = fscanf(file, "//%d %d//%d %d//%d\n", &normalIndex[0], &vertexIndex[1], &normalIndex[1], &vertexIndex[2], &normalIndex[2]);
-				if (matches != 5) // try again
-				{
+				if (matches != 5) {	// try again
 					matches = fscanf(file, "%d/%d %d/%d/%d %d/%d/%d\n", &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
-					if (matches != 8)
-					{
+					if (matches != 8)					{
 						printf("File can't be read by our simple parser :-( Try exporting with other options\n");
 						fclose(file);
 						return false;
@@ -102,8 +97,7 @@ bool Mesh::loadFromOBJFile(std::string obj_path, std::vector<ColoredVertex>& out
 	// Compute bounds of the mesh
 	vec3 max_position = { -99999,-99999,-99999 };
 	vec3 min_position = { 99999,99999,99999 };
-	for (ColoredVertex& pos : out_vertices)
-	{
+	for (ColoredVertex& pos : out_vertices) 	{
 		max_position = glm::max(max_position, pos.position);
 		min_position = glm::min(min_position, pos.position);
 	}

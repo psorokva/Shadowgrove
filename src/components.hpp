@@ -4,11 +4,33 @@
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 
-//struct {
-//	int chunk[8][8] = {
-//		{} {} {} {} {} {} {}
-//	};
-//};
+struct Chunk {
+	int x = 0;
+	int y = 0;
+	float offset_x = 0;
+	float offset_y = 0;
+	int grid[12][12] = {
+		{1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 3, 3, 6, 4, 6, 5, 0, 0, 0},
+		{0, 0, 0, 3, 6, 4, 4, 5, 3, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6},
+	};
+};
+
+struct ChunkLocation {
+	size_t index_x = 0;
+	size_t index_y = 0;
+	size_t offset_x = 0;
+	size_t offset_y = 0;
+};
 
 // Tile component
 struct Tile {
@@ -65,6 +87,11 @@ struct Motion {
 	vec2 position = { 0, 0 };
 	float angle = 0;
 	vec2 velocity = { 0, 0 };
+	vec2 scale = { 10, 10 };
+};
+
+struct Immobile {
+	vec2 position = { 0, 0 };
 	vec2 scale = { 10, 10 };
 };
 
@@ -143,7 +170,8 @@ struct Mesh {
 
 enum class TEXTURE_ASSET_ID {
 	PLAYER_CHAR = 0,
-	PLANT_00 = PLAYER_CHAR + 1,
+	KEEPER = PLAYER_CHAR + 1,
+	PLANT_00 = KEEPER +1,
 	PLANT_01 = PLANT_00 + 1,
 	PLANT_02 = PLANT_01 + 1,
 	PLANT_03 = PLANT_02 + 1,
