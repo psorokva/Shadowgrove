@@ -72,15 +72,6 @@ struct Interactable {
 
 };
 
-// Eagles have a hard shell
-struct Deadly {
-
-};
-
-// Bug and Chicken have a soft shell
-struct Eatable {
-
-};
 
 // All data relevant to the shape and motion of entities
 struct Motion {
@@ -185,19 +176,17 @@ const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum class EFFECT_ASSET_ID {
 	COLOURED = 0,
-	EGG = COLOURED + 1,
-	CHICKEN = EGG + 1,
+	CHICKEN = COLOURED + 1,
 	TEXTURED = CHICKEN + 1,
-	WIND = TEXTURED + 1,
-	EFFECT_COUNT = WIND + 1
+	NIGHT = TEXTURED + 1,
+	EFFECT_COUNT = NIGHT + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum class GEOMETRY_BUFFER_ID {
 	CHICKEN = 0,
 	SPRITE = CHICKEN + 1,
-	EGG = SPRITE + 1,
-	DEBUG_LINE = EGG + 1,
+	DEBUG_LINE = SPRITE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	GEOMETRY_COUNT = SCREEN_TRIANGLE + 1
 };
@@ -205,7 +194,7 @@ const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
 struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
-	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
+	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::CHICKEN;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 };
 

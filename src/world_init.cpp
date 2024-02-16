@@ -133,7 +133,7 @@ Entity createLine(vec2 position, vec2 scale) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-		 EFFECT_ASSET_ID::EGG,
+		 EFFECT_ASSET_ID::EFFECT_COUNT,
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
 	// Create motion
@@ -168,26 +168,4 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 
 	return entity;
 }
-
-//Entity createEgg(vec2 pos, vec2 size) {
-//	auto entity = Entity();
-//
-//	// Setting initial motion values
-//	Motion& motion = registry.motions.emplace(entity);
-//	motion.position = pos;
-//	motion.angle = 0.f;
-//	motion.velocity = { 0.f, 0.f };
-//	motion.scale = size;
-//
-//	// Create and (empty) Chicken component to be able to refer to all eagles
-//	registry.deadlys.emplace(entity);
-//	registry.renderRequests.insert(
-//		entity,
-//		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
-//			EFFECT_ASSET_ID::EGG,
-//			GEOMETRY_BUFFER_ID::EGG });
-//
-//	return entity;
-//}
-
 
