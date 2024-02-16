@@ -363,3 +363,28 @@ MigrationBackup/
 
 FodyWeavers.xsd
 /ext/project_path.hpp
+
+# CMake generated files
+CMakeLists.txt
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.make
+*.cmake
+
+# CMake user-specific files
+/*.user
+
+# CTest output
+Testing/
+
+# Exclude build directories
+build/
+cmake-build-debug/
+cmake-build-release/
+
+.cmake/
+.idea/
+Makefile
+

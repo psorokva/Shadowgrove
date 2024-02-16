@@ -12,10 +12,6 @@
 #include "physics_system.hpp"
 
 // Game configuration
-const size_t MAX_EAGLES = 15;
-const size_t MAX_BUG = 5;
-const size_t EAGLE_DELAY_MS = 2000 * 3;
-const size_t BUG_DELAY_MS = 5000 * 3;
 //const int TILE_SIZE = 55;
 //const int MAZE_SIZE = 12;
 const int MAZE_WIDTH = MAZE_SIZE;
@@ -50,19 +46,13 @@ const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
 
 
 // Create the bug world
-WorldSystem::WorldSystem() : points(0), next_eagle_spawn(0.f), next_bug_spawn(0.f) {
+WorldSystem::WorldSystem() : points(0) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
 
 WorldSystem::~WorldSystem() {
 	// Destroy music components
-	if (background_music != nullptr)
-		Mix_FreeMusic(background_music);
-	if (chicken_dead_sound != nullptr)
-		Mix_FreeChunk(chicken_dead_sound);
-	if (chicken_eat_sound != nullptr)
-		Mix_FreeChunk(chicken_eat_sound);
 	if (night_music != nullptr)
 	    Mix_FreeMusic(night_music);
 	if (bird_sounds != nullptr)
@@ -137,17 +127,11 @@ GLFWwindow* WorldSystem::create_window() {
 		return nullptr;
 	}
 
-	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
-	chicken_dead_sound = Mix_LoadWAV(audio_path("chicken_dead.wav").c_str());
-	chicken_eat_sound = Mix_LoadWAV(audio_path("chicken_eat.wav").c_str());
     night_music = Mix_LoadMUS(audio_path("forest_night.wav").c_str());
     bird_sounds = Mix_LoadWAV(audio_path("bird_noises.wav").c_str());
 
-	if (night_music == nullptr || bird_sounds == nullptr || background_music == nullptr || chicken_dead_sound == nullptr || chicken_eat_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
-			audio_path("music.wav").c_str(),
-			audio_path("chicken_dead.wav").c_str(),
-			audio_path("chicken_eat.wav").c_str(),
+	if (night_music == nullptr || bird_sounds == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n make sure the data directory is present",
             audio_path("forest_night.wav").c_str(),
             audio_path("bird_noises.wav").c_str());
 		return nullptr;
@@ -190,26 +174,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//			registry.remove_all_components_of(motions_registry.entities[i]);
 	//	}
 	//}
-
-	// Spawning new eagles
-	//next_eagle_spawn -= elapsed_ms_since_last_update * current_speed;
-	//if (registry.deadlys.components.size() <= MAX_EAGLES && next_eagle_spawn < 0.f) {
-	//	// Reset timer
-	//	next_eagle_spawn = (EAGLE_DELAY_MS / 2) + uniform_dist(rng) * (EAGLE_DELAY_MS / 2);
-	//	// Create eagle with random initial position
- //       createEagle(renderer, vec2(50.f + uniform_dist(rng) * (window_width_px - 100.f), 100.f));
-	//}
-
-	// Spawning new bug
-	//next_bug_spawn -= elapsed_ms_since_last_update * current_speed;
-	//if (registry.eatables.components.size() <= MAX_BUG && next_bug_spawn < 0.f) {
-	//	// !!!  TODO A1: Create new bug with createBug({0,0}), as for the Eagles above
-	//}
-
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A2: HANDLE EGG SPAWN HERE
-	// DON'T WORRY ABOUT THIS UNTIL ASSIGNMENT 2
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	// Processing the chicken state
 	assert(registry.screenStates.components.size() <= 1);
