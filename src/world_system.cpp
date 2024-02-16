@@ -589,7 +589,7 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
 		std::cout << "x: " << xpos << ", y: " << ypos << std::endl;
-		createPlant(renderer, camera.adjust_to_player(vec2{ xpos, ypos }), 1);
+		createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 	}
 	
 }

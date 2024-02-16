@@ -159,12 +159,12 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 	motion.position = position;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.healers.emplace(entity);
 	// TEXTURE_COUNT indicates that no txture is needed
-	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLAYER_CHAR, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }
