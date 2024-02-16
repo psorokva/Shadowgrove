@@ -57,6 +57,10 @@ WorldSystem::~WorldSystem() {
 	    Mix_FreeMusic(night_music);
 	if (bird_sounds != nullptr)
 	    Mix_FreeChunk(bird_sounds);
+    if (mushroom_sound != nullptr)
+        Mix_FreeChunk(mushroom_sound);
+    if (player_death_sound != nullptr)
+        Mix_FreeChunk(player_death_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -129,11 +133,16 @@ GLFWwindow* WorldSystem::create_window() {
 
     night_music = Mix_LoadMUS(audio_path("forest_night.wav").c_str());
     bird_sounds = Mix_LoadWAV(audio_path("bird_noises.wav").c_str());
+    mushroom_sound = Mix_LoadWAV(audio_path("mushroom.wav").c_str());
+    player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
 
-	if (night_music == nullptr || bird_sounds == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n make sure the data directory is present",
+	if (night_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr || player_death_sound == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n make sure the data directory is present",
             audio_path("forest_night.wav").c_str(),
-            audio_path("bird_noises.wav").c_str());
+            audio_path("bird_noises.wav").c_str(),
+            audio_path("mushroom.wav").c_str(),
+            audio_path("player_death.wav").c_str());
+
 		return nullptr;
 	}
 
@@ -374,6 +383,30 @@ void WorldSystem::handle_collisions() {
 					motion.position = motion.position - vec2(offset, 0);
 				}
 			}
+
+			// Checking Player - Deadly collisions
+			if (registry.deadlys.has(entity_other)) {
+				// initiate death unless already dying
+				if (!registry.deathTimers.has(entity)) {
+					// Scream, reset timer, and make the chicken sink
+					registry.deathTimers.emplace(entity);
+
+					// so that player stops moving after collision with keeper
+					registry.motions.get(player).velocity = { 0, 0 };
+					Mix_PlayChannel(-1, player_death_sound, 0);
+				}
+			}
+			// Checking Player - Eatable collisions
+			else if (registry.healers.has(entity_other)) {
+				if (!registry.deathTimers.has(entity)) {
+					// chew, count points, and set the LightUp timer
+					if (points < 5) {
+						registry.remove_all_components_of(entity_other);
+						Mix_PlayChannel(-1, mushroom_sound, 0);
+						++points;
+					}
+				}
+			}
 		}
 	}
 
@@ -533,9 +566,10 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
-		std::cout << "TEST" << std::endl;
-		std::cout << "x: " << xpos << ", y: " << ypos << std::endl;
-		createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		if (points <= 5) {
+			createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		}
+		
 	}
 	
 	

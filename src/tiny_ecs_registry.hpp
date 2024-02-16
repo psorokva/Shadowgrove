@@ -23,6 +23,7 @@ public:
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<Healer> healers;
 	ComponentContainer<Escaper> escapers;
+    ComponentContainer<Deadly> deadlys;
 	ComponentContainer<Interactable> interactables;
 	ComponentContainer<Tile> tiles;
 	ComponentContainer<Impenetrable> impenetrables;
@@ -45,6 +46,7 @@ public:
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&healers);
 		registry_list.push_back(&escapers);
+        registry_list.push_back(&deadlys);
 		registry_list.push_back(&interactables);
 		registry_list.push_back(&chunks);
 		registry_list.push_back(&tiles);

@@ -67,6 +67,10 @@ struct Escaper {
 
 };
 
+struct Deadly {
+
+};
+
 // Interactable component (trees & potions)
 struct Interactable {
 
