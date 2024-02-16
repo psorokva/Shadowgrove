@@ -588,8 +588,10 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
+		std::cout << "TEST" << std::endl;
 		std::cout << "x: " << xpos << ", y: " << ypos << std::endl;
 		createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 	}
+	
 	
 }
