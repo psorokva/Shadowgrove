@@ -9,5 +9,5 @@ class AISystem {
 public:
 	void step();
 private:
-	const int enemy_velocity_multipler = 40;
+	const int enemy_velocity_multipler = 80;
 };
