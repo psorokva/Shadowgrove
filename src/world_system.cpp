@@ -374,6 +374,30 @@ void WorldSystem::handle_collisions() {
 					motion.position = motion.position - vec2(offset, 0);
 				}
 			}
+
+			// Checking Player - Deadly collisions
+			if (registry.deadlys.has(entity_other)) {
+				// initiate death unless already dying
+				if (!registry.deathTimers.has(entity)) {
+					// Scream, reset timer, and make the chicken sink
+					registry.deathTimers.emplace(entity);
+
+					// so that player stops moving after collision with keeper
+					registry.motions.get(player).velocity = { 0, 0 };
+					Mix_PlayChannel(-1, chicken_dead_sound, 0);
+				}
+			}
+			// Checking Player - Eatable collisions
+			else if (registry.healers.has(entity_other)) {
+				if (!registry.deathTimers.has(entity)) {
+					// chew, count points, and set the LightUp timer
+					if (points < 5) {
+						registry.remove_all_components_of(entity_other);
+						Mix_PlayChannel(-1, chicken_eat_sound, 0);
+						++points;
+					}
+				}
+			}
 		}
 	}
 
@@ -533,9 +557,10 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
-		std::cout << "TEST" << std::endl;
-		std::cout << "x: " << xpos << ", y: " << ypos << std::endl;
-		createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		if (points <= 5) {
+			createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		}
+		
 	}
 	
 	
