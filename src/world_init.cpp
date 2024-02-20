@@ -164,7 +164,28 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.healers.emplace(entity);
 	// TEXTURE_COUNT indicates that no txture is needed
-	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	int potion_colour_offset = rand() % 5; 
+	switch (potion_colour_offset) {
+		case (0):
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (1):
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (2):
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (3):
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (4):
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (5):
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+	}
+	
 
 	return entity;
 }

@@ -33,8 +33,13 @@ class RenderSystem {
 			textures_path("bush_08.png"),
 			textures_path("bush_10.png"),
 			textures_path("bush_11.png"),
-			textures_path("mush_00.png")
-			
+			textures_path("mush_00.png"),
+			textures_path("potion_00.png"),
+			textures_path("potion_01.png"),
+			textures_path("potion_02.png"),
+			textures_path("potion_03.png"),
+			textures_path("potion_04.png"),
+			textures_path("potion_05.png"),
 	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
 
 	std::array<GLuint, effect_count> effects;

@@ -5,8 +5,7 @@ void AISystem::step() {
 	auto& enemy_registry = registry.enemies;
 	auto& player = registry.players.entities[0];
 	Motion player_position = registry.motions.get(player);
-	for (uint i = 0; i < enemy_registry.size(); i++)
-	{
+	for (uint i = 0; i < enemy_registry.size(); i++) {
 		// !!! TODO A1: update motion.position based on step_seconds and motion.velocity
 		Enemy& enemy = enemy_registry.components[i];
 		Entity entity = enemy_registry.entities[i];

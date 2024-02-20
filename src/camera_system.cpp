@@ -6,8 +6,7 @@ void CameraSystem::step() {
 	auto& player = registry.players.entities[0];
 	Motion& player_motion = motion_registry.get(player);
 
-	for (uint i = 0; i < motion_registry.size(); i++)
-	{
+	for (uint i = 0; i < motion_registry.size(); i++) {
 		// !!! TODO A1: update motion.position based on step_seconds and motion.velocity
 		Entity entity = motion_registry.entities[i];
 		if (player == entity) {
