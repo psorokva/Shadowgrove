@@ -9,6 +9,7 @@
 #include "physics_system.hpp"
 #include "render_system.hpp"
 #include "world_system.hpp"
+#include "map_generator.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -18,6 +19,9 @@ int main(){
 	WorldSystem world;
 	RenderSystem renderer;
 	PhysicsSystem physics;
+	MapGen generator;
+
+	generator.createWorldMap(2, 2);
 
 	// Initializing window
 	GLFWwindow* window = world.create_window();
@@ -28,9 +32,15 @@ int main(){
 		return EXIT_FAILURE;
 	}
 
+
+
 	// initialize the main systems
 	renderer.init(window);
-	world.init(&renderer);
+	
+
+	world.init(&renderer, &generator);
+
+	
 
 	// variable timestep loop
 	auto t = Clock::now();

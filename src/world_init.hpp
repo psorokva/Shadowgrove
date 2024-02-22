@@ -16,7 +16,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos);
 Entity createKeeper(RenderSystem* renderer, vec2 pos);
 
 Entity createPlant(RenderSystem* renderer, vec2 pos, int type);
-Entity createMapChunk(vec2 position);
+//Entity createMapChunk(vec2 position);
 Entity createPotion(RenderSystem* renderer, vec2 position);
 
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int tile_type);

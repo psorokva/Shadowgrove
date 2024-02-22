@@ -87,16 +87,16 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
 	return entity;
 }
 
-Entity createMapChunk( vec2 position) {
-	auto entity = Entity();
-
-	auto& chunk = registry.chunks.emplace(entity);
-	chunk.x = position.x;
-	chunk.y = position.y;
-	chunk.offset_x = position.x * MAZE_SIZE * TILE_SIZE;
-	chunk.offset_y = position.y * MAZE_SIZE * TILE_SIZE;
-	return entity;
-}
+//Entity createMapChunk( vec2 position) {
+//	auto entity = Entity();
+//
+//	auto& chunk = registry.chunks.emplace(entity);
+//	chunk.x = position.x;
+//	chunk.y = position.y;
+//	chunk.offset_x = position.x * MAZE_SIZE * TILE_SIZE;
+//	chunk.offset_y = position.y * MAZE_SIZE * TILE_SIZE;
+//	return entity;
+//}
 
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int type) {
 	maze[row][col].tile_type = type;

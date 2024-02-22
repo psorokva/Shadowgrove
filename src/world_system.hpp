@@ -12,7 +12,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_mixer.h>
-
+#include "map_generator.hpp"
 #include "render_system.hpp"
 
 // Container for all our entities and game logic. Individual rendering / update is
@@ -25,7 +25,7 @@ public:
 	GLFWwindow* create_window();
 
 	// starts the game
-	void init(RenderSystem* renderer);
+	void init(RenderSystem* renderer, MapGen* generator);
 
 	// Releases all associated resources
 	~WorldSystem();
@@ -57,6 +57,7 @@ private:
 	CameraSystem camera;
 	AISystem ai;
 	RenderSystem* renderer;
+	MapGen* generator;
 	float current_speed;
 	Entity player;
 

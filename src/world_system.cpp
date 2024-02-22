@@ -29,20 +29,20 @@ Direction playerDirection;
 const float CHARACTER_SPEED = 300.0f;
 
 // evetually use pointers for this and add travesal between maps 
-const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
-		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
-		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
-		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
-		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
-		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
-		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
-};
+//const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
+//		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
+//		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
+//		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
+//		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
+//		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
+//		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
+//};
 
 
 // Create the bug world
@@ -154,8 +154,9 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
-void WorldSystem::init(RenderSystem* renderer_arg) {
+void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
 	this->renderer = renderer_arg;
+	this->generator = generator_arg;
 	// Playing background music indefinitely
 	Mix_PlayMusic(night_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -243,31 +244,38 @@ void WorldSystem::restart_game() {
 	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
 
-	for (int i = 0; i < 2; i++) {
-		for (int j = 0; j < 2; j++) {
-			createMapChunk(vec2{ i, j });
-		}
-	}
-	createMapChunk(vec2{ 0, 0 });
 
-	Chunk& chunk = registry.chunks.components[0];
+	//Chunk& chunk = registry.chunks.components[0];
 		
 	
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-
-	//// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
-	//for (int i = 0; i < MAZE_SIZE; i++) {
-	//	for (int j = 0; j < MAZE_SIZE; j++) {
-	//		if (maze_map[j][i] > 0) {
-	//			createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, maze_map[j][i]);
-	//		}
-	//	}
-	//}
-
 	// Create empty "path" maze
-	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT, std::vector<Tile>(MAZE_WIDTH, Tile(0)));
+	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
+	//// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
+	auto& chunks = generator->chunks;
+	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
+	//for (Chunk c : chunks) {
+	for (uint i = 0; i < chunks.size(); i++) { //chunks.size()
+		for (int row = 0; row < MAZE_SIZE; row++) {
+			for (int col = 0; col < MAZE_SIZE; col++) {
+				Chunk c = chunks[i];
+				if ( c.grid[row][col] > 0) {
+					//createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, maze_map[j][i]);
+					//printf("tile: %d %d ", c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col);
+					//updateTile(renderer, maze, c.offset_y + row, c.offset_x + col, 1);
+					updateTile(renderer, maze, c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col, c.grid[row][col]);
+				}
+				
+			}
+			//printf("\n");
+		}
+		//printf("--------\n");
+	}
+
+
+	
 
 	// TODO Add function generateMaze
 	
@@ -277,52 +285,52 @@ void WorldSystem::restart_game() {
 		}
 	}*/
 
-	// Manually create maze (for now):
-	// Horizontal:
-	// Row 0
-	for (int x = 0; x < MAZE_WIDTH; x++) {
-		updateTile(renderer, maze, x, 0, 1);
-	}
-	// Row 1
-	for (int x = 0; x < 5; x++) {
-		updateTile(renderer, maze, x, 1, 1);
-	}
-	for (int x = 10; x < MAZE_WIDTH; x++) {
-		updateTile(renderer, maze, x, 1, 1);
-	}
+	//// Manually create maze (for now):
+	//// Horizontal:
+	//// Row 0
+	//for (int x = 0; x < MAZE_WIDTH; x++) {
+	//	updateTile(renderer, maze, x, 0, 1);
+	//}
+	//// Row 1
+	//for (int x = 0; x < 5; x++) {
+	//	updateTile(renderer, maze, x, 1, 1);
+	//}
+	//for (int x = 10; x < MAZE_WIDTH; x++) {
+	//	updateTile(renderer, maze, x, 1, 1);
+	//}
 
-	// Rows 2-4
-	for (int y = 2; y < 5; y++) {
-		for (int x = 0; x < 2; x++) {
-			updateTile(renderer, maze, x, y, 1);
-		}
-	}
-	updateTile(renderer, maze, MAZE_WIDTH-1, 2, 1);
+	//// Rows 2-4
+	//for (int y = 2; y < 5; y++) {
+	//	for (int x = 0; x < 2; x++) {
+	//		updateTile(renderer, maze, x, y, 1);
+	//	}
+	//}
+	//updateTile(renderer, maze, MAZE_WIDTH-1, 2, 1);
 
-	// Rows 5-7
-	for (int y = 5; y < 7; y++) {
-		for (int x = 4; x < 8; x++) {
-			updateTile(renderer, maze, x, y, 1);
-		}
-	}
-	for (int x = 4; x < 7; x++) {
-		updateTile(renderer, maze, x, 7, 1);
-	}
-	for (int y = 5; y < MAZE_HEIGHT; y++) {
-		updateTile(renderer, maze, MAZE_WIDTH - 1, y, 1);
-	}
+	//// Rows 5-7
+	//for (int y = 5; y < 7; y++) {
+	//	for (int x = 4; x < 8; x++) {
+	//		updateTile(renderer, maze, x, y, 1);
+	//	}
+	//}
+	//for (int x = 4; x < 7; x++) {
+	//	updateTile(renderer, maze, x, 7, 1);
+	//}
+	//for (int y = 5; y < MAZE_HEIGHT; y++) {
+	//	updateTile(renderer, maze, MAZE_WIDTH - 1, y, 1);
+	//}
 
-	// Rows 8-12
-	for (int y = 8; y < MAZE_HEIGHT; y++) {
-		for (int x = 0; x < 5; x++) {
-			updateTile(renderer, maze, x, y, 1);
-		}
-	}
-	for (int y = 9; y < MAZE_HEIGHT; y++) {
-		for (int x = 9; x < MAZE_WIDTH; x++) {
-			updateTile(renderer, maze, x, y, 1);
-		}
-	}
+	//// Rows 8-12
+	//for (int y = 8; y < MAZE_HEIGHT; y++) {
+	//	for (int x = 0; x < 5; x++) {
+	//		updateTile(renderer, maze, x, y, 1);
+	//	}
+	//}
+	//for (int y = 9; y < MAZE_HEIGHT; y++) {
+	//	for (int x = 9; x < MAZE_WIDTH; x++) {
+	//		updateTile(renderer, maze, x, y, 1);
+	//	}
+	//}
 
 	//// Create a new chicken
 	//player = createPlayer(renderer, { window_width_px/2, window_height_px - 200 });
@@ -368,23 +376,23 @@ void WorldSystem::handle_collisions() {
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
 				
 				if (playerDirection == UP) {
-					printf("Collided with North wall");
+					//printf("Collided with North wall");
 					blockedNorth = true;
 					// Offset player position to stop from going through
 					motion.position = motion.position - vec2(0, -offset);
 				}
 				if (playerDirection == DOWN) {
-					printf("Collided with South wall");
+					//printf("Collided with South wall");
 					blockedSouth = true;
 					motion.position = motion.position - vec2(0, offset);
 				}
 				if (playerDirection == LEFT) {
-					printf("Collided with West wall");
+					//printf("Collided with West wall");
 					blockedWest = true;
 					motion.position = motion.position - vec2(-offset, 0);
 				}
 				if (playerDirection == RIGHT) {
-					printf("Collided with East wall");
+					//printf("Collided with East wall");
 					blockedEast = true;
 					motion.position = motion.position - vec2(offset, 0);
 				}
@@ -470,8 +478,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 		// Character movement
 		// Move Up
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_W)
-		{
+		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
 			playerDirection = UP;
 			if (!blockedNorth) {
 				motion.velocity = vec2(0.f, -CHARACTER_SPEED);
@@ -486,8 +493,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 
 		// Move Down
-		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S)
-		{
+		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
 			playerDirection = DOWN;
 			if (!blockedSouth) {
 				motion.velocity = vec2(0.f, CHARACTER_SPEED);
@@ -502,8 +508,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 
 		// Move Right
-		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D)
-		{
+		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
 			playerDirection = RIGHT;
 			if (!blockedEast) {
 				motion.velocity = vec2(CHARACTER_SPEED, 0.f);
@@ -518,8 +523,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 
 		// Move Left
-		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A)
-		{
+		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
 			playerDirection = LEFT;
 			if (!blockedWest) {
 				motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
@@ -534,8 +538,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 
 		// Stop moving when key is released
-		if (action == GLFW_RELEASE)
-		{
+		if (action == GLFW_RELEASE) {
 			motion.velocity = vec2(0.f, 0.f);
 		}
 	}
