@@ -262,10 +262,15 @@ void WorldSystem::restart_game() {
 			for (int col = 0; col < MAZE_SIZE; col++) {
 				Chunk c = chunks[i];
 				if ( c.grid[row][col] > 0) {
-					//createPlant(renderer, { j * TILE_SIZE, i * TILE_SIZE }, maze_map[j][i]);
+					int major_row = c.y * MAZE_SIZE + row;
+					int major_col = c.x * MAZE_SIZE + col;
+					int plant_x = c.offset_x + col * TILE_SIZE;
+					int plant_y = c.offset_y + row * TILE_SIZE;
+					// TODO store plant type in // c.grid[row][col]
+					createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); // 
 					//printf("tile: %d %d ", c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col);
 					//updateTile(renderer, maze, c.offset_y + row, c.offset_x + col, 1);
-					updateTile(renderer, maze, c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col, c.grid[row][col]);
+					//updateTile(renderer, maze, c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col, c.grid[row][col]);
 				}
 				
 			}
@@ -512,6 +517,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			playerDirection = RIGHT;
 			if (!blockedEast) {
 				motion.velocity = vec2(CHARACTER_SPEED, 0.f);
+				motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
 			}
 			
 			/*if (motion.angle != 0.f)
@@ -527,6 +533,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			playerDirection = LEFT;
 			if (!blockedWest) {
 				motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
+				motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
 			}
 			
 			/*if (motion.angle != 0.f)

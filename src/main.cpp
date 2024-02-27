@@ -19,9 +19,9 @@ int main(){
 	WorldSystem world;
 	RenderSystem renderer;
 	PhysicsSystem physics;
-	MapGen generator;
+	MapGen generator(3,3);
 
-	generator.createWorldMap(2, 2);
+	generator.createWorldMap();
 
 	// Initializing window
 	GLFWwindow* window = world.create_window();

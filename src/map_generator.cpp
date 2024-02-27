@@ -13,8 +13,85 @@
 
 
 
-MapGen::MapGen() {
+MapGen::MapGen(int maprows, int mapcols) {
+	// init noise grid withnoise levels of noise
+	rows = maprows;
+	cols = mapcols;
+	const int RARITY = 14;
+	const int NOISE_LEVELS = 10;
+	const int BIG_WIDTH = cols * MAZE_SIZE;
+	const int BIG_HEIGHT = rows * MAZE_SIZE;
 	chunks = std::vector<Chunk>();
+	bignoise = new int* [BIG_HEIGHT];
+	for (int i = 0; i < BIG_HEIGHT; ++i) {
+		bignoise[i] = new int[BIG_WIDTH];
+		for (int j = 0; j < BIG_WIDTH; ++j) {
+			bignoise[i][j] = rand() % NOISE_LEVELS; //random number between 0 and 4 incl
+			//printf(" %x", bignoise[i][j]);
+		}
+		//printf("\n");
+	}
+
+	// init biome filter grid with 1s
+	biome_filter = new int* [BIG_HEIGHT];
+	for (int i = 0; i < BIG_HEIGHT; ++i) {
+		biome_filter[i] = new int[BIG_WIDTH];
+		for (int j = 0; j < BIG_WIDTH; ++j) {
+			biome_filter[i][j] = 1;
+		}
+	}
+	for (int i = 0; i < BIG_HEIGHT; ++i) {
+		for (int j = 0; j < BIG_WIDTH; ++j) {
+			if (rand() % RARITY == 1) {
+				//int shot_grid[5][5];
+				int shot_type = rand() % 8;
+				int SMALLMAX = 5;
+				if (shot_type > 3) {
+					SMALLMAX = 7;
+				}
+				for (int r = 0; r < SMALLMAX; r++) {
+					for (int c = 0; c < SMALLMAX; c++) {
+						if ((i + r) < BIG_HEIGHT && (j + c < BIG_WIDTH)) {
+
+							switch (shot_type) {
+							case 0:
+								biome_filter[i + r][j + c] += biome_shotgun_00[r][c];
+								break;
+							case 1:
+								biome_filter[i + r][j + c] += biome_shotgun_01[r][c];
+								break;
+							case 2:
+								biome_filter[i + r][j + c] += biome_shotgun_02[r][c];
+								break;
+							case 3:
+								biome_filter[i + r][j + c] += biome_shotgun_03[r][c];
+								break;
+							case 4:
+								biome_filter[i + r][j + c] += biome_shotgun_10[r][c];
+								break;
+							case 5:
+								biome_filter[i + r][j + c] += biome_shotgun_11[r][c];
+								break;
+							case 6:
+								biome_filter[i + r][j + c] += biome_shotgun_12[r][c];
+								break;
+							case 7:
+								biome_filter[i + r][j + c] += biome_shotgun_13[r][c];
+								break;
+							}
+							/// POSSIBLE limit value here within range of sprite sheets
+						}
+					}
+				}
+			}
+		}
+	}
+	for (int i = 0; i < BIG_HEIGHT; ++i) {
+		for (int j = 0; j < BIG_WIDTH; ++j) {
+			printf(" %x", biome_filter[i][j]);
+		}
+		printf("\n");
+	}
 }
 
 MapGen::~MapGen() {
@@ -22,7 +99,8 @@ MapGen::~MapGen() {
 }
 
 // feed into the connectio row, cols, d, h into create?
-bool MapGen::createWorldMap(int rows, int cols) {
+bool MapGen::createWorldMap() {
+
 	for (int r = 0; r < rows; r++) {
 		for (int c = 0; c < cols; c++) {
 			Chunk& chunk = createMapChunk(vec2{ r, c });
@@ -250,7 +328,13 @@ Chunk& MapGen::createMapChunk(vec2 position) {
 }
 
 
-
+void rngFillGrid(int* grid, int w, int h) {
+	for (int r = 0; r < h; r++) {
+		for (int c = 0; c < w; c++) {
+			grid[r*w + c] = rand() % 10;
+		}
+	}
+}
 
 
 

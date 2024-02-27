@@ -21,11 +21,15 @@ private:
 
 
 public:
+	int** bignoise;
+	int** biome_filter;
+	int rows;
+	int cols;
 	std::vector<Chunk> chunks;
-	MapGen();
+	MapGen(int maprows, int mapcols);
 	~MapGen();
 	//bool createChunkGrid(Chunk& chunk);
-	bool createWorldMap(int rows, int cols);
+	bool createWorldMap();
 	Chunk& createMapChunk(vec2 position);
 };
 
