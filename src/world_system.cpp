@@ -154,6 +154,11 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
+void renderInventory() {
+    // top line
+    Entity topLine = createLine({800, 10}, {10, 2});
+}
+
 void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
 	this->renderer = renderer_arg;
 	this->generator = generator_arg;
@@ -196,6 +201,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	camera.step();
 	ai.step();
+
+    // load the inventory
+    renderInventory();
 
     float min_counter_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
