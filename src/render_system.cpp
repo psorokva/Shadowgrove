@@ -127,6 +127,12 @@ void RenderSystem::drawToScreen() {
 	ScreenState &screen = registry.screenStates.get(screen_state_entity);
 	glUniform1f(dead_timer_uloc, screen.darken_screen_factor);
 	gl_has_errors();
+	
+	// add player position to shader
+	//GLint player_position = glGetAttribLocation(night_program, "player_position");
+	//vec2 pp = vec2{ 500.0, 450.0 };
+	//glUniform2f(player_position, (float)pp.x , (float)pp.y);
+	
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
 	GLint in_position_loc = glGetAttribLocation(night_program, "in_position");

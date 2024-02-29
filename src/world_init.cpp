@@ -49,7 +49,7 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
-Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
+Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int plant_type) {
 	// TODO:
 	// add to create function wich type (what tileset lookup an int) and what subset of tileset (an int)
 	// subset will identify where to offest within tileset image
@@ -71,32 +71,135 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int type) {
 	registry.impenetrables.emplace(entity);
 
 	//add to animation // choppable // etc registry.emplace(entity);
-	if (type == 1) {
-		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-	} else if (type == 2) {
-		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-	} else if (type == 3) {
-		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-	} else if (type == 4) {
-		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-	} else if (type == 5) {
-		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-	} else if (type == 6) {
-		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	if (biome_type == 1) {
+		// BASIC TYPE 1 BUSH
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_18, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_19, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_20, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_21, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+	} else if (biome_type == 2) {
+		// TYPE 2 BUSH
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_12, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_13, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_14, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_15, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_16, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_17, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_22, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_23, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_24, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+
+	} else if (biome_type == 3) {
+		// MUSHROOMS
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_06, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_09, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_10, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_08, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+	} else if (biome_type == 4) {
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_08, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_09, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_10, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_11, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_12, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_13, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_14, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_15, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_16, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_17, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+	} else {
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_06, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_07, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_08, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_09, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
 	}
+
+
+
 	return entity;
 }
 
-Entity createMapChunk( vec2 position) {
-	auto entity = Entity();
-
-	auto& chunk = registry.chunks.emplace(entity);
-	chunk.x = position.x;
-	chunk.y = position.y;
-	chunk.offset_x = position.x * MAZE_SIZE * TILE_SIZE;
-	chunk.offset_y = position.y * MAZE_SIZE * TILE_SIZE;
-	return entity;
-}
+//Entity createMapChunk( vec2 position) {
+//	auto entity = Entity();
+//
+//	auto& chunk = registry.chunks.emplace(entity);
+//	chunk.x = position.x;
+//	chunk.y = position.y;
+//	chunk.offset_x = position.x * MAZE_SIZE * TILE_SIZE;
+//	chunk.offset_y = position.y * MAZE_SIZE * TILE_SIZE;
+//	return entity;
+//}
 
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int type) {
 	maze[row][col].tile_type = type;
