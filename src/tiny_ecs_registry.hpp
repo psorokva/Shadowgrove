@@ -28,6 +28,7 @@ public:
 	ComponentContainer<Tile> tiles;
 	ComponentContainer<Impenetrable> impenetrables;
 	ComponentContainer<Chunk> chunks;
+	ComponentContainer<Inventory> inventory;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -51,6 +52,7 @@ public:
 		registry_list.push_back(&chunks);
 		registry_list.push_back(&tiles);
 		registry_list.push_back(&impenetrables);
+		registry_list.push_back(&inventory);
 	}
 
 	void clear_all_components() {
