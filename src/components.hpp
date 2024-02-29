@@ -101,6 +101,29 @@ struct Interactable {
 
 };
 
+enum Item {
+	red_potion,
+	blue_potion,
+	magical_grapes,
+	magical_mushrooms,
+	special_x,
+	special_y,
+	healing_star,
+	food,
+	torch
+};
+
+struct ItemType {
+	Item item_type;
+};
+
+struct Inventory {
+	unsigned int max_size = 5;
+	std::vector<ItemType> holding;
+	std::vector<unsigned int> crafted;
+};
+
+
 
 // All data relevant to the shape and motion of entities
 struct Motion {
