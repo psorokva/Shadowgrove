@@ -61,9 +61,6 @@ int main(){
 
 		renderer.draw();
 			
-		int fps = 1000 / elapsed_ms;
-		printf("Fps: %i\n", fps);
-		
 	}
 	
 	return EXIT_SUCCESS;

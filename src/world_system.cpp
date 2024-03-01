@@ -169,12 +169,14 @@ void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
 	std::stringstream title_ss;
-	title_ss << "Points: " << points;
+	//title_ss << "Points: " << points;
+	int fps = 1000 / elapsed_ms_since_last_update;
+	title_ss << "FPS: " << fps;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
-	while (registry.debugComponents.entities.size() > 0)
-	    registry.remove_all_components_of(registry.debugComponents.entities.back());
+	//while (registry.debugComponents.entities.size() > 0)
+	//    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
@@ -196,6 +198,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	camera.step();
 	ai.step();
+
+	Player& player = registry.players.components[0];
+
+	// Displaying health bar
+	auto healthBar = createLine(vec2(0, 100), vec2(10*player.health, 100));
+	//registry.colors.insert(healthBar, { 0.0, 0.2, 1.0 });
 
     float min_counter_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
@@ -240,9 +248,6 @@ void WorldSystem::restart_game() {
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
-
-	// Creating health bar
-	//createLine(vec2(800, 10), vec2(10, 100));
 
 	//createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
