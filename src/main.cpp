@@ -72,7 +72,8 @@ int main(){
 		//	frames = 0;
 		//}*/
 		//int fps = frames / elapsed_ms * 1000.0;
-		//printf("Fps: %i\n", fps);
+		int fps = 1000 / elapsed_ms;
+		printf("Fps: %i\n", fps);
 		//frames = 0;
 		
 	}
