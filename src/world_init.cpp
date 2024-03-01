@@ -232,11 +232,11 @@ void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, in
 Entity createLine(vec2 position, vec2 scale) {
 	Entity entity = Entity();
 
-	// Store a reference to textured, but doesnt actually use it
+	// Store a reference to inventory line
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-		 EFFECT_ASSET_ID::COLOURED,
+		 EFFECT_ASSET_ID::INVENTORY_LINE,
 		 GEOMETRY_BUFFER_ID::INVENTORY_LINE });
 
 	// Create motion
@@ -246,7 +246,6 @@ Entity createLine(vec2 position, vec2 scale) {
 	motion.position = position;
 	motion.scale = scale;
 
-	registry.debugComponents.emplace(entity);
 	return entity;
 }
 
