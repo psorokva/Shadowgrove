@@ -171,10 +171,10 @@ void RenderSystem::initializeGlGeometryBuffers() {
 	// Two triangles
 	line_indices = {0, 1, 3, 1, 2, 3};
 	
-	int geom_index = (int)GEOMETRY_BUFFER_ID::DEBUG_LINE;
+	int geom_index = (int)GEOMETRY_BUFFER_ID::INVENTORY_LINE;
 	meshes[geom_index].vertices = line_vertices;
 	meshes[geom_index].vertex_indices = line_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::DEBUG_LINE, line_vertices, line_indices);
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::INVENTORY_LINE, line_vertices, line_indices);
 
 	///////////////////////////////////////////////////////
 	// Initialize screen triangle (yes, triangle, not quad; its more efficient).
@@ -186,6 +186,14 @@ void RenderSystem::initializeGlGeometryBuffers() {
 	// Counterclockwise as it's the default opengl front winding direction.
 	const std::vector<uint16_t> screen_indices = { 0, 1, 2 };
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, screen_vertices, screen_indices);
+
+    ///////////////
+    // Initialize inventory lines
+    float inventory_vertices[] = {
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.0f, 0.366f, 0.0f
+    };
 }
 
 RenderSystem::~RenderSystem() {

@@ -232,12 +232,12 @@ void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, in
 Entity createLine(vec2 position, vec2 scale) {
 	Entity entity = Entity();
 
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	// Store a reference to inventory line
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-		 EFFECT_ASSET_ID::EFFECT_COUNT,
-		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
+		 EFFECT_ASSET_ID::INVENTORY_LINE,
+		 GEOMETRY_BUFFER_ID::INVENTORY_LINE });
 
 	// Create motion
 	Motion& motion = registry.motions.emplace(entity);
@@ -246,9 +246,9 @@ Entity createLine(vec2 position, vec2 scale) {
 	motion.position = position;
 	motion.scale = scale;
 
-	registry.debugComponents.emplace(entity);
 	return entity;
 }
+
 
 Entity createPotion(RenderSystem* renderer, vec2 position) {
 	auto entity = Entity();
