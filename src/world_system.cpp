@@ -242,9 +242,9 @@ void WorldSystem::restart_game() {
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 	// Creating health bar
-	createLine(vec2(10, 10), vec2(10, 2));
+	//createLine(vec2(800, 10), vec2(10, 100));
 
-	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+	//createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
 
 	//Chunk& chunk = registry.chunks.components[0];

@@ -106,6 +106,7 @@ class RenderSystem {
 	// Make sure these paths remain in sync with the associated enumerators.
 	const std::array<std::string, effect_count> effect_paths = {
 		shader_path("coloured"),
+		shader_path("inventory_line"),
 		shader_path("textured"),
 		shader_path("night") };
 
