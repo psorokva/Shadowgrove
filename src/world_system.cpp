@@ -241,8 +241,10 @@ void WorldSystem::restart_game() {
 	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
-	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+	// Creating health bar
+	createLine(vec2(10, 10), vec2(10, 2));
 
+	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
 
 	//Chunk& chunk = registry.chunks.components[0];
@@ -280,70 +282,6 @@ void WorldSystem::restart_game() {
 	}
 
 
-	
-
-	// TODO Add function generateMaze
-	
-	/*for (int col = 0; col < MAZE_HEIGHT; col++) {
-		for (int row = 0; row < MAZE_WIDTH; row++) {
-			updateTile(renderer, maze, row, col, 1);
-		}
-	}*/
-
-	//// Manually create maze (for now):
-	//// Horizontal:
-	//// Row 0
-	//for (int x = 0; x < MAZE_WIDTH; x++) {
-	//	updateTile(renderer, maze, x, 0, 1);
-	//}
-	//// Row 1
-	//for (int x = 0; x < 5; x++) {
-	//	updateTile(renderer, maze, x, 1, 1);
-	//}
-	//for (int x = 10; x < MAZE_WIDTH; x++) {
-	//	updateTile(renderer, maze, x, 1, 1);
-	//}
-
-	//// Rows 2-4
-	//for (int y = 2; y < 5; y++) {
-	//	for (int x = 0; x < 2; x++) {
-	//		updateTile(renderer, maze, x, y, 1);
-	//	}
-	//}
-	//updateTile(renderer, maze, MAZE_WIDTH-1, 2, 1);
-
-	//// Rows 5-7
-	//for (int y = 5; y < 7; y++) {
-	//	for (int x = 4; x < 8; x++) {
-	//		updateTile(renderer, maze, x, y, 1);
-	//	}
-	//}
-	//for (int x = 4; x < 7; x++) {
-	//	updateTile(renderer, maze, x, 7, 1);
-	//}
-	//for (int y = 5; y < MAZE_HEIGHT; y++) {
-	//	updateTile(renderer, maze, MAZE_WIDTH - 1, y, 1);
-	//}
-
-	//// Rows 8-12
-	//for (int y = 8; y < MAZE_HEIGHT; y++) {
-	//	for (int x = 0; x < 5; x++) {
-	//		updateTile(renderer, maze, x, y, 1);
-	//	}
-	//}
-	//for (int y = 9; y < MAZE_HEIGHT; y++) {
-	//	for (int x = 9; x < MAZE_WIDTH; x++) {
-	//		updateTile(renderer, maze, x, y, 1);
-	//	}
-	//}
-
-	//// Create a new chicken
-	//player = createPlayer(renderer, { window_width_px/2, window_height_px - 200 });
-	//registry.colors.insert(player, {1, 0.8f, 0.8f});
-
-
-
-
 	// A2: Enable static eggs on the ground, for reference
 	// Create eggs on the floor, use this for reference
 	/*
@@ -371,7 +309,7 @@ void WorldSystem::handle_collisions() {
 		// For now, we are only interested in collisions that involve the chicken
 		if (registry.players.has(entity)) {
 			//Player& player = registry.players.get(entity);
-
+		
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
 				

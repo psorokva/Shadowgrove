@@ -44,6 +44,9 @@ int main(){
 
 	// variable timestep loop
 	auto t = Clock::now();
+
+	int frames = 0;
+
 	while (!world.is_over()) {
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
@@ -59,7 +62,22 @@ int main(){
 		world.handle_collisions();
 
 		renderer.draw();
+		frames++;
+
+		//printf("Frames: %i\n", frames);
+		//printf("Elapsed ms: %f\n", elapsed_ms);
+		///*if (elapsed_ms >= 1000) {
+		//	float fps = frames / elapsed_ms * 1000.0f;
+		//	printf("Fps: %f\n", fps);
+		//	frames = 0;
+		//}*/
+		//int fps = frames / elapsed_ms * 1000.0;
+		//printf("Fps: %i\n", fps);
+		//frames = 0;
+		
 	}
 
+	frames = 0;
+	
 	return EXIT_SUCCESS;
 }

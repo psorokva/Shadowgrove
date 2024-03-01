@@ -74,7 +74,7 @@ struct Impenetrable {
 
 // Player component
 struct Player {
-
+	unsigned int health;
 };
 
 // Enemy component
@@ -122,7 +122,6 @@ struct Inventory {
 	std::vector<ItemType> holding;
 	std::vector<unsigned int> crafted;
 };
-
 
 
 // All data relevant to the shape and motion of entities

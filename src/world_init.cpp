@@ -17,8 +17,10 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	motion.camera_position = { window_width_px / 2, window_height_px / 2 };
 	
 
-	// Create and (empty) Chicken component to be able to refer to all eagles
-	registry.players.emplace(entity);
+	// Add player to players registry and set starting health = 100
+	auto& player = registry.players.emplace(entity);
+	player.health = 100;
+
 	// TEXTURE_COUNT indicates that no txture is needed
 	registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::PLAYER_CHAR, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
@@ -236,7 +238,7 @@ Entity createLine(vec2 position, vec2 scale) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-		 EFFECT_ASSET_ID::EFFECT_COUNT,
+		 EFFECT_ASSET_ID::COLOURED,
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
 	// Create motion
@@ -247,6 +249,7 @@ Entity createLine(vec2 position, vec2 scale) {
 	motion.scale = scale;
 
 	registry.debugComponents.emplace(entity);
+	//registry.colors.emplace(entity, vec3(1.0, 0.0, 0.0));
 	return entity;
 }
 
