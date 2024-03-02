@@ -20,6 +20,8 @@ Entity createLine(vec2 position, vec2 size);
 //Entity createMapChunk(vec2 position);
 Entity createPotion(RenderSystem* renderer, vec2 position);
 
+Entity createLine(vec2 position, vec2 size);
+
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int tile_type);
 
 

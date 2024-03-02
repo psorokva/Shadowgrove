@@ -74,7 +74,7 @@ struct Impenetrable {
 
 // Player component
 struct Player {
-
+	unsigned int health;
 };
 
 // Enemy component
@@ -124,7 +124,6 @@ struct Inventory {
 };
 
 
-
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };
@@ -137,6 +136,7 @@ struct Motion {
 struct Immobile {
 	vec2 position = { 0, 0 };
 	vec2 scale = { 10, 10 };
+	vec2 camera_position = { 0, 0 };
 };
 
 // Stucture to store collision information
@@ -292,7 +292,7 @@ const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum class EFFECT_ASSET_ID {
 	COLOURED = 0,
-    INVENTORY_LINE = COLOURED + 1,
+	INVENTORY_LINE = COLOURED + 1,
 	TEXTURED = INVENTORY_LINE + 1,
 	NIGHT = TEXTURED + 1,
 	EFFECT_COUNT = NIGHT + 1

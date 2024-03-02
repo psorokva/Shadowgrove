@@ -188,6 +188,13 @@ void RenderSystem::initializeGlGeometryBuffers() {
 	const std::vector<uint16_t> screen_indices = { 0, 1, 2 };
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, screen_vertices, screen_indices);
 
+	///////////////
+	// Initialize inventory lines
+	float inventory_vertices[] = {
+			-0.5f, -0.5f, 0.0f,
+			0.5f, -0.5f, 0.0f,
+			0.0f, 0.366f, 0.0f
+	};
 }
 
 RenderSystem::~RenderSystem() {
