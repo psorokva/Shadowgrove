@@ -166,14 +166,6 @@ void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
 	Mix_PlayMusic(night_music, -1);
 	fprintf(stderr, "Loaded music\n");
 
-
-//    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
-//    GLint project_location = glGetUniformLocation(m_font_shaderProgram, "projection");
-//    assert(project_location > -1);
-//    std::cout << "project_location: " << project_location << std::endl;
-//    glUniformMatrix4fv(project_location, 1, GL_FALSE, glm::value_ptr(projection));
-
-
     // Set all states to default
     restart_game();
 }
@@ -212,7 +204,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
     // load the inventory
 //    renderInventory();
-//    createLine({800, 10}, {10, 100});
+    Entity l1 = createLine({800, 10}, {10, 100});
+    Entity l2 = createLine({100, 100}, {100, 10});
+
+    Motion& m_l1 = registry.motions.get(l1);
+    m_l1.camera_position = {100, 100};
 
 
     float min_counter_ms = 3000.f;

@@ -171,6 +171,22 @@ void RenderSystem::drawToScreen() {
 	gl_has_errors();
 }
 
+//void RenderSystem::drawLine(const mat3& projection) {
+//    GLuint program = effects[static_cast<GLuint>(EFFECT_ASSET_ID::INVENTORY_LINE)];
+//    glUseProgram(program);
+//
+//    GLint projectionLoc = glGetUniformLocation(program, "projection");
+//    glUniformMatrix3fv(projectionLoc, 1, GL_FALSE, (float*)&projection);
+//
+//    glBindVertexArray(vertex_buffers[0]); // Update with correct VAO for lines if stored differently
+//
+//    glDrawArrays(GL_LINES, 0, 2);
+//
+//    glBindVertexArray(0);
+//    glUseProgram(0);
+//}
+
+
 // Render our game world
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 void RenderSystem::draw() {
