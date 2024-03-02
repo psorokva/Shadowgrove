@@ -136,6 +136,7 @@ struct Motion {
 struct Immobile {
 	vec2 position = { 0, 0 };
 	vec2 scale = { 10, 10 };
+	vec2 camera_position = { 0, 0 };
 };
 
 // Stucture to store collision information

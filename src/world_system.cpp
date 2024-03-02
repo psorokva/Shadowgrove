@@ -175,8 +175,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
-	//while (registry.debugComponents.entities.size() > 0)
-	//    registry.remove_all_components_of(registry.debugComponents.entities.back());
+	while (registry.debugComponents.entities.size() > 0)
+	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 	// Removing out of screen entities
 	auto& motions_registry = registry.motions;
@@ -243,13 +243,15 @@ void WorldSystem::restart_game() {
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
+	while (registry.immobiles.entities.size() > 0)
+		registry.remove_all_components_of(registry.immobiles.entities.back());
 
 	// Create a new chicken
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
-	//createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
 
 	//Chunk& chunk = registry.chunks.components[0];

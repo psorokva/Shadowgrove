@@ -9,6 +9,12 @@ vec2 get_bounding_box(const Motion& motion) {
 	return { abs(motion.scale.x), abs(motion.scale.y) };
 }
 
+// Duplicate for collision with walls, might need to change
+vec2 get_bounding_box(const Immobile& immobile) {
+	// abs is to avoid negative scale due to the facing direction.
+	return { abs(immobile.scale.x), abs(immobile.scale.y) };
+}
+
 // This is a SUPER APPROXIMATE check that puts a circle around the bounding boxes and sees
 // if the center point of either object is inside the other's bounding-box-circle. You can
 // surely implement a more accurate detection
@@ -18,6 +24,21 @@ bool collides(const Motion& motion1, const Motion& motion2) {
 	const vec2 other_bonding_box = get_bounding_box(motion1) / 2.f;
 	const float other_r_squared = dot(other_bonding_box, other_bonding_box);
 	const vec2 my_bonding_box = get_bounding_box(motion2) / 2.f;
+	const float my_r_squared = dot(my_bonding_box, my_bonding_box);
+	const float r_squared = max(other_r_squared, my_r_squared);
+	if (dist_squared < r_squared) {
+		return true;
+	}
+	return false;
+}
+
+// Duplicate for collision with walls, might need to change
+bool collides(const Motion& motion1, const Immobile& immobile) {
+	vec2 dp = motion1.position - immobile.position;
+	float dist_squared = dot(dp, dp);
+	const vec2 other_bonding_box = get_bounding_box(motion1) / 2.f;
+	const float other_r_squared = dot(other_bonding_box, other_bonding_box);
+	const vec2 my_bonding_box = get_bounding_box(immobile) / 2.f;
 	const float my_r_squared = dot(my_bonding_box, my_bonding_box);
 	const float r_squared = max(other_r_squared, my_r_squared);
 	if (dist_squared < r_squared) {
@@ -95,6 +116,7 @@ void PhysicsSystem::step(float elapsed_ms) {
 		//}
 
 	}
+
 	// Check for collisions between all moving entities
     ComponentContainer<Motion> &motion_container = registry.motions;
 	for(uint i = 0; i<motion_container.components.size(); i++) {
@@ -107,17 +129,26 @@ void PhysicsSystem::step(float elapsed_ms) {
 			if (collides(motion_i, motion_j)) {
 				Entity entity_j = motion_container.entities[j];
 				// Create a collisions event
-				// We are abusing the ECS system a bit in that we potentially insert muliple collisions for the same entity
+				// We are abusing the ECS system a bit in that we potentially insert multiple collisions for the same entity
 				registry.collisions.emplace_with_duplicates(entity_i, entity_j);
 				registry.collisions.emplace_with_duplicates(entity_j, entity_i);
 			}
 		}
 	}
 
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A2: HANDLE EGG collisions HERE
-	// DON'T WORRY ABOUT THIS UNTIL ASSIGNMENT 2
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Check for collisions between player and walls
+	ComponentContainer<Immobile>& immobiles_container = registry.immobiles;
+	Entity player = registry.players.entities[0];
+	Motion& player_motion = motion_container.components[0];
 
+	for (uint i = 0; i < immobiles_container.components.size(); i++) {
+		Immobile& fixed_i = immobiles_container.components[i];
+		Entity entity_i = immobiles_container.entities[i];
+
+			if (collides(player_motion, fixed_i)) {
+				// Create a collisions event
+				registry.collisions.emplace_with_duplicates(player, entity_i);
+			}
+	}
 }
 

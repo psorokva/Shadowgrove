@@ -60,16 +60,18 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	// TODO: remove position from motion (almost everything gets position but not motion)
 	// Initialize the position, scale, and physics components
-	auto& motion = registry.motions.emplace(entity);
-	motion.angle = 0.f;
-	motion.velocity = { 0, 0 };
-	motion.position = position;
+	//auto& motion = registry.motions.emplace(entity);
+	//motion.angle = 0.f;
+	//motion.velocity = { 0, 0 };
+	//motion.position = position;
+	//motion.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
 
-	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
-
+	// Initialize the position and scale for non-moving entity
+	auto& fixed = registry.immobiles.emplace(entity);
+	fixed.position = position;
+	fixed.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
+	
 	registry.impenetrables.emplace(entity);
 
 	//add to animation // choppable // etc registry.emplace(entity);
@@ -203,6 +205,8 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 //	return entity;
 //}
 
+
+// Not used currently
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int type) {
 	maze[row][col].tile_type = type;
 
@@ -249,7 +253,7 @@ Entity createLine(vec2 position, vec2 scale) {
 	motion.scale = scale;
 
 	registry.debugComponents.emplace(entity);
-	//registry.colors.emplace(entity, vec3(1.0, 0.0, 0.0));
+	
 	return entity;
 }
 
@@ -261,11 +265,16 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 	// registry.meshPtrs.emplace(entity, &mesh);
 
 	// Setting initial motion values
-	Motion& motion = registry.motions.emplace(entity);
-	motion.position = position;
-	motion.angle = 0.f;
-	motion.velocity = { 0.f, 0.f };
-	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
+	//Motion& motion = registry.motions.emplace(entity);
+	//motion.position = position;
+	//motion.angle = 0.f;
+	//motion.velocity = { 0.f, 0.f };
+	//motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
+
+	// Setting fixed values
+	auto& fixed = registry.immobiles.emplace(entity);
+	fixed.position = position;
+	fixed.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.healers.emplace(entity);
