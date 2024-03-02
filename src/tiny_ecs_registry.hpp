@@ -78,6 +78,36 @@ public:
 		for (ContainerInterface* reg : registry_list)
 			reg->remove(e);
 	}
+
+	// 
+	vec2 get_empty_spawn_location() {
+		vec2 location;
+		int num_chunks = chunks.size();
+		if (num_chunks < 1) {
+			return vec2(0.0, 0.0);
+		} 
+		Entity& ent = chunks.entities[rand() % num_chunks];
+		// if (num_chunks == 1) { ent = chunks.entities[0]; } // no need for [0] because %1 == 0
+		int count = 0;
+		Chunk& chunk = chunks.get(ent);
+		int r = rand() % MAZE_SIZE;
+		int c = rand() % MAZE_SIZE;
+		while (chunk.grid[r][c] > 0) {
+			r = rand() % MAZE_SIZE;
+			c = rand() % MAZE_SIZE;
+			count++;
+			// just in case a bad full chunk
+			if (count > 16) {
+				count = 0;
+				ent = chunks.entities[rand() % num_chunks];
+				chunk = chunks.get(ent);
+			}
+		}
+		location = vec2(chunk.offset_x + c * TILE_SIZE, chunk.offset_y + r * TILE_SIZE);
+		return location;
+	}
+
+
 };
 
 extern ECSRegistry registry;

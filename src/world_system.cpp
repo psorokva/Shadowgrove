@@ -28,22 +28,6 @@ Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
 
-// evetually use pointers for this and add travesal between maps 
-//const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
-//		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
-//		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
-//		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-//		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
-//		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
-//};
-
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0) {
@@ -174,6 +158,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	title_ss << "FPS: " << fps;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
+	//vec2 spawn = registry.get_empty_spawn_location();
+	//printf("free tile at: %f, %f\n", spawn.x, spawn.y);
+
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
@@ -267,6 +254,9 @@ void WorldSystem::restart_game() {
 	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
 	//for (Chunk c : chunks) {
 	for (uint i = 0; i < chunks.size(); i++) { //chunks.size()
+		auto entity = Entity();
+		registry.chunks.insert(entity, chunks[i], false);
+
 		for (int row = 0; row < MAZE_SIZE; row++) {
 			for (int col = 0; col < MAZE_SIZE; col++) {
 				Chunk c = chunks[i];
