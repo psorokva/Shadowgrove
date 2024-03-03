@@ -33,8 +33,8 @@ inline std::string textures_path(const std::string& name) {return data_path() + 
 inline std::string audio_path(const std::string& name) {return data_path() + "/audio/" + std::string(name);};
 inline std::string mesh_path(const std::string& name) {return data_path() + "/meshes/" + std::string(name);};
 
-const int window_width_px = 900;
-const int window_height_px = 900;
+const int window_width_px = 1900;
+const int window_height_px = 1400;
 const int TILE_SIZE = 55;
 const int MAZE_SIZE = 16;
 static bool DEBUG_PRINT = true;
