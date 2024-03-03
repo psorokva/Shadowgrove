@@ -63,6 +63,7 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
+
 	else if (render_request.used_effect == EFFECT_ASSET_ID::INVENTORY_LINE)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");

@@ -251,12 +251,13 @@ Entity createLine(vec2 position, vec2 scale) {
 	motion.velocity = { 0, 0 };
 //	motion.position = position;
 	motion.scale = scale;
-    motion.camera_position = position; // (vec2(window_width_px / 2, window_height_px / 2));
+  motion.camera_position = position
 
-    registry.debugComponents.emplace(entity);
+  registry.debugComponents.emplace(entity);
 	
 	return entity;
 }
+
 
 Entity createPotion(RenderSystem* renderer, vec2 position) {
 	auto entity = Entity();
