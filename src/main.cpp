@@ -19,6 +19,7 @@ int main(){
 	WorldSystem world;
 	RenderSystem renderer;
 	PhysicsSystem physics;
+	
 	MapGen generator(3,3);
 
 	generator.createWorldMap();
@@ -38,7 +39,7 @@ int main(){
 	renderer.init(window);
 	
 
-	world.init(&renderer, &generator);
+	world.init(&renderer, &generator, &physics);
 
 	
 

@@ -103,10 +103,9 @@ bool MapGen::createWorldMap() {
 
 	for (int r = 0; r < rows; r++) {
 		for (int c = 0; c < cols; c++) {
-
 			Chunk& chunk = createMapChunk(vec2{ r, c });
 			chunks.push_back(chunk);
-
+			
 		}
 	}
 
@@ -117,6 +116,15 @@ bool MapGen::createWorldMap() {
 		for (int r = 0; r < MAZE_SIZE; r++) {
 			for (int c = 0; c < MAZE_SIZE; c++) {
 
+				// ensure starting location is relatively free
+				if (r == 0 && c == 0) {
+					for (int i = 7; i < MAZE_SIZE; i++) {
+						for (int j = 6; j < MAZE_SIZE - 6; j++) {
+							chunk.grid[i][j] = 0;
+						}
+					}
+				}
+				// print chunk
 				if (chunk.grid[r][c] == 1) {
 					printf("%c%c", (char)219u, (char)219u);
 				} else {

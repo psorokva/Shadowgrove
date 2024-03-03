@@ -14,7 +14,7 @@
 #include <SDL_mixer.h>
 #include "map_generator.hpp"
 #include "render_system.hpp"
-
+#include "physics_system.hpp"
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods
 class WorldSystem {
@@ -25,7 +25,7 @@ public:
 	GLFWwindow* create_window();
 
 	// starts the game
-	void init(RenderSystem* renderer, MapGen* generator);
+	void init(RenderSystem* renderer, MapGen* generator, PhysicsSystem* physics);
 
 	// Releases all associated resources
 	~WorldSystem();
@@ -58,8 +58,10 @@ private:
 	AISystem ai;
 	RenderSystem* renderer;
 	MapGen* generator;
+	PhysicsSystem* physics;
 	float current_speed;
 	Entity player;
+	Immobile* compass_immobile;
 
 	// music references
 	Mix_Music* night_music;
