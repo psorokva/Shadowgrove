@@ -63,6 +63,8 @@ WorldSystem::~WorldSystem() {
         Mix_FreeChunk(player_death_sound);
     if (inventory_full_sound != nullptr)
         Mix_FreeChunk(inventory_full_sound);
+	if (player_hit_sound != nullptr)
+		Mix_FreeChunk(inventory_full_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -138,6 +140,7 @@ GLFWwindow* WorldSystem::create_window() {
     mushroom_sound = Mix_LoadWAV(audio_path("mushroom.wav").c_str());
     player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
     inventory_full_sound = Mix_LoadWAV(audio_path("inventory_full.wav").c_str());
+	player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
 
 	if (night_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
         player_death_sound == nullptr || inventory_full_sound == nullptr) {
@@ -146,7 +149,8 @@ GLFWwindow* WorldSystem::create_window() {
             audio_path("bird_noises.wav").c_str(),
             audio_path("mushroom.wav").c_str(),
             audio_path("player_death.wav").c_str(),
-            audio_path("inventory_full.wav").c_str());
+            audio_path("inventory_full.wav").c_str(),
+			audio_path("player_hit.wav").c_str());
 
 		return nullptr;
 	}
@@ -234,7 +238,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
     // Displaying health bar
 	auto healthBar = createLine(vec2(0, 10), vec2(10*player.health, 100));
-	registry.colors.insert(healthBar, { 1, 1, 1 });
+	registry.colors.insert(healthBar, { 1, 0, 0 });
 
     // inventory bar position on screen
     vec2 pos = {720, 60};
@@ -349,7 +353,7 @@ void WorldSystem::handle_collisions() {
 
 		// For now, we are only interested in collisions that involve the chicken
 		if (registry.players.has(entity)) {
-			//Player& player = registry.players.get(entity);
+			Player& p = registry.players.get(entity);
 		
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
@@ -382,17 +386,28 @@ void WorldSystem::handle_collisions() {
 				}
 			}
 
-			// Checking Player - Deadly collisions
-			if (registry.deadlys.has(entity_other)) {
+			// Checking Player - Enemy collisions
+			if (registry.enemies.has(entity_other)) {
+				Enemy& e = registry.enemies.get(entity_other);
 				// initiate death unless already dying
 				if (!registry.deathTimers.has(entity)) {
-					// Scream, reset timer, and make the chicken sink
-					registry.deathTimers.emplace(entity);
+					Motion& enemy_motion = registry.motions.get(entity_other);
 
-					// so that player stops moving after collision with keeper
-					registry.motions.get(player).velocity = { 0, 0 };
-					Mix_PlayChannel(-1, player_death_sound, 0);
+					if ((p.health - e.attack) > 0) {
+						p.health = p.health - e.attack;
+						// Move enemy slightly back after collision (so that player doesn't die instantly)
+						enemy_motion.position = enemy_motion.position + (enemy_motion.velocity * vec2(-0.5, -0.5));
+						Mix_PlayChannel(-1, player_hit_sound, 0); // TODO: replace with "hit" sound
+					}
+					else {
+						p.health = 0;
+						registry.deathTimers.emplace(entity);
+						// player shouold stop moving when health is <= 0
+						registry.motions.get(player).velocity = { 0, 0 };
+						Mix_PlayChannel(-1, player_death_sound, 0);
+					}
 				}
+			
 			}
 			// Checking Player - Eatable collisions
 			else if (registry.healers.has(entity_other)) {

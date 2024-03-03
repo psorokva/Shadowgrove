@@ -69,6 +69,7 @@ private:
     Mix_Chunk* mushroom_sound;
     Mix_Chunk* player_death_sound;
     Mix_Chunk* inventory_full_sound;
+	Mix_Chunk* player_hit_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;

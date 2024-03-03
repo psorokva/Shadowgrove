@@ -79,7 +79,7 @@ struct Player {
 
 // Enemy component
 struct Enemy {
-
+	unsigned int attack;
 };
 
 // Healing Potions component
