@@ -18,6 +18,7 @@
 #include <glm/mat3x3.hpp>           // mat3
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 using namespace glm;
 
 #include "tiny_ecs.hpp"

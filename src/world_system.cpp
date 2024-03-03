@@ -154,6 +154,11 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
+void renderInventory() {
+    // top line
+//    Entity topLine = createLine({800, 10}, {10, 10});
+}
+
 void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
 	this->renderer = renderer_arg;
 	this->generator = generator_arg;
@@ -161,7 +166,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
 	Mix_PlayMusic(night_music, -1);
 	fprintf(stderr, "Loaded music\n");
 
-	// Set all states to default
+    // Set all states to default
     restart_game();
 }
 
@@ -219,7 +224,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
 
-	camera.step();
+    camera.step();
 	ai.step();
 
 	Player& player = registry.players.components[0];
@@ -234,6 +239,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     // inventory bar position on screen
     vec2 pos = {720, 60};
     createInventory(pos);
+
 
     float min_counter_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
