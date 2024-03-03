@@ -62,6 +62,8 @@ private:
 	MapGen* generator;
 	float current_speed;
 	Entity player;
+    int inventory;
+    Entity inventory1;
 
 	// music references
 	Mix_Music* night_music;

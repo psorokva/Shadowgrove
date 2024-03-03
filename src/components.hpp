@@ -82,9 +82,26 @@ struct Enemy {
 	unsigned int attack;
 };
 
+enum Item {
+	magical_apple,
+	magical_strawberry,
+	magical_grapes,
+	magical_mushroom,
+	magical_carrot,
+	special_lotus,
+	red_potion,
+	green_potion,
+	purple_potion,
+	orange_potion,
+	food,
+	torch,
+	nullval
+};
+
+
 // Healing Potions component
 struct Healer {
-
+	Item item_name;
 };
 
 // Escape Potions component
@@ -101,25 +118,10 @@ struct Interactable {
 
 };
 
-enum Item {
-	red_potion,
-	blue_potion,
-	magical_grapes,
-	magical_mushrooms,
-	special_x,
-	special_y,
-	healing_star,
-	food,
-	torch
-};
-
-struct ItemType {
-	Item item_type;
-};
 
 struct Inventory {
-	unsigned int max_size = 5;
-	std::vector<ItemType> holding;
+	unsigned int size = 0;
+	std::vector<Item> holding;
 	std::vector<unsigned int> crafted;
 };
 
