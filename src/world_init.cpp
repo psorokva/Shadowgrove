@@ -251,9 +251,9 @@ Entity createLine(vec2 position, vec2 scale) {
 	motion.velocity = { 0, 0 };
 //	motion.position = position;
 	motion.scale = scale;
-    motion.camera_position = position;
+	motion.camera_position = position;
 
-  registry.debugComponents.emplace(entity);
+	registry.debugComponents.emplace(entity);
 	
 	return entity;
 }
