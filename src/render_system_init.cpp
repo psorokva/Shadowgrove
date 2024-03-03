@@ -158,14 +158,15 @@ void RenderSystem::initializeGlGeometryBuffers() {
 	std::vector<uint16_t> line_indices;
 
 	constexpr float depth = 0.5f;
-	constexpr vec3 red = { 0.8,0.1,0.1 };
+//	constexpr vec3 red = { 0.8,0.1,0.1 };
+    constexpr vec3 color = {0.5, 0.5, 0.5};
 
 	// Corner points
 	line_vertices = {
-		{{-0.5,-0.5, depth}, red},
-		{{-0.5, 0.5, depth}, red},
-		{{ 0.5, 0.5, depth}, red},
-		{{ 0.5,-0.5, depth}, red},
+		{{-0.5,-0.5, depth}, color},
+		{{-0.5, 0.5, depth}, color},
+		{{ 0.5, 0.5, depth}, color},
+		{{ 0.5,-0.5, depth}, color},
 	};
 
 	// Two triangles
@@ -187,13 +188,13 @@ void RenderSystem::initializeGlGeometryBuffers() {
 	const std::vector<uint16_t> screen_indices = { 0, 1, 2 };
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, screen_vertices, screen_indices);
 
-    ///////////////
-    // Initialize inventory lines
-    float inventory_vertices[] = {
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.0f, 0.366f, 0.0f
-    };
+	///////////////
+	// Initialize inventory lines
+	float inventory_vertices[] = {
+			-0.5f, -0.5f, 0.0f,
+			0.5f, -0.5f, 0.0f,
+			0.0f, 0.366f, 0.0f
+	};
 }
 
 RenderSystem::~RenderSystem() {

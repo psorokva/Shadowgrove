@@ -166,26 +166,42 @@ void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
 	Mix_PlayMusic(night_music, -1);
 	fprintf(stderr, "Loaded music\n");
 
-
-//    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
-//    GLint project_location = glGetUniformLocation(m_font_shaderProgram, "projection");
-//    assert(project_location > -1);
-//    std::cout << "project_location: " << project_location << std::endl;
-//    glUniformMatrix4fv(project_location, 1, GL_FALSE, glm::value_ptr(projection));
-
-
     // Set all states to default
     restart_game();
+}
+
+void WorldSystem::createInventory(vec2 pos) {
+    Entity topLine = createLine({pos.x, pos.y - 35}, {308, 8});
+    Entity bottomLine = createLine({pos.x, pos.y + 35}, {308, 8});
+    Entity sideLine1 = createLine({pos.x - 150, pos.y}, {8, 70});
+    Entity sideLine2 = createLine({pos.x - 90, pos.y}, {8, 70});
+    Entity sideLine3 = createLine({pos.x - 30, pos.y}, {8, 70});
+    Entity sideLine4 = createLine({pos.x + 30, pos.y}, {8, 70});
+    Entity sideLine5 = createLine({pos.x + 90, pos.y}, {8, 70});
+    Entity sideLine6 = createLine({pos.x + 150, pos.y}, {8, 70});
+
+    vec3 green = {0.2, 0.8, 0.2};
+    registry.colors.insert(topLine, green);
+    registry.colors.insert(bottomLine, green);
+    registry.colors.insert(sideLine1, green);
+    registry.colors.insert(sideLine2, green);
+    registry.colors.insert(sideLine3, green);
+    registry.colors.insert(sideLine4, green);
+    registry.colors.insert(sideLine5, green);
+    registry.colors.insert(sideLine6, green);
+
 }
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
 	std::stringstream title_ss;
-	title_ss << "Points: " << points;
+	//title_ss << "Points: " << points;
+	int fps = 1000 / elapsed_ms_since_last_update;
+	title_ss << "FPS: " << fps;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
-	// Remove debug info from the last step
+//	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
@@ -203,6 +219,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//	}
 	//}
 
+
 	// Processing the chicken state
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
@@ -210,9 +227,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     camera.step();
 	ai.step();
 
-    // load the inventory
-//    renderInventory();
-//    createLine({800, 10}, {10, 100});
+	Player& player = registry.players.components[0];
+
+    Entity p = registry.players.entities[0];
+    Motion& p_motion = registry.motions.get(p);
+
+    // Displaying health bar
+	auto healthBar = createLine(vec2(0, 10), vec2(10*player.health, 100));
+	registry.colors.insert(healthBar, { 1, 1, 1 });
+
+    // inventory bar position on screen
+    vec2 pos = {720, 60};
+    createInventory(pos);
 
 
     float min_counter_ms = 3000.f;
@@ -235,8 +261,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// reduce window brightness if any of the present chickens is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
-	// !!! TODO A1: update LightUp timers and remove if time drops below zero, similar to the death counter
-
 	return true;
 }
 
@@ -253,14 +277,15 @@ void WorldSystem::restart_game() {
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
+	while (registry.immobiles.entities.size() > 0)
+		registry.remove_all_components_of(registry.immobiles.entities.back());
 
-	// Create a new chicken
+	// Create a new player
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
-
 
 
 	//Chunk& chunk = registry.chunks.components[0];
@@ -298,70 +323,6 @@ void WorldSystem::restart_game() {
 	}
 
 
-	
-
-	// TODO Add function generateMaze
-	
-	/*for (int col = 0; col < MAZE_HEIGHT; col++) {
-		for (int row = 0; row < MAZE_WIDTH; row++) {
-			updateTile(renderer, maze, row, col, 1);
-		}
-	}*/
-
-	//// Manually create maze (for now):
-	//// Horizontal:
-	//// Row 0
-	//for (int x = 0; x < MAZE_WIDTH; x++) {
-	//	updateTile(renderer, maze, x, 0, 1);
-	//}
-	//// Row 1
-	//for (int x = 0; x < 5; x++) {
-	//	updateTile(renderer, maze, x, 1, 1);
-	//}
-	//for (int x = 10; x < MAZE_WIDTH; x++) {
-	//	updateTile(renderer, maze, x, 1, 1);
-	//}
-
-	//// Rows 2-4
-	//for (int y = 2; y < 5; y++) {
-	//	for (int x = 0; x < 2; x++) {
-	//		updateTile(renderer, maze, x, y, 1);
-	//	}
-	//}
-	//updateTile(renderer, maze, MAZE_WIDTH-1, 2, 1);
-
-	//// Rows 5-7
-	//for (int y = 5; y < 7; y++) {
-	//	for (int x = 4; x < 8; x++) {
-	//		updateTile(renderer, maze, x, y, 1);
-	//	}
-	//}
-	//for (int x = 4; x < 7; x++) {
-	//	updateTile(renderer, maze, x, 7, 1);
-	//}
-	//for (int y = 5; y < MAZE_HEIGHT; y++) {
-	//	updateTile(renderer, maze, MAZE_WIDTH - 1, y, 1);
-	//}
-
-	//// Rows 8-12
-	//for (int y = 8; y < MAZE_HEIGHT; y++) {
-	//	for (int x = 0; x < 5; x++) {
-	//		updateTile(renderer, maze, x, y, 1);
-	//	}
-	//}
-	//for (int y = 9; y < MAZE_HEIGHT; y++) {
-	//	for (int x = 9; x < MAZE_WIDTH; x++) {
-	//		updateTile(renderer, maze, x, y, 1);
-	//	}
-	//}
-
-	//// Create a new chicken
-	//player = createPlayer(renderer, { window_width_px/2, window_height_px - 200 });
-	//registry.colors.insert(player, {1, 0.8f, 0.8f});
-
-
-
-
 	// A2: Enable static eggs on the ground, for reference
 	// Create eggs on the floor, use this for reference
 	/*
@@ -389,7 +350,7 @@ void WorldSystem::handle_collisions() {
 		// For now, we are only interested in collisions that involve the chicken
 		if (registry.players.has(entity)) {
 			//Player& player = registry.players.get(entity);
-
+		
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
 				

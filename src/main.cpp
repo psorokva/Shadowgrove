@@ -44,6 +44,7 @@ int main(){
 
 	// variable timestep loop
 	auto t = Clock::now();
+
 	while (!world.is_over()) {
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
@@ -59,7 +60,8 @@ int main(){
 		world.handle_collisions();
 
 		renderer.draw();
+			
 	}
-
+	
 	return EXIT_SUCCESS;
 }

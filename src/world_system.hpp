@@ -30,6 +30,8 @@ public:
 	// Releases all associated resources
 	~WorldSystem();
 
+    void createInventory(vec2 pos);
+
 	// Steps the game ahead by ms milliseconds
 	bool step(float elapsed_ms);
 

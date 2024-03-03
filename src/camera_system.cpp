@@ -18,6 +18,17 @@ void CameraSystem::step() {
 
 		motion.camera_position = { player_motion.camera_position[0] - xDiff, player_motion.camera_position[1] - yDiff };
 	}
+
+	// For walls placement, might need to change
+	auto& immobiles_registry = registry.immobiles;
+	for (uint i = 0; i < immobiles_registry.size(); i++) {
+		Entity entity = immobiles_registry.entities[i];
+		Immobile& fixed = immobiles_registry.components[i];
+		float xDiff = player_motion.position[0] - fixed.position[0];
+		float yDiff = player_motion.position[1] - fixed.position[1];
+
+		fixed.camera_position = { player_motion.camera_position[0] - xDiff, player_motion.camera_position[1] - yDiff };
+	}
 }
 
 
