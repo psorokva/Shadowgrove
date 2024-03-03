@@ -284,7 +284,7 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 
 	// TEXTURE_COUNT indicates that no texture is needed
 
-	int potion_colour_offset = rand() % 11;
+	int potion_colour_offset = rand() % 11; 
 	switch (potion_colour_offset) {
 		case (0):
 			registry.healers.get(entity).item_name = magical_mushroom;
