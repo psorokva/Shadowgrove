@@ -281,25 +281,51 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.healers.emplace(entity);
 	// TEXTURE_COUNT indicates that no txture is needed
-	int potion_colour_offset = rand() % 5; 
+	int potion_colour_offset = rand() % 11;
 	switch (potion_colour_offset) {
 		case (0):
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.healers.get(entity).item_name = magical_mushroom;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break;
 		case (1):
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.healers.get(entity).item_name = magical_strawberry;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break;
 		case (2):
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.healers.get(entity).item_name = magical_grapes;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break;
 		case (3):
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.healers.get(entity).item_name = red_potion;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break;
 		case (4):
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.healers.get(entity).item_name = green_potion;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break;
 		case (5):
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.healers.get(entity).item_name = purple_potion;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (6):
+			registry.healers.get(entity).item_name = orange_potion;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (7):
+			registry.healers.get(entity).item_name = magical_apple;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (8):
+			registry.healers.get(entity).item_name = magical_carrot;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_07, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (9):
+			registry.healers.get(entity).item_name = food;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
+		case (10):
+			registry.healers.get(entity).item_name = special_lotus;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break;
 	}
 	
