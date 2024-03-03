@@ -185,7 +185,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     ScreenState &screen = registry.screenStates.components[0];
 
 	camera.step();
-	//ai.step();
+	ai.step();
 
 	Player& player = registry.players.components[0];
 
