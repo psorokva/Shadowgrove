@@ -245,9 +245,17 @@ void WorldSystem::restart_game() {
 	    registry.remove_all_components_of(registry.motions.entities.back());
 	while (registry.immobiles.entities.size() > 0)
 		registry.remove_all_components_of(registry.immobiles.entities.back());
+	while (registry.inventory.entities.size() > 0)
+		registry.remove_all_components_of(registry.inventory.entities.back());
 
 	// Create a new chicken
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	registry.inventory.emplace(player);
+	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
 	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
@@ -362,16 +370,16 @@ void WorldSystem::handle_collisions() {
 			}
 			// Checking Player - Eatable collisions
 			else if (registry.healers.has(entity_other)) {
-				if (!registry.deathTimers.has(entity)) {
-					// chew, count points, and set the LightUp timer
-					if (points < 5) {
-						registry.remove_all_components_of(entity_other);
-						Mix_PlayChannel(-1, mushroom_sound, 0);
-						++points;
-					} else {
-                        Mix_PlayChannel(-1, inventory_full_sound, 0);
-                    }
-				}
+				// chew, count points, and set the LightUp timer
+				if (registry.inventory.get(entity).size < 5) {
+					Inventory& player_inv = registry.inventory.get(entity);
+					player_inv.holding[player_inv.size] = registry.healers.get(entity_other).item_name;
+					registry.inventory.get(entity).size += 1;
+					registry.remove_all_components_of(entity_other);
+					Mix_PlayChannel(-1, mushroom_sound, 0);
+				} else {
+                       Mix_PlayChannel(-1, inventory_full_sound, 0);
+                }
 			}
 		}
 	}
