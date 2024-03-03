@@ -79,7 +79,7 @@ struct Player {
 
 // Enemy component
 struct Enemy {
-
+	unsigned int attack;
 };
 
 enum Item {
@@ -146,6 +146,14 @@ struct Collision {
 	// Note, the first object is stored in the ECS container.entities
 	Entity other; // the second object involved in the collision
 	Collision(Entity& other) { this->other = other; };
+};
+
+struct Character {
+	unsigned int TextureID;  // ID handle of the glyph texture
+	glm::ivec2   Size;       // Size of glyph
+	glm::ivec2   Bearing;    // Offset from baseline to left/top of glyph
+	unsigned int Advance;    // Offset to advance to next glyph
+	char character;
 };
 
 // Data structure for toggling debug mode
