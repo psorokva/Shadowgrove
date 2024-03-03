@@ -165,6 +165,28 @@ void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
     restart_game();
 }
 
+void WorldSystem::createInventory(vec2 pos) {
+    Entity topLine = createLine({pos.x, pos.y - 35}, {308, 8});
+    Entity bottomLine = createLine({pos.x, pos.y + 35}, {308, 8});
+    Entity sideLine1 = createLine({pos.x - 150, pos.y}, {8, 70});
+    Entity sideLine2 = createLine({pos.x - 90, pos.y}, {8, 70});
+    Entity sideLine3 = createLine({pos.x - 30, pos.y}, {8, 70});
+    Entity sideLine4 = createLine({pos.x + 30, pos.y}, {8, 70});
+    Entity sideLine5 = createLine({pos.x + 90, pos.y}, {8, 70});
+    Entity sideLine6 = createLine({pos.x + 150, pos.y}, {8, 70});
+
+    vec3 green = {0.2, 0.8, 0.2};
+    registry.colors.insert(topLine, green);
+    registry.colors.insert(bottomLine, green);
+    registry.colors.insert(sideLine1, green);
+    registry.colors.insert(sideLine2, green);
+    registry.colors.insert(sideLine3, green);
+    registry.colors.insert(sideLine4, green);
+    registry.colors.insert(sideLine5, green);
+    registry.colors.insert(sideLine6, green);
+
+}
+
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
@@ -206,11 +228,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     Motion& p_motion = registry.motions.get(p);
 
     // Displaying health bar
-	auto healthBar = createLine(vec2(0, 100), vec2(10*player.health, 100));
-	//registry.colors.insert(healthBar, { 0.0, 0.2, 1.0 });
+	auto healthBar = createLine(vec2(0, 10), vec2(10*player.health, 100));
+	registry.colors.insert(healthBar, { 1, 1, 1 });
 
-    createLine(vec2(100, 400), vec2 (100, 10));
-    createLine(vec2(100, 500), vec2 (100, 10));
+    // inventory bar position on screen
+    vec2 pos = {720, 60};
+    createInventory(pos);
 
     float min_counter_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
