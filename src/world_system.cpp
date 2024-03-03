@@ -174,7 +174,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	title_ss << "FPS: " << fps;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
-	// Remove debug info from the last step
+//	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
@@ -192,6 +192,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//	}
 	//}
 
+
 	// Processing the chicken state
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
@@ -201,9 +202,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	Player& player = registry.players.components[0];
 
-	// Displaying health bar
+    Entity p = registry.players.entities[0];
+    Motion& p_motion = registry.motions.get(p);
+
+    // Displaying health bar
 	auto healthBar = createLine(vec2(0, 100), vec2(10*player.health, 100));
 	//registry.colors.insert(healthBar, { 0.0, 0.2, 1.0 });
+
+    createLine(vec2(100, 400), vec2 (100, 10));
+    createLine(vec2(100, 500), vec2 (100, 10));
 
     float min_counter_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
@@ -225,8 +232,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// reduce window brightness if any of the present chickens is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
-	// !!! TODO A1: update LightUp timers and remove if time drops below zero, similar to the death counter
-
 	return true;
 }
 
@@ -246,7 +251,7 @@ void WorldSystem::restart_game() {
 	while (registry.immobiles.entities.size() > 0)
 		registry.remove_all_components_of(registry.immobiles.entities.back());
 
-	// Create a new chicken
+	// Create a new player
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });

@@ -172,23 +172,7 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::INVENTORY_LINE)
-	{
-		GLint in_position_loc = glGetAttribLocation(program, "in_position");
-		GLint in_color_loc = glGetAttribLocation(program, "in_color");
-		gl_has_errors();
 
-		glEnableVertexAttribArray(in_position_loc);
-		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
-			sizeof(ColoredVertex), (void*)0);
-		gl_has_errors();
-
-		glEnableVertexAttribArray(in_color_loc);
-		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,
-			sizeof(ColoredVertex), (void*)sizeof(vec3));
-		gl_has_errors();
-
-	}
 	else {
 		assert(false && "Type of render request not supported");
 	}
@@ -226,8 +210,9 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 void RenderSystem::drawToScreen() {
 	// Setting shaders
 	// get the wind texture, sprite mesh, and program
-	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::NIGHT]);
-	gl_has_errors();
+    glUseProgram(effects[(GLuint) EFFECT_ASSET_ID::NIGHT]);
+    gl_has_errors();
+
 	// Clearing backbuffer
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h); // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
@@ -282,6 +267,7 @@ void RenderSystem::drawToScreen() {
 	gl_has_errors();
 }
 
+
 // Render our game world
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 void RenderSystem::draw() {
@@ -309,12 +295,14 @@ void RenderSystem::draw() {
 	for (Entity entity : registry.renderRequests.entities) {
 		if (registry.motions.has(entity)) 
 		{
-			drawTexturedMesh(entity, projection_2D);
+//            if (!registry.debugComponents.has(entity)) {
+                drawTexturedMesh(entity, projection_2D);
+//            }
 		} 
 		// for non-moving entities (plants and potions)
 		else if (registry.immobiles.has(entity)) 
 		{
-			drawTexturedStaticMesh(entity, projection_2D);
+            drawTexturedStaticMesh(entity, projection_2D);
 		}
 		
 		// Note, its not very efficient to access elements indirectly via the entity
