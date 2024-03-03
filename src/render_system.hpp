@@ -7,6 +7,11 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
+// fonts
+//#include <ft2build.h>
+//#include FT_FREETYPE_H
+#include <map>
+
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
 class RenderSystem {
@@ -118,6 +123,8 @@ public:
 	// Initialize the window
 	bool init(GLFWwindow* window);
 
+	void fontInit(GLFWwindow& window, const std::string& font_filename, unsigned int font_default_size);
+
 	template <class T>
 	void bindVBOandIBO(GEOMETRY_BUFFER_ID gid, std::vector<T> vertices, std::vector<uint16_t> indices);
 
@@ -142,6 +149,8 @@ public:
 
 	mat3 createProjectionMatrix();
 
+	//void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
+
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
@@ -157,6 +166,12 @@ private:
 	GLuint off_screen_render_buffer_depth;
 
 	Entity screen_state_entity;
+
+	// fonts
+	std::map<char, Character> m_ftCharacters;	// map of all characters and their textures
+	GLuint m_font_shaderProgram;				// drawing the font
+	GLuint m_font_VAO;							// to isolate font things in separate VAO/VBO
+	GLuint m_font_VBO;
 };
 
 bool loadEffectFromFile(
