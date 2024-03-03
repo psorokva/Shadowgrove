@@ -64,7 +64,7 @@ WorldSystem::~WorldSystem() {
     if (inventory_full_sound != nullptr)
         Mix_FreeChunk(inventory_full_sound);
 	if (player_hit_sound != nullptr)
-		Mix_FreeChunk(inventory_full_sound);
+		Mix_FreeChunk(player_hit_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
