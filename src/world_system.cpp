@@ -16,7 +16,7 @@
 //const int MAZE_SIZE = 12;
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
-std::vector<std::pair<int, int>> generated_maze_map;
+// std::vector<std::pair<int, int>> generated_maze_map;
 
 bool blockedNorth = false;
 bool blockedSouth = false;
@@ -263,6 +263,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
+
 	printf("Restarting\n");
 
 	// Reset the game speed
@@ -277,16 +278,24 @@ void WorldSystem::restart_game() {
 		registry.remove_all_components_of(registry.immobiles.entities.back());
 	while (registry.inventory.entities.size() > 0)
 		registry.remove_all_components_of(registry.inventory.entities.back());
-
+	while (registry.chunks.entities.size() > 0)
+		registry.remove_all_components_of(registry.chunks.entities.back());
+	while (registry.players.entities.size() > 0)
+		registry.remove_all_components_of(registry.players.entities.back());
+	//registry.clear_all_components();
+	generator->clearMap();
+	printf("AFTER CLEARED REGISTRY");
+	registry.list_all_components();
 	// Create a new player
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 	registry.inventory.emplace(player);
+	generator->createWorldMap();
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
-	
+	printf("MAP AND PLAYER CREATED");
 	// create a compass to calc player movement 
 	Entity compass = createCompass(vec2(155.0,155.0));
 	Immobile& imo = registry.immobiles.get(compass);
