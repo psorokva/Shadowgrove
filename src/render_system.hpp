@@ -124,8 +124,6 @@ public:
 	// Initialize the window
 	bool init(GLFWwindow* window);
 
-	//void fontInit(GLFWwindow& window, const std::string& font_filename, unsigned int font_default_size);
-
 	template <class T>
 	void bindVBOandIBO(GEOMETRY_BUFFER_ID gid, std::vector<T> vertices, std::vector<uint16_t> indices);
 
@@ -142,7 +140,11 @@ public:
 	// shader
 	bool initScreenTexture();
 
+	// Initialize fonts to output text to the screen
 	bool initializeFonts(unsigned int font_default_size);
+
+	// Print text to the screen
+	void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
 
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
@@ -152,8 +154,6 @@ public:
 
 	mat3 createProjectionMatrix();
 
-	//void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
-
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
@@ -162,6 +162,9 @@ private:
 
 	// Window handle
 	GLFWwindow* window;
+
+	// Use before EnableVertexAttribArray to avoid GL errors
+	GLuint vao;
 
 	// Screen texture handles
 	GLuint frame_buffer;
@@ -174,5 +177,3 @@ private:
 
 bool loadEffectFromFile(
 	const std::string& vs_path, const std::string& fs_path, GLuint& out_program);
-
-void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);

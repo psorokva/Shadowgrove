@@ -22,8 +22,6 @@ GLuint m_font_shaderProgram;				// drawing the font
 GLuint m_font_VAO;							// to isolate font things in separate VAO/VBO
 GLuint m_font_VBO;
 
-//std::string fonts_vertex_shader = LoadShaderFromFile();
-
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg) {
 	this->window = window_arg;
@@ -59,7 +57,7 @@ bool RenderSystem::init(GLFWwindow* window_arg) {
 
 	// We are not really using VAO's but without at least one bound we will crash in
 	// some systems.
-	GLuint vao;
+	// Moved vao to global scope
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	gl_has_errors();
@@ -366,38 +364,11 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 	const std::string fonts_vertex_shader_name = font_path + ".vs.glsl";
 	const std::string fonts_fragment_shader_name = font_path + ".fs.glsl";
 
-	//GLuint fonts_program;
-	//const char* fonts_vertex_shader = "fonts.vs.glsl";
-	//const char* fonts_fragment_shader = "fonts.fs.glsl";
-	//bool is_valid = loadEffectFromFile(fonts_vertex_shader_name, fonts_fragment_shader_name, fonts_program);
-	//assert(is_valid && fonts_program != 0);
 	bool is_valid = loadEffectFromFile(fonts_vertex_shader_name, fonts_fragment_shader_name, m_font_shaderProgram);
 	assert(is_valid && m_font_shaderProgram != 0);
 
-	//// font vertex shader
-	//unsigned int font_vertexShader;
-	//font_vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//glShaderSource(font_vertexShader, 1, &fonts_program, NULL);
-	//glCompileShader(font_vertexShader);
-//
-//	// font fragment shader		// ideally add some tests to capture weird bugs
-//	unsigned int font_fragmentShader;
-//	font_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-//	glShaderSource(font_fragmentShader, 1, &fontFragmentShaderSource, NULL);
-//	glCompileShader(font_fragmentShader);
-//
-	//// font shader program
-	//m_font_shaderProgram = glCreateProgram();
-	//glAttachShader(m_font_shaderProgram, font_vertexShader);
-	//glAttachShader(m_font_shaderProgram, font_fragmentShader);
-	/*glLinkProgram(m_font_shaderProgram);*/
-
-//	// clean up shaders
-//	glDeleteShader(font_vertexShader);
-//	glDeleteShader(font_fragmentShader);
-//
-//	// use our new shader
-	glUseProgram(m_font_shaderProgram);		// !! very important
+	// use our new shader (very important!)
+	glUseProgram(m_font_shaderProgram);
 
 	// apply projection matrix for font
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
@@ -493,11 +464,10 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 
 }
 
-void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans) {
+void RenderSystem::renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans) {
 
 	// activate the shaders!
 	glUseProgram(m_font_shaderProgram);
-	//assert(m_font_shaderProgram > -1);
 
 	GLint textColor_location = glGetUniformLocation(m_font_shaderProgram, "textColor");
 

@@ -37,11 +37,14 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 	// Input data location as in the vertex buffer
 	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		assert(in_position_loc >= 0);
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
 		gl_has_errors();
 		assert(in_texcoord_loc >= 0);
 
+		glBindVertexArray(vao);
 		glEnableVertexAttribArray(in_position_loc);
+		gl_has_errors();
 		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
 							  sizeof(TexturedVertex), (void *)0);
 		gl_has_errors();
@@ -69,6 +72,7 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_color_loc = glGetAttribLocation(program, "in_color");
 		gl_has_errors();
+		glBindVertexArray(vao);
 
 		glEnableVertexAttribArray(in_position_loc);
 		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
@@ -138,6 +142,8 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
 	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
 	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	glBindVertexArray(vao);
 
 	// Setting vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -229,6 +235,8 @@ void RenderSystem::drawToScreen() {
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
 
+	glBindVertexArray(vao);
+
 	// Draw the screen texture on the quad geometry
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
@@ -311,12 +319,12 @@ void RenderSystem::draw() {
 	}
 
 	glm::mat4 trans = glm::mat4(1.0f);
-	//trans = glm::rotate(trans, glm::radians(window.rotation), glm::vec3(0.0, 0.0, 1.0));
-	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));
-	//render(window, trans, glm::vec4(0.0, 0.0, 0.0, 1.0));
-
-	// Render text
-	renderText("Test", 0.0f, 0.0f, 1.0f, glm::vec3(1.0, 1.0, 1.0), trans);
+	// Might need to use rotation and scaling in the future
+	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));
+	
+	// Render text at the bottom left of the screen
+	renderText("Test", 0.0f, 70.0f, 1.0f, glm::vec3(1.0, 1.0, 1.0), trans); // Note if y value is less than 70 the text gets cut off
 
 	// Truely render to the screen
 	drawToScreen();
