@@ -14,7 +14,7 @@ const float MUSHROOM_SIZE = 50.0f;
 // the player
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
 Entity createKeeper(RenderSystem* renderer, vec2 pos);
-
+Entity createCompass(vec2 position);
 Entity createPlant(RenderSystem* renderer, vec2 pos, int biome_type, int plant_type);
 Entity createLine(vec2 position, vec2 size);
 //Entity createMapChunk(vec2 position);

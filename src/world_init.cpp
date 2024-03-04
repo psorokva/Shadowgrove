@@ -61,13 +61,6 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	// Initialize the position, scale, and physics components
-	//auto& motion = registry.motions.emplace(entity);
-	//motion.angle = 0.f;
-	//motion.velocity = { 0, 0 };
-	//motion.position = position;
-	//motion.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
-
 	// Initialize the position and scale for non-moving entity
 	auto& fixed = registry.immobiles.emplace(entity);
 	fixed.position = position;
@@ -267,17 +260,17 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 	// Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
 	// registry.meshPtrs.emplace(entity, &mesh);
 
-	// Setting initial motion values
-	//Motion& motion = registry.motions.emplace(entity);
-	//motion.position = position;
-	//motion.angle = 0.f;
-	//motion.velocity = { 0.f, 0.f };
-	//motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
+	//  Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
 
-	// Setting fixed values
-	auto& fixed = registry.immobiles.emplace(entity);
-	fixed.position = position;
-	fixed.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
+	//// Setting fixed values
+	//auto& fixed = registry.immobiles.emplace(entity);
+	//fixed.position = position;
+	//fixed.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.healers.emplace(entity);
@@ -333,6 +326,17 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 	}
 	
 
+	return entity;
+}
+
+// just an invisible marker to calculate where player is in relation to
+Entity createCompass(vec2 position) {
+	auto entity = Entity();
+	auto& fixed = registry.immobiles.emplace(entity);
+	fixed.position.x = position.x;
+	fixed.position.y = position.y;
+	fixed.camera_position.x = position.x;
+	fixed.camera_position.y = position.y;
 	return entity;
 }
 
