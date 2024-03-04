@@ -23,7 +23,6 @@ bool blockedSouth = false;
 bool blockedEast = false;
 bool blockedWest = false;
 
-enum Direction { UP, DOWN, LEFT, RIGHT};
 Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
@@ -305,7 +304,7 @@ void WorldSystem::restart_game() {
 	
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
-	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+	//createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
 
 	//Chunk& chunk = registry.chunks.components[0];
@@ -464,6 +463,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
+	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
+		//std::cout << "in here!" << std::endl;
+		while (registry.enemies.entities.size() > 0)
+			registry.remove_all_components_of(registry.enemies.entities.back());
+	}
+
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -593,9 +598,10 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
-		if (points <= 5) {
-			createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
-		}
+		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		//if (points <= 5) {
+		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		//}
 		
 	}
 	

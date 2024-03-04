@@ -5,6 +5,8 @@
 #include "components.hpp"
 #include "tiny_ecs_registry.hpp"
 
+bool collides(const Motion& motion1, const Immobile& immobile);
+
 // A simple physics system that moves rigid bodies and checks for collision
 class PhysicsSystem {
 public:

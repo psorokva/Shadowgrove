@@ -80,6 +80,7 @@ struct Player {
 // Enemy component
 struct Enemy {
 	unsigned int attack;
+	int frame_count = 0;
 };
 
 enum Item {

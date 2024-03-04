@@ -38,6 +38,7 @@ const int window_height_px = 1400;
 const int TILE_SIZE = 55;
 const int MAZE_SIZE = 16;
 static bool DEBUG_PRINT = true;
+enum Direction { UP, DOWN, LEFT, RIGHT };
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
