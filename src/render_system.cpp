@@ -294,15 +294,13 @@ void RenderSystem::draw() {
 	mat3 projection_2D = createProjectionMatrix();
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities) {
-		if (registry.motions.has(entity)) 
-		{
+		if (registry.motions.has(entity)) {
 //            if (!registry.debugComponents.has(entity)) {
                 drawTexturedMesh(entity, projection_2D);
 //            }
 		} 
 		// for non-moving entities (plants and potions)
-		else if (registry.immobiles.has(entity)) 
-		{
+		else if (registry.immobiles.has(entity)) {
             drawTexturedStaticMesh(entity, projection_2D);
 		}
 		

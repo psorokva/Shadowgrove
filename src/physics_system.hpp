@@ -7,8 +7,20 @@
 
 // A simple physics system that moves rigid bodies and checks for collision
 class PhysicsSystem {
+private:
+	Entity* compass_entity;
+	Immobile* compass_immobile;
+
 public:
 	void step(float elapsed_ms);
 
-	PhysicsSystem() { }
+	PhysicsSystem() {}
+
+	//PhysicsSystem(Entity* entity, Immobile* immobile) {
+	//	compass_entity = entity;
+	//	compass_immobile = immobile;
+	//}
+
+	void setCompass(Entity* entity, Immobile* immobile);
+
 };

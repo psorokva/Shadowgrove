@@ -28,22 +28,6 @@ Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
 
-// evetually use pointers for this and add travesal between maps 
-//const int maze_map[MAZE_SIZE][MAZE_SIZE] = {
-//		{1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 2, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 2, 0, 2, 1},
-//		{1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 2, 1},
-//		{1, 0, 1, 2, 1, 1, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1},
-//		{1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-//		{1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1},
-//		{1, 0, 1, 0, 1, 1, 0, 2, 1, 0, 0, 1},
-//		{1, 0, 1, 2, 1, 1, 0, 2, 1, 0, 0, 1},
-//};
-
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0) {
@@ -159,9 +143,10 @@ void renderInventory() {
 //    Entity topLine = createLine({800, 10}, {10, 10});
 }
 
-void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg) {
+void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg, PhysicsSystem* physics_arg) {
 	this->renderer = renderer_arg;
 	this->generator = generator_arg;
+	this->physics = physics_arg;
 	// Playing background music indefinitely
 	Mix_PlayMusic(night_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -201,7 +186,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	title_ss << "FPS: " << fps;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
-//	// Remove debug info from the last step
+	//vec2 spawn = registry.get_empty_spawn_location();
+	//printf("free tile at: %f, %f\n", spawn.x, spawn.y);
+
+	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
@@ -299,16 +287,17 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	
+	// create a compass to calc player movement 
+	Entity compass = createCompass(vec2(155.0,155.0));
+	Immobile& imo = registry.immobiles.get(compass);
+	compass_immobile = &imo;
+	//printf("COMPASS SETTING: x %f  y: %f", compass_immobile->position.x, compass_immobile->position.x);
+
+	physics->setCompass(&compass,&imo);
+
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
-
-
-	//Chunk& chunk = registry.chunks.components[0];
-		
-	
-	// Debugging for memory/component leaks
-	registry.list_all_components();
 
 	// Create empty "path" maze
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
@@ -317,6 +306,9 @@ void WorldSystem::restart_game() {
 	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
 	//for (Chunk c : chunks) {
 	for (uint i = 0; i < chunks.size(); i++) { //chunks.size()
+		auto entity = Entity();
+		registry.chunks.insert(entity, chunks[i], false);
+
 		for (int row = 0; row < MAZE_SIZE; row++) {
 			for (int col = 0; col < MAZE_SIZE; col++) {
 				Chunk c = chunks[i];
@@ -338,20 +330,8 @@ void WorldSystem::restart_game() {
 		//printf("--------\n");
 	}
 
-
-	// A2: Enable static eggs on the ground, for reference
-	// Create eggs on the floor, use this for reference
-	/*
-	for (uint i = 0; i < 20; i++) {
-		int w, h;
-		glfwGetWindowSize(window, &w, &h);
-		float radius = 30 * (uniform_dist(rng) + 0.3f); // range 0.3 .. 1.3
-		Entity egg = createEgg({ uniform_dist(rng) * w, h - uniform_dist(rng) * 20 },
-			         { radius, radius });
-		float brightness = uniform_dist(rng) * 0.5 + 0.5;
-		registry.colors.insert(egg, { brightness, brightness, brightness});
-	}
-	*/
+	// Debugging for memory/component leaks
+	registry.list_all_components();
 }
 
 // Compute collisions between entities
@@ -367,36 +347,36 @@ void WorldSystem::handle_collisions() {
 		if (registry.players.has(entity)) {
 			//Player& player = registry.players.get(entity);
 		
-			// Checking Player - Wall collisions
-			if (registry.impenetrables.has(entity_other)) {
-				
-				Motion& motion = registry.motions.get(entity);
-				// Can adjust this
-				float offset = 10.0f;
-                // Mix_PlayChannel(-1, tree_collision_sound, 0);
-				
-				if (playerDirection == UP) {
-					//printf("Collided with North wall");
-					blockedNorth = true;
-					// Offset player position to stop from going through
-					motion.position = motion.position - vec2(0, -offset);
-				}
-				if (playerDirection == DOWN) {
-					//printf("Collided with South wall");
-					blockedSouth = true;
-					motion.position = motion.position - vec2(0, offset);
-				}
-				if (playerDirection == LEFT) {
-					//printf("Collided with West wall");
-					blockedWest = true;
-					motion.position = motion.position - vec2(-offset, 0);
-				}
-				if (playerDirection == RIGHT) {
-					//printf("Collided with East wall");
-					blockedEast = true;
-					motion.position = motion.position - vec2(offset, 0);
-				}
-			}
+			//// Checking Player - Wall collisions
+			//if (registry.impenetrables.has(entity_other)) {
+			//	
+			//	Motion& motion = registry.motions.get(entity);
+			//	// Can adjust this
+			//	float offset = 10.0f;
+   //             // Mix_PlayChannel(-1, tree_collision_sound, 0);
+			//	
+			//	if (playerDirection == UP) {
+			//		//printf("Collided with North wall");
+			//		blockedNorth = true;
+			//		// Offset player position to stop from going through
+			//		motion.position = motion.position - vec2(0, -offset);
+			//	}
+			//	if (playerDirection == DOWN) {
+			//		//printf("Collided with South wall");
+			//		blockedSouth = true;
+			//		motion.position = motion.position - vec2(0, offset);
+			//	}
+			//	if (playerDirection == LEFT) {
+			//		//printf("Collided with West wall");
+			//		blockedWest = true;
+			//		motion.position = motion.position - vec2(-offset, 0);
+			//	}
+			//	if (playerDirection == RIGHT) {
+			//		//printf("Collided with East wall");
+			//		blockedEast = true;
+			//		motion.position = motion.position - vec2(offset, 0);
+			//	}
+			//}
 
 			// Checking Player - Deadly collisions
 			if (registry.deadlys.has(entity_other)) {
@@ -579,6 +559,24 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
 		if (points <= 5) {
+			//if (registry.is_clear(vec2( xpos, ypos ), compass_immobile, player) ) {
+			//	printf("VALID LOCATION\n");
+			//} else {
+			//	printf("BLOCKED!\n");
+			//}
+			//Motion& p = registry.motions.get(player);
+			//printf("P: x: %f\n", p.position.x);
+			//printf("P: y: %f\n", p.position.y);
+			//for (int j = 0; j < 8; j ++ ) {
+			//	for (int i = 0; i < 8; i++) {
+			//		if (registry.is_clear(vec2(xpos + i * TILE_SIZE / 2, ypos + j * TILE_SIZE / 2), compass_immobile, player)) {
+			//			createPotion(renderer, camera.adjust_to_player(vec2{ xpos + i * TILE_SIZE /2, ypos + j * TILE_SIZE / 2 }));
+			//			//printf("C: x: %f\n", compass_immobile->position.x);
+			//			//printf("C: y: %f\n", compass_immobile->position.y);
+			//		}
+			//	}
+			//}
+
 			createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		}
 		
