@@ -28,7 +28,7 @@ Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
 int num_of_item_on_screen = 0;
-
+uint animation_cycle = 0;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0) {
@@ -180,6 +180,8 @@ void WorldSystem::createInventory(vec2 pos) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+	animation_cycle++;
+	animation_cycle %= 4;
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
@@ -514,12 +516,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		// Move Up
 		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
 			playerDirection = UP;
+			RenderRequest& r = registry.renderRequests.get(player);
+			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
 			if (!blockedNorth) {
 				motion.velocity = vec2(0.f, -CHARACTER_SPEED);
 			}
 			// TODO fix this if using angle
-			/*if (motion.angle != 0.f)
-			{
+			/*if (motion.angle != 0.f)	{
 				motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
 				motion.velocity.x = motion.velocity.x * cos(motion.angle);
 				motion.velocity.y = motion.velocity.y * sin(motion.angle);
@@ -529,12 +532,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		// Move Down
 		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
 			playerDirection = DOWN;
+			RenderRequest& r = registry.renderRequests.get(player);
+			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
 			if (!blockedSouth) {
 				motion.velocity = vec2(0.f, CHARACTER_SPEED);
 			}
 			
-			/*if (motion.angle != 0.f)
-			{
+			/*if (motion.angle != 0.f)	{
 				motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
 				motion.velocity.x = motion.velocity.x * cos(motion.angle);
 				motion.velocity.y = motion.velocity.y * sin(motion.angle);
@@ -544,13 +548,14 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		// Move Right
 		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
 			playerDirection = RIGHT;
+			RenderRequest& r = registry.renderRequests.get(player);
+			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
 			if (!blockedEast) {
 				motion.velocity = vec2(CHARACTER_SPEED, 0.f);
 				motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
 			}
 			
-			/*if (motion.angle != 0.f)
-			{
+			/*if (motion.angle != 0.f)	{
 				motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
 				motion.velocity.y = motion.velocity.y * cos(motion.angle);
 				motion.velocity.x = motion.velocity.x * sin(motion.angle);
@@ -560,13 +565,14 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		// Move Left
 		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
 			playerDirection = LEFT;
+			RenderRequest& r = registry.renderRequests.get(player);
+			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle+1);
 			if (!blockedWest) {
 				motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
 				motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
 			}
 			
-			/*if (motion.angle != 0.f)
-			{
+			/*if (motion.angle != 0.f)	{
 				motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
 				motion.velocity.y = motion.velocity.y * cos(motion.angle);
 				motion.velocity.x = motion.velocity.x * sin(motion.angle);
@@ -576,6 +582,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		// Stop moving when key is released
 		if (action == GLFW_RELEASE) {
 			motion.velocity = vec2(0.f, 0.f);
+			RenderRequest& r = registry.renderRequests.get(player);
+			r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1; 
 		}
 	}
 
