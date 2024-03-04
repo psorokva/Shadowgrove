@@ -79,8 +79,8 @@ void PhysicsSystem::step(float elapsed_ms) {
 		//// TODO: check if collide with map
 		//registry.chunks
 		ChunkLocation* current_pos = getPlayerTiles(motion,compass_immobile);
-		future.position = motion.position + step_seconds * motion.velocity + vec2(0.0, -PLAYER_WIDTH);;
-		future_w.position = motion.position + step_seconds * motion.velocity + vec2(PLAYER_WIDTH, 0.0);
+		future.position = motion.position + step_seconds * motion.velocity + vec2(0.0, -PLAYER_WIDTH*0.25);;
+		//future_w.position = motion.position + step_seconds * motion.velocity + vec2(PLAYER_WIDTH, 0.0);
 		ChunkLocation* future_pos = getPlayerTiles(future, compass_immobile);
 		ChunkLocation* future_w_pos = getPlayerTiles(future_w, compass_immobile);
 
@@ -92,9 +92,9 @@ void PhysicsSystem::step(float elapsed_ms) {
 			//	printf("vec4 offset: x %d ,y %d , index: x %d ,y %d \n", future_pos->offset_x, future_pos->offset_y, future_pos->index_x, future_pos->index_y);
 			//}
 			// if relevant chunk is there
-			if (chunk.x == future_pos->index_x && chunk.y == future_pos->index_y && chunk.x == future_w_pos->index_x && chunk.y == future_w_pos->index_y) {
+			if (chunk.x == future_pos->index_x && chunk.y == future_pos->index_y ) { // && chunk.x == future_w_pos->index_x && chunk.y == future_w_pos->index_y) {
 				// check if future position is legal
-				if (chunk.grid[future_pos->offset_y][future_pos->offset_x] == 0 && chunk.grid[future_w_pos->offset_y][future_w_pos->offset_x] == 0) {
+				if (chunk.grid[future_pos->offset_y][future_pos->offset_x] == 0 ){ // && chunk.grid[future_w_pos->offset_y][future_w_pos->offset_x] == 0) {
 					//motion.position = motion.position + step_seconds * motion.velocity;
 					//printf("vec4 offset: x %u ,y %u , index: x %u ,y %u \n", future_pos->offset_x, future_pos->offset_y, future_pos->index_x, future_pos->index_y);
 				} // else don't update also add checks for previous location after
