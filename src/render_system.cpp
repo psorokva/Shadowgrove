@@ -369,6 +369,14 @@ void RenderSystem::draw() {
         }
     }
 
+	glm::mat4 trans = glm::mat4(1.0f);
+	//trans = glm::rotate(trans, glm::radians(window.rotation), glm::vec3(0.0, 0.0, 1.0));
+	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));
+	//render(window, trans, glm::vec4(0.0, 0.0, 0.0, 1.0));
+
+	// Render text
+	renderText("Test", 0.0f, 0.0f, 1.0f, glm::vec3(1.0, 1.0, 1.0), trans);
+
 	// Truely render to the screen
 	drawToScreen();
 

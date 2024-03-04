@@ -8,8 +8,8 @@
 #include "tiny_ecs.hpp"
 
 // fonts
-//#include <ft2build.h>
-//#include FT_FREETYPE_H
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include <map>
 
 // System responsible for setting up OpenGL and for rendering all the
@@ -121,7 +121,8 @@ class RenderSystem {
 		shader_path("coloured"),
 		shader_path("inventory_line"),
 		shader_path("textured"),
-		shader_path("night") };
+		shader_path("night") 
+		};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
@@ -131,7 +132,7 @@ public:
 	// Initialize the window
 	bool init(GLFWwindow* window);
 
-	void fontInit(GLFWwindow& window, const std::string& font_filename, unsigned int font_default_size);
+	//void fontInit(GLFWwindow& window, const std::string& font_filename, unsigned int font_default_size);
 
 	template <class T>
 	void bindVBOandIBO(GEOMETRY_BUFFER_ID gid, std::vector<T> vertices, std::vector<uint16_t> indices);
@@ -148,6 +149,8 @@ public:
 	// The draw loop first renders to this texture, then it is used for the wind
 	// shader
 	bool initScreenTexture();
+
+	bool initializeFonts(unsigned int font_default_size);
 
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
@@ -175,12 +178,9 @@ private:
 
 	Entity screen_state_entity;
 
-	// fonts
-	std::map<char, Character> m_ftCharacters;	// map of all characters and their textures
-	GLuint m_font_shaderProgram;				// drawing the font
-	GLuint m_font_VAO;							// to isolate font things in separate VAO/VBO
-	GLuint m_font_VBO;
 };
 
 bool loadEffectFromFile(
 	const std::string& vs_path, const std::string& fs_path, GLuint& out_program);
+
+void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
