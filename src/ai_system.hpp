@@ -19,8 +19,9 @@ private:
 	inline bool check_step(const Motion& motion, const Immobile& immobile, const vec2& direction);
 
 	const int enemy_velocity_multipler = 80;
-	const int step_size = 30;
-	const int frames_till_update = 20;
+	const int step_size = PLAYER_HEIGHT / 2;
+	const int frames_till_update = 30;
+	const int chase_distance = 500;
 	std::unordered_map<Direction, vec2> direction_to_velocity = {
 		{LEFT, {-enemy_velocity_multipler, 0} },
 		{RIGHT, {enemy_velocity_multipler, 0} },

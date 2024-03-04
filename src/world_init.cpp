@@ -39,7 +39,7 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+	motion.scale = vec2({ PLAYER_HEIGHT, PLAYER_HEIGHT });
 
 	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
 	auto& enemy = registry.enemies.emplace(entity);
