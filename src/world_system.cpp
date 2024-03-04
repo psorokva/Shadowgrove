@@ -208,13 +208,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	title_ss << "FPS: " << fps;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
-	//vec2 spawn = registry.get_empty_spawn_location();
-	//printf("free tile at: %f, %f\n", spawn.x, spawn.y);
-
 	// Remove debug info from the last step
-	while (registry.debugComponents.entities.size() > 0) {
-		registry.remove_all_components_of(registry.debugComponents.entities.back());
-	}
+	while (registry.debugComponents.entities.size() > 0)
+	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 	// Animating enemy entities
 	auto& enemies = registry.enemies.components;
