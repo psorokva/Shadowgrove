@@ -27,6 +27,7 @@ enum Direction { UP, DOWN, LEFT, RIGHT};
 Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
+int num_of_item_on_screen = 0;
 
 
 // Create the bug world
@@ -228,12 +229,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     vec2 pos = {720, 60};
     createInventory(pos);
 
-    for (int i = 0; i < inventory; i++) {
+    for (int i = 0; i < 5; i++) {
         Inventory& player_inv = registry.inventory.get(p);
         auto& item = player_inv.holding[i];
 
         createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
+
+	if (num_of_item_on_screen < 100) {
+		vec2 spawn_pos = registry.get_empty_spawn_location();
+		printf("Spawning object at x %f  y %f\n", spawn_pos.x, spawn_pos.y);
+		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+		num_of_item_on_screen++;
+	}
 
 
     float min_counter_ms = 3000.f;
@@ -392,20 +400,31 @@ void WorldSystem::handle_collisions() {
 			}
 			// Checking Player - Eatable collisions
 			else if (registry.healers.has(entity_other)) {
-				// chew, count points, and set the LightUp timer
-				// if (registry.inventory.get(entity).size < 5) {
-                if (inventory < 5) {
-					Inventory& player_inv = registry.inventory.get(entity);
-					player_inv.holding[inventory] = registry.healers.get(entity_other).item_name;
-					// registry.inventory.get(entity).size += 1;
-                    inventory++;
-                    printf("inventory size %d\n", inventory);
-
+				Inventory& player_inv = registry.inventory.get(entity);
+				if (player_inv.holding[0] == nullval) {
+					player_inv.holding[0] = registry.healers.get(entity_other).item_name;
 					registry.remove_all_components_of(entity_other);
 					Mix_PlayChannel(-1, mushroom_sound, 0);
-				} else {
-                       Mix_PlayChannel(-1, inventory_full_sound, 0);
-                }
+				} else if (player_inv.holding[1] == nullval) {
+					player_inv.holding[1] = registry.healers.get(entity_other).item_name;
+					registry.remove_all_components_of(entity_other);
+					Mix_PlayChannel(-1, mushroom_sound, 0);
+				} else if (player_inv.holding[2] == nullval) {
+					player_inv.holding[2] = registry.healers.get(entity_other).item_name;
+					registry.remove_all_components_of(entity_other);
+					Mix_PlayChannel(-1, mushroom_sound, 0);
+				} else if (player_inv.holding[3] == nullval) {
+					player_inv.holding[3] = registry.healers.get(entity_other).item_name;
+					registry.remove_all_components_of(entity_other);
+					Mix_PlayChannel(-1, mushroom_sound, 0);
+				} else if (player_inv.holding[4] == nullval) {
+					player_inv.holding[4] = registry.healers.get(entity_other).item_name;
+					registry.remove_all_components_of(entity_other);
+					Mix_PlayChannel(-1, mushroom_sound, 0);
+				}
+				else {
+					Mix_PlayChannel(-1, inventory_full_sound, 0);
+				}
 			}
 		}
 	}
@@ -428,6 +447,28 @@ bool WorldSystem::is_over() const {
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
+
+	// remove items from slot on num key press
+	if (action == GLFW_RELEASE && key == GLFW_KEY_1 && registry.inventory.get(registry.players.entities[0]).holding[0] != nullval) {
+		registry.inventory.get(registry.players.entities[0]).holding[0] = nullval;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_2 && registry.inventory.get(registry.players.entities[0]).holding[1] != nullval) {
+		registry.inventory.get(registry.players.entities[0]).holding[1] = nullval;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_3 && registry.inventory.get(registry.players.entities[0]).holding[2] != nullval) {
+		registry.inventory.get(registry.players.entities[0]).holding[2] = nullval;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_4 && registry.inventory.get(registry.players.entities[0]).holding[3] != nullval) {
+		registry.inventory.get(registry.players.entities[0]).holding[3] = nullval;
+		inventory--;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_5 && registry.inventory.get(registry.players.entities[0]).holding[4] != nullval) {
+		registry.inventory.get(registry.players.entities[0]).holding[4] = nullval;
+	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
@@ -558,29 +599,9 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
-		if (points <= 5) {
-			//if (registry.is_clear(vec2( xpos, ypos ), compass_immobile, player) ) {
-			//	printf("VALID LOCATION\n");
-			//} else {
-			//	printf("BLOCKED!\n");
-			//}
-			//Motion& p = registry.motions.get(player);
-			//printf("P: x: %f\n", p.position.x);
-			//printf("P: y: %f\n", p.position.y);
-			//for (int j = 0; j < 8; j ++ ) {
-			//	for (int i = 0; i < 8; i++) {
-			//		if (registry.is_clear(vec2(xpos + i * TILE_SIZE / 2, ypos + j * TILE_SIZE / 2), compass_immobile, player)) {
-			//			createPotion(renderer, camera.adjust_to_player(vec2{ xpos + i * TILE_SIZE /2, ypos + j * TILE_SIZE / 2 }));
-			//			//printf("C: x: %f\n", compass_immobile->position.x);
-			//			//printf("C: y: %f\n", compass_immobile->position.y);
-			//		}
-			//	}
-			//}
-			vec2 spawn_pos = registry.get_empty_spawn_location();
-			printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
-			createPotion(renderer, camera.adjust_to_player(spawn_pos));
-		}
-		
+		vec2 spawn_pos = registry.get_empty_spawn_location();
+		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
+		createPotion(renderer, camera.adjust_to_player(spawn_pos));
 	}
 	
 	
