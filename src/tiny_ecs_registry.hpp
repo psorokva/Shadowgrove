@@ -103,7 +103,13 @@ public:
 				chunk = chunks.get(ent);
 			}
 		}
-		location = vec2(chunk.offset_x + c * TILE_SIZE, chunk.offset_y + r * TILE_SIZE);
+		//Immobile& zero = immobiles.components[0];
+		printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
+		printf("Desired Chunk x %x y %x \n", chunk.campos_x, chunk.campos_y);
+		//printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
+		//printf("Zero cam pos x %f y %f \n", zero.camera_position.x, zero.camera_position.y);
+		//printf("Zero pos x %f y %f \n", zero.position.x, zero.position.y);
+		location = vec2(chunk.campos_x + c * TILE_SIZE, chunk.campos_y + r * TILE_SIZE) ;
 		return location;
 	}
 

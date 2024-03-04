@@ -29,6 +29,17 @@ void CameraSystem::step() {
 
 		fixed.camera_position = { player_motion.camera_position[0] - xDiff, player_motion.camera_position[1] - yDiff };
 	}
+
+	auto& chunks = registry.chunks;
+	for (uint i = 0; i < chunks.size(); i++) {
+		Entity entity = chunks.entities[i];
+		Chunk& chunk = chunks.components[i];
+		float xDiff = player_motion.position[0] - chunk.offset_x;
+		float yDiff = player_motion.position[1] - chunk.offset_y;
+		chunk.campos_x = player_motion.camera_position[0] - xDiff;
+		chunk.campos_y =  player_motion.camera_position[1] - yDiff;
+	}
+
 }
 
 

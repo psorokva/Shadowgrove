@@ -576,8 +576,9 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 			//		}
 			//	}
 			//}
-
-			createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+			vec2 spawn_pos = registry.get_empty_spawn_location();
+			printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
+			createPotion(renderer, camera.adjust_to_player(spawn_pos));
 		}
 		
 	}
