@@ -463,6 +463,20 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		glfwSetWindowShouldClose(window, true);
 	}
 
+    // Changing game scene to day
+    if (action == GLFW_RELEASE && key == GLFW_KEY_D) {
+        printf("D key pressed, switching to day");
+        ScreenState &screen = registry.screenStates.components[0];
+        screen.game_screen = game_screen_day;
+    }
+
+    // Changing game scene to day
+    if (action == GLFW_RELEASE && key == GLFW_KEY_N) {
+        printf("D key pressed, switching to night");
+        ScreenState &screen = registry.screenStates.components[0];
+        screen.game_screen = game_screen_night;
+    }
+
 	// Debugging
 	if (key == GLFW_KEY_D) {
 		if (action == GLFW_RELEASE)

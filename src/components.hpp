@@ -151,9 +151,18 @@ struct Debug {
 };
 extern Debug debugging;
 
+enum Game_screens
+{
+    game_screen_main_menu,
+    game_screen_night,
+    game_screen_day,
+    game_screen_game_over,
+};
+
 // Sets the brightness of the screen
 struct ScreenState {
 	float darken_screen_factor = -1;
+    Game_screens game_screen = game_screen_night;
 };
 
 // A struct to refer to debugging graphics in the ECS
@@ -214,7 +223,8 @@ enum class TEXTURE_ASSET_ID {
 	PLAYER_CHAR = 0,
 	KEEPER = PLAYER_CHAR + 1,
 	DOG = KEEPER + 1,
-	INGR_00 = DOG + 1,
+    DAYTIME = DOG + 1,
+	INGR_00 = DAYTIME + 1,
 	INGR_01 = INGR_00 + 1,
 	INGR_02 = INGR_01 + 1,
 	INGR_03 = INGR_02 + 1,

@@ -292,21 +292,30 @@ void RenderSystem::draw() {
 							  // sprites back to front
 	gl_has_errors();
 	mat3 projection_2D = createProjectionMatrix();
-	// Draw all textured meshes that have a position and size component
-	for (Entity entity : registry.renderRequests.entities) {
-		if (registry.motions.has(entity)) {
+
+    ScreenState &screen = registry.screenStates.components[0];
+
+    if (screen.game_screen == game_screen_night) {
+
+        // Draw all textured meshes that have a position and size component
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.motions.has(entity)) {
 //            if (!registry.debugComponents.has(entity)) {
                 drawTexturedMesh(entity, projection_2D);
 //            }
-		} 
-		// for non-moving entities (plants and potions)
-		else if (registry.immobiles.has(entity)) {
-            drawTexturedStaticMesh(entity, projection_2D);
-		}
-		
-		// Note, its not very efficient to access elements indirectly via the entity
-		// albeit iterating through all Sprites in sequence. A good point to optimize
-	}
+            }
+                // for non-moving entities (plants and potions)
+            else if (registry.immobiles.has(entity)) {
+                drawTexturedStaticMesh(entity, projection_2D);
+            }
+
+            // Note, its not very efficient to access elements indirectly via the entity
+            // albeit iterating through all Sprites in sequence. A good point to optimize
+        }
+    } else if (screen.game_screen == game_screen_day) {
+        Entity player = registry.players.entities[0];
+        drawTexturedMesh(player, projection_2D);
+    }
 
 	// Truely render to the screen
 	drawToScreen();
