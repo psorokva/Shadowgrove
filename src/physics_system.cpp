@@ -79,8 +79,8 @@ void PhysicsSystem::step(float elapsed_ms) {
 		//// TODO: check if collide with map
 		//registry.chunks
 		ChunkLocation* current_pos = getPlayerTiles(motion,compass_immobile);
-		future.position = motion.position + step_seconds * motion.velocity;
-		future_w.position = motion.position + step_seconds * motion.velocity + vec2(0.0, PLAYER_WIDTH);
+		future.position = motion.position + step_seconds * motion.velocity + vec2(0.0, -PLAYER_WIDTH);;
+		future_w.position = motion.position + step_seconds * motion.velocity + vec2(PLAYER_WIDTH, 0.0);
 		ChunkLocation* future_pos = getPlayerTiles(future, compass_immobile);
 		ChunkLocation* future_w_pos = getPlayerTiles(future_w, compass_immobile);
 

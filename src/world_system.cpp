@@ -276,7 +276,7 @@ void WorldSystem::restart_game() {
 	// Reset the game speed
 	current_speed = 1.f;
     inventory = 0;
-
+	num_of_item_on_screen = 0;
 	// Remove all entities that we created
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
 	while (registry.motions.entities.size() > 0)
