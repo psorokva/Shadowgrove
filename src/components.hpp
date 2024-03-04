@@ -151,9 +151,18 @@ struct Debug {
 };
 extern Debug debugging;
 
+enum Game_screens
+{
+    game_screen_main_menu,
+    game_screen_night,
+    game_screen_day,
+    game_screen_game_over,
+};
+
 // Sets the brightness of the screen
 struct ScreenState {
 	float darken_screen_factor = -1;
+    Game_screens game_screen = game_screen_night;
 };
 
 // A struct to refer to debugging graphics in the ECS
@@ -211,10 +220,15 @@ struct Mesh {
  */
 
 enum class TEXTURE_ASSET_ID {
-	PLAYER_CHAR = 0,
-	KEEPER = PLAYER_CHAR + 1,
+	PLAYER_CHAR1 = 0,
+	PLAYER_CHAR2 = PLAYER_CHAR1 + 1,
+	PLAYER_CHAR3 = PLAYER_CHAR2 + 1,
+	PLAYER_CHAR4 = PLAYER_CHAR3 + 1,
+	PLAYER_CHAR5 = PLAYER_CHAR4 + 1,
+	KEEPER = PLAYER_CHAR5 + 1,
 	DOG = KEEPER + 1,
-	INGR_00 = DOG + 1,
+    DAYTIME = DOG + 1,
+	INGR_00 = DAYTIME + 1,
 	INGR_01 = INGR_00 + 1,
 	INGR_02 = INGR_01 + 1,
 	INGR_03 = INGR_02 + 1,
@@ -284,7 +298,8 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_15 = PLANT_14 + 1,
 	PLANT_16 = PLANT_15 + 1,
 	PLANT_17 = PLANT_16 + 1,
-	TEXTURE_COUNT = PLANT_17 + 1
+	DAY_SCREEN = PLANT_17 + 1,
+	TEXTURE_COUNT = DAY_SCREEN + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

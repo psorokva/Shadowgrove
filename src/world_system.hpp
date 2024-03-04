@@ -66,6 +66,7 @@ private:
 	Immobile* compass_immobile;
     int inventory;
     Entity inventory1;
+	int num_item_on_screen;
 
 	// music references
 	Mix_Music* night_music;

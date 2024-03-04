@@ -11,7 +11,9 @@
 #include <vector>
 #include <iostream>
 
-
+void MapGen::clearMap() {
+	chunks.clear();
+}
 
 MapGen::MapGen(int maprows, int mapcols) {
 	// init noise grid withnoise levels of noise
@@ -86,12 +88,12 @@ MapGen::MapGen(int maprows, int mapcols) {
 			}
 		}
 	}
-	for (int i = 0; i < BIG_HEIGHT; ++i) {
-		for (int j = 0; j < BIG_WIDTH; ++j) {
-			printf(" %x", biome_filter[i][j]);
-		}
-		printf("\n");
-	}
+	//for (int i = 0; i < BIG_HEIGHT; ++i) {
+	//	for (int j = 0; j < BIG_WIDTH; ++j) {
+	//		printf(" %x", biome_filter[i][j]);
+	//	}
+	//	printf("\n");
+	//}
 }
 
 MapGen::~MapGen() {
@@ -154,22 +156,20 @@ bool MapGen::createWorldMap() {
 
 
 
-		for (int r = 0; r < MAZE_SIZE; r++) {
-			for (int c = 0; c < MAZE_SIZE; c++) {
-
-				// print chunk
-				if (chunk.grid[r][c] == 1) {
-					printf("%c%c", (char)219u, (char)219u);
-				} else {
-					printf("  ");
-				}
-					
-
-				//printf(" %x ", chunk.grid[r][c]);
-			}
-			printf("\n");
-		}
-		printf("--------\n");
+		//for (int r = 0; r < MAZE_SIZE; r++) {
+		//	for (int c = 0; c < MAZE_SIZE; c++) {
+		//		// print chunk
+		//		if (chunk.grid[r][c] == 1) {
+		//			printf("%c%c", (char)219u, (char)219u);
+		//		} else {
+		//			printf("  ");
+		//		}
+		//			
+		//		//printf(" %x ", chunk.grid[r][c]);
+		//	}
+		//	printf("\n");
+		//}
+		//printf("--------\n");
 	}
 	return true;
 }

@@ -30,9 +30,14 @@ class RenderSystem {
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	const std::array<std::string, texture_count> texture_paths = {
-			textures_path("player_00.png"),
+			textures_path("player_01.png"),
+			textures_path("player_02.png"),
+			textures_path("player_03.png"),
+			textures_path("player_04.png"),
+			textures_path("player_05.png"),
 			textures_path("keeper_01.png"),
 			textures_path("dog_00.png"),
+            textures_path("daytimesceen.png"),
 			textures_path("ingredient_00.png"),
 			textures_path("ingredient_01.png"),
 			textures_path("ingredient_02.png"),
@@ -103,6 +108,8 @@ class RenderSystem {
 			textures_path("plant_15.png"),
 			textures_path("plant_16.png"),
 			textures_path("plant_17.png"),
+			textures_path("daytimesceen.png"),
+
 
 
 	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
