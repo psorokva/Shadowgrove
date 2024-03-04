@@ -41,11 +41,12 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	motion.velocity = { 0.f, 0.f };
 	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
 
+	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
+	auto& enemy = registry.enemies.emplace(entity);
+	enemy.attack = 50;
 
-	// Create and (empty) Chicken component to be able to refer to all eagles
-	registry.enemies.emplace(entity);
-	registry.deadlys.emplace(entity);
-	// TEXTURE_COUNT indicates that no txture is needed
+	registry.deadlys.emplace(entity); // Do we still need this?
+	// TEXTURE_COUNT indicates that no texture is needed
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
@@ -280,7 +281,9 @@ Entity createPotion(RenderSystem* renderer, vec2 position) {
 
 	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.healers.emplace(entity);
-	// TEXTURE_COUNT indicates that no txture is needed
+
+	// TEXTURE_COUNT indicates that no texture is needed
+
 	int potion_colour_offset = rand() % 11;
 	switch (potion_colour_offset) {
 		case (0):
