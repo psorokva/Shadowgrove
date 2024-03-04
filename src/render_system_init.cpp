@@ -366,11 +366,13 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 	const std::string fonts_vertex_shader_name = font_path + ".vs.glsl";
 	const std::string fonts_fragment_shader_name = font_path + ".fs.glsl";
 
-	GLuint fonts_program;
+	//GLuint fonts_program;
 	//const char* fonts_vertex_shader = "fonts.vs.glsl";
 	//const char* fonts_fragment_shader = "fonts.fs.glsl";
-	bool is_valid = loadEffectFromFile(fonts_vertex_shader_name, fonts_fragment_shader_name, fonts_program);
-	assert(is_valid && fonts_program != 0);
+	//bool is_valid = loadEffectFromFile(fonts_vertex_shader_name, fonts_fragment_shader_name, fonts_program);
+	//assert(is_valid && fonts_program != 0);
+	bool is_valid = loadEffectFromFile(fonts_vertex_shader_name, fonts_fragment_shader_name, m_font_shaderProgram);
+	assert(is_valid && m_font_shaderProgram != 0);
 
 	//// font vertex shader
 	//unsigned int font_vertexShader;
@@ -395,11 +397,11 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 //	glDeleteShader(font_fragmentShader);
 //
 //	// use our new shader
-	glUseProgram(fonts_program);		// !! very important
+	glUseProgram(m_font_shaderProgram);		// !! very important
 
 	// apply projection matrix for font
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
-	GLint project_location = glGetUniformLocation(fonts_program, "projection");
+	GLint project_location = glGetUniformLocation(m_font_shaderProgram, "projection");
 	assert(project_location > -1);
 	std::cout << "project_location: " << project_location << std::endl;
 	glUniformMatrix4fv(project_location, 1, GL_FALSE, glm::value_ptr(projection));
@@ -494,7 +496,8 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans) {
 
 	// activate the shaders!
-		glUseProgram(m_font_shaderProgram);
+	glUseProgram(m_font_shaderProgram);
+	//assert(m_font_shaderProgram > -1);
 
 	GLint textColor_location = glGetUniformLocation(m_font_shaderProgram, "textColor");
 
