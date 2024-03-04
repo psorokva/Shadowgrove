@@ -14,11 +14,9 @@
 class MapGen {
 private:
 	//std::vector<Chunk> chunks;
-
 	//static const int MapGen::grid_pillars[MAZE_SIZE][MAZE_SIZE];
 	//static const int MapGen::grid_alt_base1[MAZE_SIZE][MAZE_SIZE];
 	//static const int MapGen::grid_alt_base2[MAZE_SIZE][MAZE_SIZE];
-
 
 public:
 	int** bignoise;
@@ -28,6 +26,7 @@ public:
 	std::vector<Chunk> chunks;
 	MapGen(int maprows, int mapcols);
 	~MapGen();
+	void clearMap();
 	//bool createChunkGrid(Chunk& chunk);
 	bool createWorldMap();
 	Chunk& createMapChunk(vec2 position);
