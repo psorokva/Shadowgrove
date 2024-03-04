@@ -116,7 +116,9 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 // Might need to optimize in the future
 void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection) {
 
+//    printf("in textured static mesh with entity %zu done \n", entity);
 	Immobile& immobile = registry.immobiles.get(entity);
+//    printf("entity immobile %zu done\n", entity);
 	// Transformation code, see Rendering and Transformation in the template
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
@@ -313,11 +315,18 @@ void RenderSystem::draw() {
             // albeit iterating through all Sprites in sequence. A good point to optimize
         }
     } else if (screen.game_screen == game_screen_day) {
-        Entity player = registry.players.entities[0];
-        drawTexturedMesh(player, projection_2D);
-//        Entity dayScreen = registry.screenStates.entities[0];
-//        drawTexturedStaticMesh(dayScreen, projection_2D);
-        // printf("screen state entities %zu\n", registry.screenStates.entities.size());
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.players.has(entity)) {
+                drawTexturedMesh(entity, projection_2D);
+            }
+                // for non-moving entities (plants and potions)
+            else if (registry.immobiles.has(entity)) {
+                if (registry.screenStates.has(entity)) {
+                    printf("day entity %zu\n", entity);
+                    drawTexturedStaticMesh(entity, projection_2D);
+                }
+            }
+        }
     }
 
 	// Truely render to the screen

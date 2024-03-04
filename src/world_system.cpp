@@ -36,6 +36,9 @@ float animation_elpased_ms = 0.0f;
 WorldSystem::WorldSystem() : points(0) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
+
+    Entity day = createDay();
+    printf("day entity init %zu\n", day);
 }
 
 WorldSystem::~WorldSystem() {
@@ -220,9 +223,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//	}
 	//}
 
-
-	// Processing the chicken state
-	assert(registry.screenStates.components.size() <= 1);
+//	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
 
     camera.step();
@@ -311,14 +312,15 @@ void WorldSystem::restart_game() {
 	// Create a new player
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 	registry.inventory.emplace(player);
-	generator->createWorldMap();
+
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
-	printf("MAP AND PLAYER CREATED");
-	// create a compass to calc player movement 
+	printf("MAP AND PLAYER CREATED\n");
+
+	// create a compass to calc player movement
 	Entity compass = createCompass(vec2(155.0,155.0));
 	Immobile& imo = registry.immobiles.get(compass);
 	compass_immobile = &imo;
@@ -328,24 +330,24 @@ void WorldSystem::restart_game() {
 
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
-	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
 
     ScreenState &screen = registry.screenStates.components[0];
     if (screen.game_screen == game_screen_night) {
         // Playing background music indefinitely
         Mix_PlayMusic(night_music, -1);
         fprintf(stderr, "Loaded music\n");
+        generator->createWorldMap();
+        createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
     } else if (screen.game_screen == game_screen_day) {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
     }
 
-//    createDay();
 
 	// Create empty "path" maze
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
-	//// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
+	//// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers
 	auto& chunks = generator->chunks;
 	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
 	//for (Chunk c : chunks) {
@@ -362,12 +364,12 @@ void WorldSystem::restart_game() {
 					int plant_x = c.offset_x + col * TILE_SIZE;
 					int plant_y = c.offset_y + row * TILE_SIZE;
 					// TODO store plant type in // c.grid[row][col]
-					createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); // 
+					createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); //
 					//printf("tile: %d %d ", c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col);
 					//updateTile(renderer, maze, c.offset_y + row, c.offset_x + col, 1);
 					//updateTile(renderer, maze, c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col, c.grid[row][col]);
 				}
-				
+
 			}
 			//printf("\n");
 		}
