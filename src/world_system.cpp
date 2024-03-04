@@ -42,6 +42,8 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (night_music != nullptr)
 	    Mix_FreeMusic(night_music);
+    if (day_music != nullptr)
+        Mix_FreeMusic(day_music);
 	if (bird_sounds != nullptr)
 	    Mix_FreeChunk(bird_sounds);
     if (mushroom_sound != nullptr)
@@ -123,16 +125,18 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
     night_music = Mix_LoadMUS(audio_path("forest_night.wav").c_str());
+    day_music = Mix_LoadMUS(audio_path("day.wav").c_str());
     bird_sounds = Mix_LoadWAV(audio_path("bird_noises.wav").c_str());
     mushroom_sound = Mix_LoadWAV(audio_path("mushroom.wav").c_str());
     player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
     inventory_full_sound = Mix_LoadWAV(audio_path("inventory_full.wav").c_str());
 	player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
 
-	if (night_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
+	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
         player_death_sound == nullptr || inventory_full_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
             audio_path("forest_night.wav").c_str(),
+            audio_path("day.wav").c_str(),
             audio_path("bird_noises.wav").c_str(),
             audio_path("mushroom.wav").c_str(),
             audio_path("player_death.wav").c_str(),
@@ -149,9 +153,9 @@ void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg, Physic
 	this->renderer = renderer_arg;
 	this->generator = generator_arg;
 	this->physics = physics_arg;
-	// Playing background music indefinitely
-	Mix_PlayMusic(night_music, -1);
-	fprintf(stderr, "Loaded music\n");
+//	// Playing background music indefinitely
+//	Mix_PlayMusic(night_music, -1);
+//	fprintf(stderr, "Loaded music\n");
 
     // Set all states to default
     restart_game();
@@ -325,6 +329,17 @@ void WorldSystem::restart_game() {
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+
+    ScreenState &screen = registry.screenStates.components[0];
+    if (screen.game_screen == game_screen_night) {
+        // Playing background music indefinitely
+        Mix_PlayMusic(night_music, -1);
+        fprintf(stderr, "Loaded music\n");
+    } else if (screen.game_screen == game_screen_day) {
+        // Playing background music indefinitely
+        Mix_PlayMusic(day_music, -1);
+        fprintf(stderr, "Loaded music\n");
+    }
 
 //    createDay();
 
@@ -526,6 +541,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         printf("D key pressed, switching to day");
         ScreenState &screen = registry.screenStates.components[0];
         screen.game_screen = game_screen_day;
+        restart_game();
     }
 
     // Changing game scene to day
@@ -533,6 +549,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         printf("D key pressed, switching to night");
         ScreenState &screen = registry.screenStates.components[0];
         screen.game_screen = game_screen_night;
+         restart_game();
     }
 
 	// Debugging

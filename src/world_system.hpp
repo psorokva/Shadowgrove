@@ -70,6 +70,7 @@ private:
 
 	// music references
 	Mix_Music* night_music;
+    Mix_Music* day_music;
 	Mix_Chunk* bird_sounds;
     Mix_Chunk* mushroom_sound;
     Mix_Chunk* player_death_sound;
