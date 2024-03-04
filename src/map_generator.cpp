@@ -100,6 +100,12 @@ MapGen::~MapGen() {
 
 // feed into the connectio row, cols, d, h into create?
 bool MapGen::createWorldMap() {
+	int sparn_chunk_col = (window_width_px / 2) / (MAZE_SIZE * TILE_SIZE);
+	int spawn_chunk_row = (window_height_px - 200) / (MAZE_SIZE * TILE_SIZE);
+	int start_row = ((window_height_px - 200) / TILE_SIZE) % MAZE_SIZE - 2;
+	int fin_row = ((window_height_px - 200) / TILE_SIZE) % MAZE_SIZE + 3;
+	int start_col = (window_width_px / 2 / TILE_SIZE) % MAZE_SIZE - 2;
+	int fin_col = (window_width_px / 2 / TILE_SIZE) % MAZE_SIZE + 3;
 
 	for (int r = 0; r < rows; r++) {
 		for (int c = 0; c < cols; c++) {
@@ -113,17 +119,44 @@ bool MapGen::createWorldMap() {
 		printf("Chunk:\n");
 		printf("position: x= %x, y= %x \n",chunk.x,chunk.y);
 		//printf("offset: x= %f, y= %f \n", chunk.offset_x, chunk.offset_y);
+
+		if (chunk.y == 0) {
+			for (int i = 0; i < MAZE_SIZE; i++) {
+				chunk.grid[0][i] = rand() % 3 + 1;
+			}
+		}
+		if (chunk.x == 0) {
+			for (int i = 0; i < MAZE_SIZE; i++) {
+				chunk.grid[i][0] = rand() % 3 + 1;
+			}
+		}
+		if (chunk.y == rows-1) {
+			for (int i = 0; i < MAZE_SIZE; i++) {
+				chunk.grid[MAZE_SIZE-1][i] = rand() % 3 + 1;
+			}
+		}
+		if (chunk.x == cols-1) {
+			for (int i = 0; i < MAZE_SIZE; i++) {
+				chunk.grid[i][MAZE_SIZE-1] = rand() % 3 + 1;
+			}
+		}
+		// ensure starting location is relatively free
+		// player spawns at window_width_px / 2, window_height_px - 200
+
+		if (chunk.y == spawn_chunk_row && chunk.x == sparn_chunk_col) {
+			for (int i = start_row; i < fin_row; i++) {
+				for (int j = start_col; j < fin_col; j++) {
+					chunk.grid[i][j] = 0;
+				}
+			}
+		}
+
+
+
+
 		for (int r = 0; r < MAZE_SIZE; r++) {
 			for (int c = 0; c < MAZE_SIZE; c++) {
 
-				// ensure starting location is relatively free
-				if (r == 0 && c == 0) {
-					for (int i = 7; i < MAZE_SIZE; i++) {
-						for (int j = 6; j < MAZE_SIZE - 6; j++) {
-							chunk.grid[i][j] = 0;
-						}
-					}
-				}
 				// print chunk
 				if (chunk.grid[r][c] == 1) {
 					printf("%c%c", (char)219u, (char)219u);
