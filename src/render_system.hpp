@@ -185,5 +185,3 @@ private:
 
 bool loadEffectFromFile(
 	const std::string& vs_path, const std::string& fs_path, GLuint& out_program);
-
-void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
