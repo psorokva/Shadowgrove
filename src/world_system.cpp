@@ -240,11 +240,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     vec2 pos = {720, 60};
     createInventory(pos);
 
-    for (int i = 1; i <= inventory; i++) {
+    for (int i = 0; i < inventory; i++) {
         Inventory& player_inv = registry.inventory.get(p);
         auto& item = player_inv.holding[i];
 
-        createInventoryPotion(item, {pos.x - 180 + (60.0 * i), pos.y});
+        createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
 
 
@@ -415,10 +415,10 @@ void WorldSystem::handle_collisions() {
 				// chew, count points, and set the LightUp timer
 				// if (registry.inventory.get(entity).size < 5) {
                 if (inventory < 5) {
-                    inventory++;
 					Inventory& player_inv = registry.inventory.get(entity);
 					player_inv.holding[inventory] = registry.healers.get(entity_other).item_name;
 					// registry.inventory.get(entity).size += 1;
+                    inventory++;
                     printf("inventory size %d\n", inventory);
 
 					registry.remove_all_components_of(entity_other);
