@@ -211,9 +211,9 @@ void RenderSystem::initializeGlGeometryBuffers() {
 
 RenderSystem::~RenderSystem() {
 	// font
-	/*glDeleteProgram(m_font_shaderProgram);
+	glDeleteProgram(m_font_shaderProgram);
 	glDeleteBuffers(1, &m_font_VBO);
-	glDeleteBuffers(1, &m_font_VAO);*/
+	glDeleteBuffers(1, &m_font_VAO);
 	// Don't need to free gl resources since they last for as long as the program,
 	// but it's polite to clean after yourself.
 	glDeleteBuffers((GLsizei)vertex_buffers.size(), vertex_buffers.data());
