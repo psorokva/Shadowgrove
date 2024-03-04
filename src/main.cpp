@@ -22,7 +22,7 @@ int main(){
 	
 	MapGen generator(3,3);
 
-	generator.createWorldMap();
+	//generator.createWorldMap();
 
 	// Initializing window
 	GLFWwindow* window = world.create_window();

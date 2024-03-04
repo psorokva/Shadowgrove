@@ -7,8 +7,10 @@
 // These are hard coded to the dimensions of the entity texture
 const float STD_PLANT_WIDTH = 90.0f;
 const float STD_PLANT_HEIGHT = 90.0f;
-const float PLAYER_WIDTH = 40.0f;
-const float PLAYER_HEIGHT = PLAYER_WIDTH * 2.0;
+const float PLAYER_HEIGHT = 80.0f;
+const float PLAYER_WIDTH = PLAYER_HEIGHT * 0.75;
+const float KEEPER_WIDTH = 50.0f;
+const float KEEPER_HEIGHT = KEEPER_WIDTH * 2.0;
 const float MUSHROOM_SIZE = 50.0f;
 
 // the player

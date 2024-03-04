@@ -22,7 +22,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	player.health = 100;
 
 	// TEXTURE_COUNT indicates that no txture is needed
-	registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::PLAYER_CHAR, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::PLAYER_CHAR1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }
@@ -39,7 +39,7 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	motion.position = pos;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
-	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+	motion.scale = vec2({ KEEPER_WIDTH, KEEPER_HEIGHT });
 
 	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
 	auto& enemy = registry.enemies.emplace(entity);
