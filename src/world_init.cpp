@@ -409,3 +409,14 @@ Entity createInventoryPotion(Item& item, vec2 position) {
 
     return entity;
 }
+
+Entity createDay() {
+    auto entity = Entity();
+
+    auto& day = registry.screenStates.emplace(entity);
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}

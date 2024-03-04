@@ -24,6 +24,7 @@ Entity createPotion(RenderSystem* renderer, vec2 position);
 Entity createInventoryPotion(Item& item, vec2 position);
 
 Entity createLine(vec2 position, vec2 size);
+Entity createDay();
 
 void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int tile_type);
 

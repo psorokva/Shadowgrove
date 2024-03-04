@@ -315,6 +315,9 @@ void RenderSystem::draw() {
     } else if (screen.game_screen == game_screen_day) {
         Entity player = registry.players.entities[0];
         drawTexturedMesh(player, projection_2D);
+//        Entity dayScreen = registry.screenStates.entities[0];
+//        drawTexturedStaticMesh(dayScreen, projection_2D);
+        // printf("screen state entities %zu\n", registry.screenStates.entities.size());
     }
 
 	// Truely render to the screen

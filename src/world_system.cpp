@@ -143,11 +143,6 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
-void renderInventory() {
-    // top line
-//    Entity topLine = createLine({800, 10}, {10, 10});
-}
-
 void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg, PhysicsSystem* physics_arg) {
 	this->renderer = renderer_arg;
 	this->generator = generator_arg;
@@ -296,6 +291,8 @@ void WorldSystem::restart_game() {
 		registry.remove_all_components_of(registry.chunks.entities.back());
 	while (registry.players.entities.size() > 0)
 		registry.remove_all_components_of(registry.players.entities.back());
+//    while (registry.screenStates.entities.size() > 0)
+//        registry.remove_all_components_of(registry.screenStates.entities.back());
 	//registry.clear_all_components();
 	generator->clearMap();
 	printf("AFTER CLEARED REGISTRY");
@@ -321,6 +318,8 @@ void WorldSystem::restart_game() {
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+
+//    createDay();
 
 	// Create empty "path" maze
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));

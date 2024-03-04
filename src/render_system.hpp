@@ -37,7 +37,6 @@ class RenderSystem {
 			textures_path("player_05.png"),
 			textures_path("keeper_01.png"),
 			textures_path("dog_00.png"),
-            textures_path("daytimesceen.png"),
 			textures_path("ingredient_00.png"),
 			textures_path("ingredient_01.png"),
 			textures_path("ingredient_02.png"),
