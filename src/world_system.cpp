@@ -27,8 +27,10 @@ enum Direction { UP, DOWN, LEFT, RIGHT};
 Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
+const float ANIMATION_SPEED = 1000.0 / 24.0;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
+float animation_elpased_ms = 0.0f;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0) {
@@ -184,8 +186,13 @@ void WorldSystem::createInventory(vec2 pos) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
-	animation_cycle++;
-	animation_cycle %= 4;
+	animation_elpased_ms += elapsed_ms_since_last_update;
+	if (animation_elpased_ms > ANIMATION_SPEED) {
+		animation_elpased_ms = 0.0;
+		animation_cycle++;
+		animation_cycle %= 4;
+	}
+
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
