@@ -343,6 +343,7 @@ void WorldSystem::restart_game() {
         printf("day entity init %zu\n", day);
     }
 
+    createHelp();
 
 	// Create empty "path" maze
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
@@ -543,20 +544,28 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		glfwSetWindowShouldClose(window, true);
 	}
 
-    // Changing game scene to day
-    if (action == GLFW_RELEASE && key == GLFW_KEY_D) {
-        printf("D key pressed, switching to day");
-        ScreenState &screen = registry.screenStates.components[0];
-        screen.game_screen = game_screen_day;
-        restart_game();
-    }
 
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_N) {
-        printf("D key pressed, switching to night");
+        printf("N key pressed, switching screen");
         ScreenState &screen = registry.screenStates.components[0];
-        screen.game_screen = game_screen_night;
+        if (screen.game_screen == game_screen_night) {
+            screen.game_screen = game_screen_day;
+        } else {
+            screen.game_screen = game_screen_night;
+        }
          restart_game();
+    }
+
+    // Opening help screen
+    if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
+        printf("H key pressed, opening help screen");
+        HelpScreen &screen = registry.helpScreen.components[0];
+        if (screen.help == 1) {
+            screen.help = 0;
+        } else {
+            screen.help = 1;
+        }
     }
 
 	// Debugging

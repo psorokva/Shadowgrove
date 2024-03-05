@@ -108,6 +108,7 @@ class RenderSystem {
 			textures_path("plant_16.png"),
 			textures_path("plant_17.png"),
 			textures_path("daytimesceen.png"),
+            textures_path("helpscreen.png"),
 
 
 
