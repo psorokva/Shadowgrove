@@ -63,7 +63,7 @@ void PhysicsSystem::setCompass(Entity* entity, Immobile* immobile) {
 }
 
 void PhysicsSystem::step(float elapsed_ms) {
-	//printf("HELLO x %f  y%f \n", compass_immobile->camera_position.x, compass_immobile->camera_position.y);
+	//printf("HELLO physics \n");
 
 	// Move bug based on how much time has passed, this is to (partially) avoid
 	// having entities move at different speed based on the machine.
@@ -85,6 +85,7 @@ void PhysicsSystem::step(float elapsed_ms) {
 		ChunkLocation* future_w_pos = getPlayerTiles(future_w, compass_immobile);
 
 		for (Chunk& chunk : registry.chunks.components) {
+			//printf(".");
 			//if (DEBUG_PRINT) {
 			//	printf("mp %f , %f \n", motion.position[0], motion.position[1]);
 			//	printf("vec4 offset: x %d ,y %d , index: x %d ,y %d \n", current_pos->offset_x, current_pos->offset_y, current_pos->index_x, current_pos->index_y);
