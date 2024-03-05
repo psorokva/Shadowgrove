@@ -23,11 +23,12 @@ bool blockedSouth = false;
 bool blockedEast = false;
 bool blockedWest = false;
 
-enum Direction { UP, DOWN, LEFT, RIGHT};
 Direction playerDirection;
-
+const uint NUM_POTIONS = 10;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 24.0;
+const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
@@ -186,12 +187,20 @@ void WorldSystem::createInventory(vec2 pos) {
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	animation_elpased_ms += elapsed_ms_since_last_update;
+	keeper_spawn_time += elapsed_ms_since_last_update;
 	if (animation_elpased_ms > ANIMATION_SPEED) {
 		animation_elpased_ms = 0.0;
 		animation_cycle++;
 		animation_cycle %= 4;
 	}
-
+	//const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+	//f//loat keeper_spawn_time = 0.0f;
+	if (keeper_spawn_time > KEEPER_SPAWN_FREQ) {
+		keeper_spawn_time = 0.0;
+		vec2 spawn_pos = registry.get_empty_spawn_location();
+		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+	}
+	
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
@@ -246,7 +255,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
 
-	if (num_of_item_on_screen < 7) {
+	if (num_of_item_on_screen < NUM_POTIONS) {
 		vec2 spawn_pos = registry.get_empty_spawn_location();
 		printf("Spawning object at x %f  y %f\n", spawn_pos.x, spawn_pos.y);
 		createPotion(renderer, camera.adjust_to_player(spawn_pos));
@@ -519,6 +528,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		registry.inventory.get(registry.players.entities[0]).holding[4] = nullval;
 	}
 
+	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
+		//std::cout << "in here!" << std::endl;
+		while (registry.enemies.entities.size() > 0)
+			registry.remove_all_components_of(registry.enemies.entities.back());
+	}
+
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -675,7 +690,12 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
 		vec2 spawn_pos = registry.get_empty_spawn_location();
 		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
-		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+		//createPotion(renderer, camera.adjust_to_player(spawn_pos));
+		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+		//if (points <= 5) {
+		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		//}
+		
 	}
 	
 	

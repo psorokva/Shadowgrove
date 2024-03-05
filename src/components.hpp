@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+#include <set>
 
 struct Chunk {
 	int x = 0;
@@ -68,6 +69,9 @@ struct Player {
 // Enemy component
 struct Enemy {
 	unsigned int attack;
+	int frame_count = 0;
+	std::set<Direction> last_possible_directions;
+	Direction last_direction;
 };
 
 enum Item {
