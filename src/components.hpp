@@ -162,7 +162,7 @@ enum Game_screens
 // Sets the brightness of the screen
 struct ScreenState {
 	float darken_screen_factor = -1;
-    Game_screens game_screen = game_screen_night;
+    Game_screens game_screen = game_screen_day;
 };
 
 // A struct to refer to debugging graphics in the ECS

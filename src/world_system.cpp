@@ -36,9 +36,6 @@ float animation_elpased_ms = 0.0f;
 WorldSystem::WorldSystem() : points(0) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
-
-    Entity day = createDay();
-    printf("day entity init %zu\n", day);
 }
 
 WorldSystem::~WorldSystem() {
@@ -174,7 +171,7 @@ void WorldSystem::createInventory(vec2 pos) {
     Entity sideLine5 = createLine({pos.x + 90, pos.y}, {8, 70});
     Entity sideLine6 = createLine({pos.x + 150, pos.y}, {8, 70});
 
-    vec3 green = {0.2, 0.8, 0.2};
+    vec3 green = {0.07, 0.5, 0.05};
     registry.colors.insert(topLine, green);
     registry.colors.insert(bottomLine, green);
     registry.colors.insert(sideLine1, green);
@@ -249,7 +246,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
 
-	if (num_of_item_on_screen < 100) {
+	if (num_of_item_on_screen < 7) {
 		vec2 spawn_pos = registry.get_empty_spawn_location();
 		printf("Spawning object at x %f  y %f\n", spawn_pos.x, spawn_pos.y);
 		createPotion(renderer, camera.adjust_to_player(spawn_pos));
@@ -342,6 +339,9 @@ void WorldSystem::restart_game() {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
+
+        Entity day = createDay();
+        printf("day entity init %zu\n", day);
     }
 
 
@@ -566,72 +566,75 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 		Motion& motion = registry.motions.get(player);
 
-		// Character movement
-		// Move Up
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-			playerDirection = UP;
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-			if (!blockedNorth) {
-				motion.velocity = vec2(0.f, -CHARACTER_SPEED);
-			}
-			// TODO fix this if using angle
-			/*if (motion.angle != 0.f)	{
-				motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-				motion.velocity.x = motion.velocity.x * cos(motion.angle);
-				motion.velocity.y = motion.velocity.y * sin(motion.angle);
-			}*/
-		}
+        ScreenState& screen = registry.screenStates.components[0];
+        if (screen.game_screen == game_screen_night) {
+            // Character movement
+            // Move Up
+            if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+                playerDirection = UP;
+                RenderRequest& r = registry.renderRequests.get(player);
+                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
+                if (!blockedNorth) {
+                    motion.velocity = vec2(0.f, -CHARACTER_SPEED);
+                }
+                // TODO fix this if using angle
+                /*if (motion.angle != 0.f)	{
+                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
+                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
+                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
+                }*/
+            }
 
-		// Move Down
-		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
-			playerDirection = DOWN;
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-			if (!blockedSouth) {
-				motion.velocity = vec2(0.f, CHARACTER_SPEED);
-			}
-			
-			/*if (motion.angle != 0.f)	{
-				motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-				motion.velocity.x = motion.velocity.x * cos(motion.angle);
-				motion.velocity.y = motion.velocity.y * sin(motion.angle);
-			}*/
-		}
+            // Move Down
+            if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
+                playerDirection = DOWN;
+                RenderRequest& r = registry.renderRequests.get(player);
+                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
+                if (!blockedSouth) {
+                    motion.velocity = vec2(0.f, CHARACTER_SPEED);
+                }
 
-		// Move Right
-		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-			playerDirection = RIGHT;
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-			if (!blockedEast) {
-				motion.velocity = vec2(CHARACTER_SPEED, 0.f);
-				motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
-			}
-			
-			/*if (motion.angle != 0.f)	{
-				motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-				motion.velocity.y = motion.velocity.y * cos(motion.angle);
-				motion.velocity.x = motion.velocity.x * sin(motion.angle);
-			}*/
-		}
+                /*if (motion.angle != 0.f)	{
+                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
+                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
+                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
+                }*/
+            }
 
-		// Move Left
-		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
-			playerDirection = LEFT;
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle+1);
-			if (!blockedWest) {
-				motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
-				motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
-			}
-			
-			/*if (motion.angle != 0.f)	{
-				motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-				motion.velocity.y = motion.velocity.y * cos(motion.angle);
-				motion.velocity.x = motion.velocity.x * sin(motion.angle);
-			}*/
-		}
+            // Move Right
+            if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+                playerDirection = RIGHT;
+                RenderRequest& r = registry.renderRequests.get(player);
+                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
+                if (!blockedEast) {
+                    motion.velocity = vec2(CHARACTER_SPEED, 0.f);
+                    motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
+                }
+
+                /*if (motion.angle != 0.f)	{
+                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
+                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
+                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
+                }*/
+            }
+
+            // Move Left
+            if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
+                playerDirection = LEFT;
+                RenderRequest &r = registry.renderRequests.get(player);
+                r.used_texture = (TEXTURE_ASSET_ID) (animation_cycle + 1);
+                if (!blockedWest) {
+                    motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
+                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
+                }
+
+                /*if (motion.angle != 0.f)	{
+                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
+                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
+                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
+                }*/
+            }
+        }
 
 		// Stop moving when key is released
 		if (action == GLFW_RELEASE) {

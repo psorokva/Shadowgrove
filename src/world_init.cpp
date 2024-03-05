@@ -416,9 +416,9 @@ Entity createDay() {
     auto& day = registry.screenStates.emplace(entity);
 
     auto& fixed = registry.immobiles.emplace(entity);
-    fixed.position = { 0,0};
+    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
     fixed.scale = { window_width_px, window_height_px };
-    fixed.camera_position = { 0,0};
+//    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
 
     // TEXTURE_COUNT indicates that no txture is needed
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
