@@ -26,7 +26,7 @@ bool blockedWest = false;
 Direction playerDirection;
 const uint NUM_POTIONS = 10;
 const float CHARACTER_SPEED = 300.0f;
-const float ANIMATION_SPEED = 1000.0 / 24.0;
+const float ANIMATION_SPEED = 1000.0 / 16.0;
 const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
@@ -212,24 +212,23 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//printf("free tile at: %f, %f\n", spawn.x, spawn.y);
 
 	// Remove debug info from the last step
-	while (registry.debugComponents.entities.size() > 0)
-	    registry.remove_all_components_of(registry.debugComponents.entities.back());
+	while (registry.debugComponents.entities.size() > 0) {
+		registry.remove_all_components_of(registry.debugComponents.entities.back());
+	}
 
-	// Removing out of screen entities
-	auto& motions_registry = registry.motions;
+	// Animating enemy entities
+	auto& enemies = registry.enemies.components;
+	for (int i = 0; i < enemies.size(); i++ ) {
+		RenderRequest& r = registry.renderRequests.get( enemies[i].e_id );
+		if (animation_cycle % 2 == 1) { 
+			r.used_texture = TEXTURE_ASSET_ID::KEEPER2;
+		} else {
+			r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
+		}
+	}
 
-	// Remove entities that leave the screen on the left side
-	// Iterate backwards to be able to remove without unterfering with the next object to visit
-	// (the containers exchange the last element with the current)
-	//for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
-	//    Motion& motion = motions_registry.components[i];
-	//	if (motion.position.x + abs(motion.scale.x) < 0.f) {
-	//		if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
-	//			registry.remove_all_components_of(motions_registry.entities[i]);
-	//	}
-	//}
 
-//	assert(registry.screenStates.components.size() <= 1);
+	//	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
 
     camera.step();
@@ -280,7 +279,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
-	// reduce window brightness if any of the present chickens is dying
+	// reduce window brightness if any of the present is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
 	return true;
@@ -384,7 +383,7 @@ void WorldSystem::restart_game() {
 		}
 		//printf("--------\n");
 	}
-
+	// wait();
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 }
