@@ -302,12 +302,16 @@ void RenderSystem::draw() {
         for (Entity entity: registry.renderRequests.entities) {
             if (registry.motions.has(entity)) {
                 if (!registry.debugComponents.has(entity)) {
-                    drawTexturedMesh(entity, projection_2D);
+                    if (!registry.helpScreen.has(entity)) {
+                        drawTexturedMesh(entity, projection_2D);
+                    }
                 }
             }
                 // for non-moving entities (plants and potions)
             else if (registry.immobiles.has(entity)) {
-                drawTexturedStaticMesh(entity, projection_2D);
+                if (!registry.helpScreen.has(entity)) {
+                    drawTexturedStaticMesh(entity, projection_2D);
+                }
             }
 
             // Note, its not very efficient to access elements indirectly via the entity
@@ -319,6 +323,19 @@ void RenderSystem::draw() {
                 drawTexturedMesh(entity, projection_2D);
             }
         }
+
+        // add help screen to night screen
+//        HelpScreen& help = registry.helpScreen.components[0];
+//        if (help.help == 1) {
+//            Entity helpScreen = registry.helpScreen.entities[0];
+//
+//            if (!registry.motions.has(helpScreen)) {
+//                auto &motion = registry.motions.emplace(helpScreen);
+//                motion.position = {window_width_px / 2, 0.75 * window_height_px};
+//                motion.scale = {0.5 * window_width_px, 0.5 * window_height_px};
+//            }
+//            drawTexturedMesh(helpScreen, projection_2D);
+//        }
 
     } else if (screen.game_screen == game_screen_day) {
         for (Entity entity: registry.renderRequests.entities) {
@@ -338,6 +355,18 @@ void RenderSystem::draw() {
             player_im.scale = { 2 * 60, 2 * 80 };
         }
         drawTexturedStaticMesh(player, projection_2D);
+
+        HelpScreen& help = registry.helpScreen.components[0];
+        if (help.help == 1) {
+            Entity helpScreen = registry.helpScreen.entities[0];
+
+            if (!registry.immobiles.has(helpScreen)) {
+                auto &fixed = registry.immobiles.emplace(helpScreen);
+                fixed.position = {window_width_px / 2, 0.75 * window_height_px};
+                fixed.scale = {0.5 * window_width_px, 0.5 * window_height_px};
+            }
+            drawTexturedStaticMesh(helpScreen, projection_2D);
+        }
     }
 
 	// Truely render to the screen

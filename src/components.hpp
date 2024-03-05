@@ -170,6 +170,10 @@ struct ScreenState {
     Game_screens game_screen = game_screen_day;
 };
 
+struct HelpScreen {
+    int help = 0;
+};
+
 // A struct to refer to debugging graphics in the ECS
 struct DebugComponent {
 	// Note, an empty struct has size 1
@@ -304,7 +308,8 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_16 = PLANT_15 + 1,
 	PLANT_17 = PLANT_16 + 1,
 	DAY_SCREEN = PLANT_17 + 1,
-	TEXTURE_COUNT = DAY_SCREEN + 1
+    HELP_SCREEN = DAY_SCREEN +1,
+	TEXTURE_COUNT = HELP_SCREEN + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

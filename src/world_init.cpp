@@ -420,3 +420,14 @@ Entity createDay() {
 
     return entity;
 }
+
+Entity createHelp() {
+    auto entity = Entity();
+
+    auto& help = registry.helpScreen.emplace(entity);
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::HELP_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}
