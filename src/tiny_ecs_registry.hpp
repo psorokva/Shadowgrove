@@ -105,7 +105,7 @@ public:
 		}
 		//Immobile& zero = immobiles.components[0];
 		printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
-		printf("Desired Chunk x %x y %x \n", chunk.campos_x, chunk.campos_y);
+		printf("Desired Chunk x %f y %f \n", chunk.campos_x, chunk.campos_y);
 		//printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
 		//printf("Zero cam pos x %f y %f \n", zero.camera_position.x, zero.camera_position.y);
 		//printf("Zero pos x %f y %f \n", zero.position.x, zero.position.y);
@@ -133,8 +133,8 @@ public:
 			if (ccc[i].x == cl->index_x && ccc[i].y == cl->index_y) {
 				printf("CLICK: x:%f y:%f\n", location.x, location.y);
 				printf("\tCOMPASS: x:%f y:%f\n", p_x, p_y);
-				printf("\tCHUNK: x:%d y:%d\n", cl->index_x, cl->index_y);
-				printf("\tCHUNK CELL: x:%d y:%d \n", cl->offset_x, cl->offset_y);
+				printf("\tCHUNK: x:%zu y:%zu\n", cl->index_x, cl->index_y);
+				printf("\tCHUNK CELL: x:%zu y:%zu \n", cl->offset_x, cl->offset_y);
 				// if spot clear 
 				if ( ccc[i].grid[cl->offset_y][cl->offset_x] == 0 ) {
 					return true;

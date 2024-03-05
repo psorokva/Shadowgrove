@@ -37,11 +37,14 @@ int main(){
 
 	// initialize the main systems
 	renderer.init(window);
+
+	// setup fonts
+	//td::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+	unsigned int font_default_size = 48;
+	//renderer.fontInit(window, font_filename, font_default_size);
 	
 
 	world.init(&renderer, &generator, &physics);
-
-	
 
 	// variable timestep loop
 	auto t = Clock::now();

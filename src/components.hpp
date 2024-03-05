@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+#include <set>
 
 struct Chunk {
 	int x = 0;
@@ -67,7 +68,11 @@ struct Player {
 
 // Enemy component
 struct Enemy {
-
+	unsigned int attack;
+	int frame_count = 0;
+	std::set<Direction> last_possible_directions;
+	Direction last_direction;
+	Entity e_id;
 };
 
 enum Item {
@@ -136,6 +141,14 @@ struct Collision {
 	Collision(Entity& other) { this->other = other; };
 };
 
+struct Character {
+	unsigned int TextureID;  // ID handle of the glyph texture
+	glm::ivec2   Size;       // Size of glyph
+	glm::ivec2   Bearing;    // Offset from baseline to left/top of glyph
+	unsigned int Advance;    // Offset to advance to next glyph
+	char character;
+};
+
 // Data structure for toggling debug mode
 struct Debug {
 	bool in_debug_mode = 0;
@@ -143,9 +156,18 @@ struct Debug {
 };
 extern Debug debugging;
 
+enum Game_screens
+{
+    game_screen_main_menu,
+    game_screen_night,
+    game_screen_day,
+    game_screen_game_over,
+};
+
 // Sets the brightness of the screen
 struct ScreenState {
 	float darken_screen_factor = -1;
+    Game_screens game_screen = game_screen_day;
 };
 
 // A struct to refer to debugging graphics in the ECS
@@ -208,8 +230,9 @@ enum class TEXTURE_ASSET_ID {
 	PLAYER_CHAR3 = PLAYER_CHAR2 + 1,
 	PLAYER_CHAR4 = PLAYER_CHAR3 + 1,
 	PLAYER_CHAR5 = PLAYER_CHAR4 + 1,
-	KEEPER = PLAYER_CHAR5 + 1,
-	DOG = KEEPER + 1,
+	KEEPER1 = PLAYER_CHAR5 + 1,
+	KEEPER2 = KEEPER1 + 1,
+	DOG = KEEPER2 + 1,
 	INGR_00 = DOG + 1,
 	INGR_01 = INGR_00 + 1,
 	INGR_02 = INGR_01 + 1,
@@ -280,7 +303,8 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_15 = PLANT_14 + 1,
 	PLANT_16 = PLANT_15 + 1,
 	PLANT_17 = PLANT_16 + 1,
-	TEXTURE_COUNT = PLANT_17 + 1
+	DAY_SCREEN = PLANT_17 + 1,
+	TEXTURE_COUNT = DAY_SCREEN + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

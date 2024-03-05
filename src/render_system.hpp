@@ -7,6 +7,11 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
+// fonts
+//#include <ft2build.h>
+//#include FT_FREETYPE_H
+#include <map>
+
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
 class RenderSystem {
@@ -31,6 +36,7 @@ class RenderSystem {
 			textures_path("player_04.png"),
 			textures_path("player_05.png"),
 			textures_path("keeper_01.png"),
+			textures_path("keeper_02.png"),
 			textures_path("dog_00.png"),
 			textures_path("ingredient_00.png"),
 			textures_path("ingredient_01.png"),
@@ -102,6 +108,8 @@ class RenderSystem {
 			textures_path("plant_15.png"),
 			textures_path("plant_16.png"),
 			textures_path("plant_17.png"),
+			textures_path("daytimesceen.png"),
+
 
 
 	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
@@ -121,6 +129,8 @@ class RenderSystem {
 public:
 	// Initialize the window
 	bool init(GLFWwindow* window);
+
+	void fontInit(GLFWwindow& window, const std::string& font_filename, unsigned int font_default_size);
 
 	template <class T>
 	void bindVBOandIBO(GEOMETRY_BUFFER_ID gid, std::vector<T> vertices, std::vector<uint16_t> indices);
@@ -146,6 +156,8 @@ public:
 
 	mat3 createProjectionMatrix();
 
+	//void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
+
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
@@ -161,6 +173,12 @@ private:
 	GLuint off_screen_render_buffer_depth;
 
 	Entity screen_state_entity;
+
+	// fonts
+	std::map<char, Character> m_ftCharacters;	// map of all characters and their textures
+	GLuint m_font_shaderProgram;				// drawing the font
+	GLuint m_font_VAO;							// to isolate font things in separate VAO/VBO
+	GLuint m_font_VBO;
 };
 
 bool loadEffectFromFile(

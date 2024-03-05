@@ -42,12 +42,13 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	motion.velocity = { 0.f, 0.f };
 	motion.scale = vec2({ KEEPER_WIDTH, KEEPER_HEIGHT });
 
-
-	// Create and (empty) Chicken component to be able to refer to all eagles
-	registry.enemies.emplace(entity);
-	registry.deadlys.emplace(entity);
-	// TEXTURE_COUNT indicates that no txture is needed
-	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
+	auto& enemy = registry.enemies.emplace(entity);
+	enemy.attack = 50;
+	enemy.e_id = entity;
+	registry.deadlys.emplace(entity); // Do we still need this?
+	// TEXTURE_COUNT indicates that no texture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }
@@ -263,6 +264,7 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
 
 	registry.healers.emplace(entity);
+
 	// TEXTURE_COUNT indicates that no txture is needed
 	int randomizer_size = randomizer.size();
 	std::random_device rd;
@@ -271,6 +273,7 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 
 	int random_pick = distr(gen);
 	switch (randomizer[random_pick]) {
+
 		case (0):
 			registry.healers.get(entity).item_name = magical_mushroom;
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
@@ -398,6 +401,22 @@ Entity createInventoryPotion(Item& item, vec2 position) {
             break;
     }
 
+
+    return entity;
+}
+
+Entity createDay() {
+    auto entity = Entity();
+
+    auto& day = registry.screenStates.emplace(entity);
+
+    auto& fixed = registry.immobiles.emplace(entity);
+    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
+    fixed.scale = { window_width_px, window_height_px };
+//    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
 }
