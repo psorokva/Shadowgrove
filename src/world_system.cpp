@@ -254,7 +254,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
 
-	if (num_of_item_on_screen < 50) {
+	if (num_of_item_on_screen < NUM_POTIONS) {
 		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 };
 		for (int i = 0; i < 5; i++) {
 			Item& item = registry.inventory.get(p).holding[i];
