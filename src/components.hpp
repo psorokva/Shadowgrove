@@ -72,6 +72,7 @@ struct Enemy {
 	int frame_count = 0;
 	std::set<Direction> last_possible_directions;
 	Direction last_direction;
+	Entity e_id;
 };
 
 enum Item {
@@ -233,8 +234,9 @@ enum class TEXTURE_ASSET_ID {
 	PLAYER_CHAR3 = PLAYER_CHAR2 + 1,
 	PLAYER_CHAR4 = PLAYER_CHAR3 + 1,
 	PLAYER_CHAR5 = PLAYER_CHAR4 + 1,
-	KEEPER = PLAYER_CHAR5 + 1,
-	DOG = KEEPER + 1,
+	KEEPER1 = PLAYER_CHAR5 + 1,
+	KEEPER2 = KEEPER1 + 1,
+	DOG = KEEPER2 + 1,
 	INGR_00 = DOG + 1,
 	INGR_01 = INGR_00 + 1,
 	INGR_02 = INGR_01 + 1,

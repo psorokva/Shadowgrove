@@ -131,14 +131,23 @@ void AISystem::step()
 					// get some randomness in keeper decision making
 					std::shuffle(std::begin(possible_directions), std::end(possible_directions), rng);
 					//std::cout << "GOING " << possible_directions[0] << "DIRECTION" << std::endl;
-					new_enemy_direction = possible_directions[0];
+					if (possible_directions.size() == 0) {
+						new_enemy_direction = direction_to_player[0];
+					} else {
+						new_enemy_direction = possible_directions[0];
+					}
 				}
 			}
 			else {
 				// get some randomness in keeper decision making
 				std::shuffle(std::begin(possible_directions), std::end(possible_directions), rng);
 				//std::cout << "GOING " << possible_directions[0] << "DIRECTION" << std::endl;
-				new_enemy_direction = possible_directions[0];
+				if (possible_directions.size() == 0) {
+					new_enemy_direction = direction_to_player[0];
+				} else {
+					new_enemy_direction = possible_directions[0];
+				}
+
 			}
 		}
 
