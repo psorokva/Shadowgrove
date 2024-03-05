@@ -24,7 +24,7 @@ bool blockedEast = false;
 bool blockedWest = false;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 10;
+const uint NUM_POTIONS = 8;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
