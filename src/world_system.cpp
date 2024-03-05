@@ -23,7 +23,6 @@ bool blockedSouth = false;
 bool blockedEast = false;
 bool blockedWest = false;
 
-enum Direction { UP, DOWN, LEFT, RIGHT};
 Direction playerDirection;
 
 const float CHARACTER_SPEED = 300.0f;
@@ -395,12 +394,12 @@ void WorldSystem::handle_collisions() {
 		
 			//// Checking Player - Wall collisions
 			//if (registry.impenetrables.has(entity_other)) {
-			//	
+			//
 			//	Motion& motion = registry.motions.get(entity);
 			//	// Can adjust this
 			//	float offset = 10.0f;
    //             // Mix_PlayChannel(-1, tree_collision_sound, 0);
-			//	
+			//
 			//	if (playerDirection == UP) {
 			//		//printf("Collided with North wall");
 			//		blockedNorth = true;
@@ -517,6 +516,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_5 && registry.inventory.get(registry.players.entities[0]).holding[4] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[4] = nullval;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
+		//std::cout << "in here!" << std::endl;
+		while (registry.enemies.entities.size() > 0)
+			registry.remove_all_components_of(registry.enemies.entities.back());
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
@@ -640,7 +645,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (action == GLFW_RELEASE) {
 			motion.velocity = vec2(0.f, 0.f);
 			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1; 
+			r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1;
 		}
 	}
 
@@ -673,9 +678,14 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
-		vec2 spawn_pos = registry.get_empty_spawn_location();
-		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
-		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+//		vec2 spawn_pos = registry.get_empty_spawn_location();
+//		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
+//		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+//		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		//if (points <= 5) {
+		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		//}
+
 	}
 	
 	
