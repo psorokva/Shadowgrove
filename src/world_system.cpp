@@ -366,6 +366,7 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
+	save_state.loadInventory();
 	printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -582,6 +583,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
+		save_state.saveInventory();
 		glfwSetWindowShouldClose(window, true);
 	}
 
@@ -593,11 +595,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         restart_game();
 	}
 
-	// Exiting game
-	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
-		printf("ESC key pressed, close window");
-		glfwSetWindowShouldClose(window, true);
-	}
+	//// Exiting game
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+	//	printf("ESC key pressed, close window");
+	//	glfwSetWindowShouldClose(window, true);
+	//}
 
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_D) {

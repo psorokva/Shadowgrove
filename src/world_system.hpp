@@ -4,6 +4,7 @@
 #include "common.hpp"
 #include "camera_system.hpp"
 #include "ai_system.hpp"
+#include "save_state.hpp"
 
 // stlib
 #include <vector>
@@ -56,6 +57,7 @@ private:
 	unsigned int points;
 
 	// Game state
+	SaveState save_state;
 	CameraSystem camera;
 	AISystem ai;
 	RenderSystem* renderer;
