@@ -1,5 +1,6 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
+#include <random>
 
 Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
@@ -252,30 +253,24 @@ Entity createLine(vec2 position, vec2 scale) {
 }
 
 
-Entity createPotion(RenderSystem* renderer, vec2 position) {
+Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> randomizer) {
 	auto entity = Entity();
 
-	// Store a reference to the potentially re-used mesh object
-	// Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
-	// registry.meshPtrs.emplace(entity, &mesh);
-
-	//  Setting initial motion values
 	Motion& motion = registry.motions.emplace(entity);
 	motion.position = position;
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
 	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
 
-	//// Setting fixed values
-	//auto& fixed = registry.immobiles.emplace(entity);
-	//fixed.position = position;
-	//fixed.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
-
-	// Create and (empty) Chicken component to be able to refer to all eagles
 	registry.healers.emplace(entity);
 	// TEXTURE_COUNT indicates that no txture is needed
-	int potion_colour_offset = rand() % 11;
-	switch (potion_colour_offset) {
+	int randomizer_size = randomizer.size();
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> distr(0, randomizer_size - 1);
+
+	int random_pick = distr(gen);
+	switch (randomizer[random_pick]) {
 		case (0):
 			registry.healers.get(entity).item_name = magical_mushroom;
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });

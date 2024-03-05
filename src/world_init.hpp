@@ -20,7 +20,7 @@ Entity createCompass(vec2 position);
 Entity createPlant(RenderSystem* renderer, vec2 pos, int biome_type, int plant_type);
 Entity createLine(vec2 position, vec2 size);
 //Entity createMapChunk(vec2 position);
-Entity createPotion(RenderSystem* renderer, vec2 position);
+Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 });
 Entity createInventoryPotion(Item& item, vec2 position);
 
 Entity createLine(vec2 position, vec2 size);

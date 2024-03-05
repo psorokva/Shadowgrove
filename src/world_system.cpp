@@ -238,10 +238,52 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
 
-	if (num_of_item_on_screen < 100) {
+	if (num_of_item_on_screen < 50) {
+		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 };
+		for (int i = 0; i < 5; i++) {
+			Item& item = registry.inventory.get(p).holding[i];
+			switch (item) {
+				case (magical_mushroom):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 0), randomizer.end());
+					break;
+				case (magical_strawberry):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 1), randomizer.end());
+					break;
+				case (magical_grapes):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 2), randomizer.end());
+					break;
+				case (red_potion):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 3), randomizer.end());
+					break;
+				case (green_potion):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 4), randomizer.end());
+					break;
+				case (purple_potion):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 5), randomizer.end());
+					break;
+				case (orange_potion):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 6), randomizer.end());
+					break;
+				case (magical_apple):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 7), randomizer.end());
+					break;
+				case (magical_carrot):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 8), randomizer.end());
+					break;
+				case (food):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 9), randomizer.end());
+					break;
+				case (special_lotus):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 10), randomizer.end());
+					break;
+			}
+		}
 		vec2 spawn_pos = registry.get_empty_spawn_location();
-		printf("Spawning object at x %f  y %f\n", spawn_pos.x, spawn_pos.y);
-		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+		createPotion(renderer, camera.adjust_to_player(spawn_pos), randomizer);
+		//for (size_t i = 0; i < randomizer.size(); ++i) {
+		//	printf("%d ", randomizer[i]);
+		//}
+		//printf("\n");
 		num_of_item_on_screen++;
 	}
 
@@ -462,23 +504,27 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// remove items from slot on num key press
 	if (action == GLFW_RELEASE && key == GLFW_KEY_1 && registry.inventory.get(registry.players.entities[0]).holding[0] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[0] = nullval;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_2 && registry.inventory.get(registry.players.entities[0]).holding[1] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[1] = nullval;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_3 && registry.inventory.get(registry.players.entities[0]).holding[2] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[2] = nullval;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_4 && registry.inventory.get(registry.players.entities[0]).holding[3] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[3] = nullval;
-		inventory--;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_5 && registry.inventory.get(registry.players.entities[0]).holding[4] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[4] = nullval;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
@@ -616,9 +662,9 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
-		vec2 spawn_pos = registry.get_empty_spawn_location();
-		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
-		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+		//vec2 spawn_pos = registry.get_empty_spawn_location();
+		//printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
+		//createPotion(renderer, camera.adjust_to_player(spawn_pos));
 	}
 	
 	
