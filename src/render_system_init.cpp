@@ -159,7 +159,7 @@ void RenderSystem::initializeGlGeometryBuffers() {
 
 	constexpr float depth = 0.5f;
 //	constexpr vec3 red = { 0.8,0.1,0.1 };
-    constexpr vec3 color = {0.5, 0.5, 0.5};
+    constexpr vec3 color = {1, 1, 1};
 
 	// Corner points
 	line_vertices = {

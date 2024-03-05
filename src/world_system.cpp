@@ -23,11 +23,12 @@ bool blockedSouth = false;
 bool blockedEast = false;
 bool blockedWest = false;
 
-enum Direction { UP, DOWN, LEFT, RIGHT};
 Direction playerDirection;
-
+const uint NUM_POTIONS = 10;
 const float CHARACTER_SPEED = 300.0f;
-const float ANIMATION_SPEED = 1000.0 / 24.0;
+const float ANIMATION_SPEED = 1000.0 / 16.0;
+const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
@@ -42,6 +43,8 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (night_music != nullptr)
 	    Mix_FreeMusic(night_music);
+    if (day_music != nullptr)
+        Mix_FreeMusic(day_music);
 	if (bird_sounds != nullptr)
 	    Mix_FreeChunk(bird_sounds);
     if (mushroom_sound != nullptr)
@@ -123,16 +126,18 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
     night_music = Mix_LoadMUS(audio_path("forest_night.wav").c_str());
+    day_music = Mix_LoadMUS(audio_path("day.wav").c_str());
     bird_sounds = Mix_LoadWAV(audio_path("bird_noises.wav").c_str());
     mushroom_sound = Mix_LoadWAV(audio_path("mushroom.wav").c_str());
     player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
     inventory_full_sound = Mix_LoadWAV(audio_path("inventory_full.wav").c_str());
 	player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
 
-	if (night_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
+	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
         player_death_sound == nullptr || inventory_full_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
             audio_path("forest_night.wav").c_str(),
+            audio_path("day.wav").c_str(),
             audio_path("bird_noises.wav").c_str(),
             audio_path("mushroom.wav").c_str(),
             audio_path("player_death.wav").c_str(),
@@ -145,18 +150,13 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
-void renderInventory() {
-    // top line
-//    Entity topLine = createLine({800, 10}, {10, 10});
-}
-
 void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg, PhysicsSystem* physics_arg) {
 	this->renderer = renderer_arg;
 	this->generator = generator_arg;
 	this->physics = physics_arg;
-	// Playing background music indefinitely
-	Mix_PlayMusic(night_music, -1);
-	fprintf(stderr, "Loaded music\n");
+//	// Playing background music indefinitely
+//	Mix_PlayMusic(night_music, -1);
+//	fprintf(stderr, "Loaded music\n");
 
     // Set all states to default
     restart_game();
@@ -172,7 +172,7 @@ void WorldSystem::createInventory(vec2 pos) {
     Entity sideLine5 = createLine({pos.x + 90, pos.y}, {8, 70});
     Entity sideLine6 = createLine({pos.x + 150, pos.y}, {8, 70});
 
-    vec3 green = {0.2, 0.8, 0.2};
+    vec3 green = {0.07, 0.5, 0.05};
     registry.colors.insert(topLine, green);
     registry.colors.insert(bottomLine, green);
     registry.colors.insert(sideLine1, green);
@@ -187,12 +187,20 @@ void WorldSystem::createInventory(vec2 pos) {
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	animation_elpased_ms += elapsed_ms_since_last_update;
+	keeper_spawn_time += elapsed_ms_since_last_update;
 	if (animation_elpased_ms > ANIMATION_SPEED) {
 		animation_elpased_ms = 0.0;
 		animation_cycle++;
 		animation_cycle %= 4;
 	}
-
+	//const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+	//f//loat keeper_spawn_time = 0.0f;
+	if (keeper_spawn_time > KEEPER_SPAWN_FREQ) {
+		keeper_spawn_time = 0.0;
+		vec2 spawn_pos = registry.get_empty_spawn_location();
+		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+	}
+	
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
@@ -204,26 +212,23 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//printf("free tile at: %f, %f\n", spawn.x, spawn.y);
 
 	// Remove debug info from the last step
-	while (registry.debugComponents.entities.size() > 0)
-	    registry.remove_all_components_of(registry.debugComponents.entities.back());
+	while (registry.debugComponents.entities.size() > 0) {
+		registry.remove_all_components_of(registry.debugComponents.entities.back());
+	}
 
-	// Removing out of screen entities
-	auto& motions_registry = registry.motions;
-
-	// Remove entities that leave the screen on the left side
-	// Iterate backwards to be able to remove without unterfering with the next object to visit
-	// (the containers exchange the last element with the current)
-	//for (int i = (int)motions_registry.components.size()-1; i>=0; --i) {
-	//    Motion& motion = motions_registry.components[i];
-	//	if (motion.position.x + abs(motion.scale.x) < 0.f) {
-	//		if(!registry.players.has(motions_registry.entities[i])) // don't remove the player
-	//			registry.remove_all_components_of(motions_registry.entities[i]);
-	//	}
-	//}
+	// Animating enemy entities
+	auto& enemies = registry.enemies.components;
+	for (int i = 0; i < enemies.size(); i++ ) {
+		RenderRequest& r = registry.renderRequests.get( enemies[i].e_id );
+		if (animation_cycle % 2 == 1) { 
+			r.used_texture = TEXTURE_ASSET_ID::KEEPER2;
+		} else {
+			r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
+		}
+	}
 
 
-	// Processing the chicken state
-	assert(registry.screenStates.components.size() <= 1);
+	//	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
 
     camera.step();
@@ -249,7 +254,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
 
-	if (num_of_item_on_screen < 100) {
+	if (num_of_item_on_screen < NUM_POTIONS) {
 		vec2 spawn_pos = registry.get_empty_spawn_location();
 		printf("Spawning object at x %f  y %f\n", spawn_pos.x, spawn_pos.y);
 		createPotion(renderer, camera.adjust_to_player(spawn_pos));
@@ -274,7 +279,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
-	// reduce window brightness if any of the present chickens is dying
+	// reduce window brightness if any of the present is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
 	return true;
@@ -303,6 +308,8 @@ void WorldSystem::restart_game() {
 		registry.remove_all_components_of(registry.chunks.entities.back());
 	while (registry.players.entities.size() > 0)
 		registry.remove_all_components_of(registry.players.entities.back());
+//    while (registry.screenStates.entities.size() > 0)
+//        registry.remove_all_components_of(registry.screenStates.entities.back());
 	//registry.clear_all_components();
 	generator->clearMap();
 	printf("AFTER CLEARED REGISTRY");
@@ -310,14 +317,15 @@ void WorldSystem::restart_game() {
 	// Create a new player
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 	registry.inventory.emplace(player);
-	generator->createWorldMap();
+
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
-	printf("MAP AND PLAYER CREATED");
-	// create a compass to calc player movement 
+	printf("MAP AND PLAYER CREATED\n");
+
+	// create a compass to calc player movement
 	Entity compass = createCompass(vec2(155.0,155.0));
 	Immobile& imo = registry.immobiles.get(compass);
 	compass_immobile = &imo;
@@ -327,11 +335,27 @@ void WorldSystem::restart_game() {
 
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
-	createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+
+    ScreenState &screen = registry.screenStates.components[0];
+    if (screen.game_screen == game_screen_night) {
+        // Playing background music indefinitely
+        Mix_PlayMusic(night_music, -1);
+        fprintf(stderr, "Loaded music\n");
+        generator->createWorldMap();
+        createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+    } else if (screen.game_screen == game_screen_day) {
+        // Playing background music indefinitely
+        Mix_PlayMusic(day_music, -1);
+        fprintf(stderr, "Loaded music\n");
+
+        Entity day = createDay();
+        printf("day entity init %zu\n", day);
+    }
+
 
 	// Create empty "path" maze
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
-	//// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers 
+	//// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers
 	auto& chunks = generator->chunks;
 	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
 	//for (Chunk c : chunks) {
@@ -348,18 +372,18 @@ void WorldSystem::restart_game() {
 					int plant_x = c.offset_x + col * TILE_SIZE;
 					int plant_y = c.offset_y + row * TILE_SIZE;
 					// TODO store plant type in // c.grid[row][col]
-					createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); // 
+					createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); //
 					//printf("tile: %d %d ", c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col);
 					//updateTile(renderer, maze, c.offset_y + row, c.offset_x + col, 1);
 					//updateTile(renderer, maze, c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col, c.grid[row][col]);
 				}
-				
+
 			}
 			//printf("\n");
 		}
 		//printf("--------\n");
 	}
-
+	// wait();
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 }
@@ -503,6 +527,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		registry.inventory.get(registry.players.entities[0]).holding[4] = nullval;
 	}
 
+	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
+		//std::cout << "in here!" << std::endl;
+		while (registry.enemies.entities.size() > 0)
+			registry.remove_all_components_of(registry.enemies.entities.back());
+	}
+
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		glfwSetWindowShouldClose(window, true);
@@ -527,6 +557,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         printf("D key pressed, switching to day");
         ScreenState &screen = registry.screenStates.components[0];
         screen.game_screen = game_screen_day;
+        restart_game();
     }
 
     // Changing game scene to day
@@ -534,6 +565,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         printf("D key pressed, switching to night");
         ScreenState &screen = registry.screenStates.components[0];
         screen.game_screen = game_screen_night;
+         restart_game();
     }
 
 	// Debugging
@@ -548,72 +580,75 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 		Motion& motion = registry.motions.get(player);
 
-		// Character movement
-		// Move Up
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-			playerDirection = UP;
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-			if (!blockedNorth) {
-				motion.velocity = vec2(0.f, -CHARACTER_SPEED);
-			}
-			// TODO fix this if using angle
-			/*if (motion.angle != 0.f)	{
-				motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-				motion.velocity.x = motion.velocity.x * cos(motion.angle);
-				motion.velocity.y = motion.velocity.y * sin(motion.angle);
-			}*/
-		}
+        ScreenState& screen = registry.screenStates.components[0];
+        if (screen.game_screen == game_screen_night) {
+            // Character movement
+            // Move Up
+            if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+                playerDirection = UP;
+                RenderRequest& r = registry.renderRequests.get(player);
+                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
+                if (!blockedNorth) {
+                    motion.velocity = vec2(0.f, -CHARACTER_SPEED);
+                }
+                // TODO fix this if using angle
+                /*if (motion.angle != 0.f)	{
+                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
+                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
+                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
+                }*/
+            }
 
-		// Move Down
-		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
-			playerDirection = DOWN;
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-			if (!blockedSouth) {
-				motion.velocity = vec2(0.f, CHARACTER_SPEED);
-			}
-			
-			/*if (motion.angle != 0.f)	{
-				motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-				motion.velocity.x = motion.velocity.x * cos(motion.angle);
-				motion.velocity.y = motion.velocity.y * sin(motion.angle);
-			}*/
-		}
+            // Move Down
+            if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
+                playerDirection = DOWN;
+                RenderRequest& r = registry.renderRequests.get(player);
+                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
+                if (!blockedSouth) {
+                    motion.velocity = vec2(0.f, CHARACTER_SPEED);
+                }
 
-		// Move Right
-		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-			playerDirection = RIGHT;
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-			if (!blockedEast) {
-				motion.velocity = vec2(CHARACTER_SPEED, 0.f);
-				motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
-			}
-			
-			/*if (motion.angle != 0.f)	{
-				motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-				motion.velocity.y = motion.velocity.y * cos(motion.angle);
-				motion.velocity.x = motion.velocity.x * sin(motion.angle);
-			}*/
-		}
+                /*if (motion.angle != 0.f)	{
+                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
+                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
+                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
+                }*/
+            }
 
-		// Move Left
-		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
-			playerDirection = LEFT;
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle+1);
-			if (!blockedWest) {
-				motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
-				motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
-			}
-			
-			/*if (motion.angle != 0.f)	{
-				motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-				motion.velocity.y = motion.velocity.y * cos(motion.angle);
-				motion.velocity.x = motion.velocity.x * sin(motion.angle);
-			}*/
-		}
+            // Move Right
+            if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+                playerDirection = RIGHT;
+                RenderRequest& r = registry.renderRequests.get(player);
+                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
+                if (!blockedEast) {
+                    motion.velocity = vec2(CHARACTER_SPEED, 0.f);
+                    motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
+                }
+
+                /*if (motion.angle != 0.f)	{
+                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
+                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
+                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
+                }*/
+            }
+
+            // Move Left
+            if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
+                playerDirection = LEFT;
+                RenderRequest &r = registry.renderRequests.get(player);
+                r.used_texture = (TEXTURE_ASSET_ID) (animation_cycle + 1);
+                if (!blockedWest) {
+                    motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
+                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
+                }
+
+                /*if (motion.angle != 0.f)	{
+                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
+                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
+                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
+                }*/
+            }
+        }
 
 		// Stop moving when key is released
 		if (action == GLFW_RELEASE) {
@@ -654,7 +689,12 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
 		vec2 spawn_pos = registry.get_empty_spawn_location();
 		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
-		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+		//createPotion(renderer, camera.adjust_to_player(spawn_pos));
+		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+		//if (points <= 5) {
+		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		//}
+		
 	}
 	
 	

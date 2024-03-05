@@ -116,7 +116,9 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 // Might need to optimize in the future
 void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection) {
 
+//    printf("in textured static mesh with entity %zu done \n", entity);
 	Immobile& immobile = registry.immobiles.get(entity);
+//    printf("entity immobile %zu done\n", entity);
 	// Transformation code, see Rendering and Transformation in the template
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
@@ -173,7 +175,6 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
-
 	else {
 		assert(false && "Type of render request not supported");
 	}
@@ -300,9 +301,9 @@ void RenderSystem::draw() {
         // Draw all textured meshes that have a position and size component
         for (Entity entity: registry.renderRequests.entities) {
             if (registry.motions.has(entity)) {
-//            if (!registry.debugComponents.has(entity)) {
-                drawTexturedMesh(entity, projection_2D);
-//            }
+                if (!registry.debugComponents.has(entity)) {
+                    drawTexturedMesh(entity, projection_2D);
+                }
             }
                 // for non-moving entities (plants and potions)
             else if (registry.immobiles.has(entity)) {
@@ -312,9 +313,31 @@ void RenderSystem::draw() {
             // Note, its not very efficient to access elements indirectly via the entity
             // albeit iterating through all Sprites in sequence. A good point to optimize
         }
+        // render inventory lines last?
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.debugComponents.has(entity)) {
+                drawTexturedMesh(entity, projection_2D);
+            }
+        }
+
     } else if (screen.game_screen == game_screen_day) {
+        for (Entity entity: registry.renderRequests.entities) {
+            // for non-moving entities (plants and potions)
+            if (registry.immobiles.has(entity)) {
+                if (registry.screenStates.has(entity)) {
+//                    printf("day entity %zu\n", entity);
+                    drawTexturedStaticMesh(entity, projection_2D);
+                }
+            }
+        }
+
         Entity player = registry.players.entities[0];
-        drawTexturedMesh(player, projection_2D);
+        if (!registry.immobiles.has(player)) {
+            Immobile& player_im = registry.immobiles.emplace(player);
+            player_im.position = { 0.60 * window_width_px, 1.1 * window_height_px };
+            player_im.scale = { 2 * 60, 2 * 80 };
+        }
+        drawTexturedStaticMesh(player, projection_2D);
     }
 
 	// Truely render to the screen

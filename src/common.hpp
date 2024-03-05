@@ -33,11 +33,12 @@ inline std::string textures_path(const std::string& name) {return data_path() + 
 inline std::string audio_path(const std::string& name) {return data_path() + "/audio/" + std::string(name);};
 inline std::string mesh_path(const std::string& name) {return data_path() + "/meshes/" + std::string(name);};
 
-const int window_width_px = 1900;
-const int window_height_px = 1400;
+const int window_width_px =  1085; // 1900;
+const int window_height_px = 800; // 1400;
 const int TILE_SIZE = 55;
 const int MAZE_SIZE = 16;
 static bool DEBUG_PRINT = true;
+enum Direction { UP, DOWN, LEFT, RIGHT };
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
@@ -75,7 +76,7 @@ static const int grid_pillars[MAZE_SIZE][MAZE_SIZE] = {
 };
 
 static const int grid_alt_base1[MAZE_SIZE][MAZE_SIZE] = {
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1},
 		{0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0},
 		{0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0},
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
@@ -90,7 +91,7 @@ static const int grid_alt_base1[MAZE_SIZE][MAZE_SIZE] = {
 		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		{1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1},
 		{1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1},
 };
 
 static const int grid_alt_base2[MAZE_SIZE][MAZE_SIZE] = {
@@ -131,7 +132,7 @@ static const int grid_alt_base2[MAZE_SIZE][MAZE_SIZE] = {
 //		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 //};
 static const int grid_center_clear1[MAZE_SIZE][MAZE_SIZE] = {
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
@@ -146,7 +147,7 @@ static const int grid_center_clear1[MAZE_SIZE][MAZE_SIZE] = {
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1},
 };
 
 //static const int grid_center_clear2[MAZE_SIZE][MAZE_SIZE] = {

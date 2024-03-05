@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+#include <set>
 
 struct Chunk {
 	int x = 0;
@@ -68,6 +69,10 @@ struct Player {
 // Enemy component
 struct Enemy {
 	unsigned int attack;
+	int frame_count = 0;
+	std::set<Direction> last_possible_directions;
+	Direction last_direction;
+	Entity e_id;
 };
 
 enum Item {
@@ -162,7 +167,7 @@ enum Game_screens
 // Sets the brightness of the screen
 struct ScreenState {
 	float darken_screen_factor = -1;
-    Game_screens game_screen = game_screen_night;
+    Game_screens game_screen = game_screen_day;
 };
 
 // A struct to refer to debugging graphics in the ECS
@@ -225,10 +230,10 @@ enum class TEXTURE_ASSET_ID {
 	PLAYER_CHAR3 = PLAYER_CHAR2 + 1,
 	PLAYER_CHAR4 = PLAYER_CHAR3 + 1,
 	PLAYER_CHAR5 = PLAYER_CHAR4 + 1,
-	KEEPER = PLAYER_CHAR5 + 1,
-	DOG = KEEPER + 1,
-    DAYTIME = DOG + 1,
-	INGR_00 = DAYTIME + 1,
+	KEEPER1 = PLAYER_CHAR5 + 1,
+	KEEPER2 = KEEPER1 + 1,
+	DOG = KEEPER2 + 1,
+	INGR_00 = DOG + 1,
 	INGR_01 = INGR_00 + 1,
 	INGR_02 = INGR_01 + 1,
 	INGR_03 = INGR_02 + 1,

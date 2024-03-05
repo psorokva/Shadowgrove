@@ -44,10 +44,10 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
 	auto& enemy = registry.enemies.emplace(entity);
 	enemy.attack = 50;
-
+	enemy.e_id = entity;
 	registry.deadlys.emplace(entity); // Do we still need this?
 	// TEXTURE_COUNT indicates that no texture is needed
-	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }
@@ -406,6 +406,22 @@ Entity createInventoryPotion(Item& item, vec2 position) {
             break;
     }
 
+
+    return entity;
+}
+
+Entity createDay() {
+    auto entity = Entity();
+
+    auto& day = registry.screenStates.emplace(entity);
+
+    auto& fixed = registry.immobiles.emplace(entity);
+    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
+    fixed.scale = { window_width_px, window_height_px };
+//    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
 }
