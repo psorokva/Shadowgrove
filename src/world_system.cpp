@@ -446,36 +446,36 @@ void WorldSystem::handle_collisions() {
 		if (registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
 		
-			//// Checking Player - Wall collisions
-			//if (registry.impenetrables.has(entity_other)) {
-			//
-			//	Motion& motion = registry.motions.get(entity);
-			//	// Can adjust this
-			//	float offset = 10.0f;
-   //             // Mix_PlayChannel(-1, tree_collision_sound, 0);
-			//
-			//	if (playerDirection == UP) {
-			//		//printf("Collided with North wall");
-			//		blockedNorth = true;
-			//		// Offset player position to stop from going through
-			//		motion.position = motion.position - vec2(0, -offset);
-			//	}
-			//	if (playerDirection == DOWN) {
-			//		//printf("Collided with South wall");
-			//		blockedSouth = true;
-			//		motion.position = motion.position - vec2(0, offset);
-			//	}
-			//	if (playerDirection == LEFT) {
-			//		//printf("Collided with West wall");
-			//		blockedWest = true;
-			//		motion.position = motion.position - vec2(-offset, 0);
-			//	}
-			//	if (playerDirection == RIGHT) {
-			//		//printf("Collided with East wall");
-			//		blockedEast = true;
-			//		motion.position = motion.position - vec2(offset, 0);
-			//	}
-			//}
+			// Checking Player - Wall collisions
+			if (registry.impenetrables.has(entity_other)) {
+			
+				Motion& motion = registry.motions.get(entity);
+				// Can adjust this
+				float offset = 10.0f;
+                // Mix_PlayChannel(-1, tree_collision_sound, 0);
+			
+				if (playerDirection == UP) {
+					//printf("Collided with North wall");
+					blockedNorth = true;
+					// Offset player position to stop from going through
+					motion.position = motion.position - vec2(0, -offset);
+				}
+				if (playerDirection == DOWN) {
+					//printf("Collided with South wall");
+					blockedSouth = true;
+					motion.position = motion.position - vec2(0, offset);
+				}
+				if (playerDirection == LEFT) {
+					//printf("Collided with West wall");
+					blockedWest = true;
+					motion.position = motion.position - vec2(-offset, 0);
+				}
+				if (playerDirection == RIGHT) {
+					//printf("Collided with East wall");
+					blockedEast = true;
+					motion.position = motion.position - vec2(offset, 0);
+				}
+			}
 
 			// Checking Player - Enemy collisions
 			if (registry.enemies.has(entity_other)) {
