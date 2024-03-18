@@ -118,6 +118,13 @@ struct Inventory {
 	std::vector<unsigned int> crafted;
 };
 
+struct Invincible {
+
+};
+
+struct HitTimer {
+    float counter_ms = 3000;
+};
 
 // All data relevant to the shape and motion of entities
 struct Motion {

@@ -31,6 +31,8 @@ public:
 	ComponentContainer<Chunk> chunks;
 	ComponentContainer<Inventory> inventory;
     ComponentContainer<HelpScreen> helpScreen;
+    ComponentContainer<HitTimer> hitTimers;
+    ComponentContainer<Invincible> invincibles;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -55,6 +57,8 @@ public:
 		registry_list.push_back(&impenetrables);
 		registry_list.push_back(&inventory);
         registry_list.push_back(&helpScreen);
+        registry_list.push_back(&hitTimers);
+        registry_list.push_back(&invincibles);
 	}
 
 	void clear_all_components() {

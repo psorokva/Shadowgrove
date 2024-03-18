@@ -200,7 +200,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		vec2 spawn_pos = registry.get_empty_spawn_location();
 		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
 	}
-	
+
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
@@ -220,7 +220,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	auto& enemies = registry.enemies.components;
 	for (int i = 0; i < enemies.size(); i++ ) {
 		RenderRequest& r = registry.renderRequests.get( enemies[i].e_id );
-		if (animation_cycle % 2 == 1) { 
+		if (animation_cycle % 2 == 1) {
 			r.used_texture = TEXTURE_ASSET_ID::KEEPER2;
 		} else {
 			r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
@@ -324,6 +324,27 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 	// reduce window brightness if any of the present is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
+
+    // on collision with enemy
+    float hit_counter_ms = 3000.f;
+    for (Entity entity : registry.hitTimers.entities)
+    {
+        // progress timer
+        HitTimer &counter = registry.hitTimers.get(entity);
+        counter.counter_ms -= elapsed_ms_since_last_update;
+
+        if (counter.counter_ms < hit_counter_ms)
+        {
+            hit_counter_ms = counter.counter_ms;
+        }
+
+        if (counter.counter_ms < 0)
+        {
+            registry.invincibles.remove(entity);
+            registry.hitTimers.remove(entity);
+            return true;
+        }
+    }
 
 	return true;
 }
@@ -448,12 +469,12 @@ void WorldSystem::handle_collisions() {
 		
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
-			
+
 				Motion& motion = registry.motions.get(entity);
 				// Can adjust this
 				float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
-			
+
 				if (playerDirection == UP) {
 					//printf("Collided with North wall");
 					blockedNorth = true;
@@ -481,11 +502,24 @@ void WorldSystem::handle_collisions() {
 			if (registry.enemies.has(entity_other)) {
 				Enemy& e = registry.enemies.get(entity_other);
 				// initiate death unless already dying
-				if (!registry.deathTimers.has(entity)) {
+				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity)) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
 
 					if ((p.health - e.attack) > 0) {
 						p.health = p.health - e.attack;
+                        // make player temporarily invincible
+                        if (!registry.invincibles.has(entity))
+                        {
+                            registry.invincibles.emplace(entity);
+                            printf("hellooo chicken wing\n");
+                        }
+
+                        if (!registry.hitTimers.has(entity))
+                        {
+                            registry.hitTimers.emplace(entity);
+                            printf("hellooo chicken nugget\n");
+                        }
+
 						// Move enemy slightly back after collision (so that player doesn't die instantly)
 						enemy_motion.position = enemy_motion.position + (enemy_motion.velocity * vec2(-0.5, -0.5));
 						Mix_PlayChannel(-1, player_hit_sound, 0); // TODO: replace with "hit" sound
