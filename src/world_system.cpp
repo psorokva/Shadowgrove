@@ -24,7 +24,7 @@ bool blockedEast = false;
 bool blockedWest = false;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 10;
+const uint NUM_POTIONS = 8;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
@@ -200,7 +200,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		vec2 spawn_pos = registry.get_empty_spawn_location();
 		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
 	}
-
+	
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
@@ -220,7 +220,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	auto& enemies = registry.enemies.components;
 	for (int i = 0; i < enemies.size(); i++ ) {
 		RenderRequest& r = registry.renderRequests.get( enemies[i].e_id );
-		if (animation_cycle % 2 == 1) {
+		if (animation_cycle % 2 == 1) { 
 			r.used_texture = TEXTURE_ASSET_ID::KEEPER2;
 		} else {
 			r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
@@ -255,9 +255,52 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     }
 
 	if (num_of_item_on_screen < NUM_POTIONS) {
+		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 };
+		for (int i = 0; i < 5; i++) {
+			Item& item = registry.inventory.get(p).holding[i];
+			switch (item) {
+				case (magical_mushroom):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 0), randomizer.end());
+					break;
+				case (magical_strawberry):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 1), randomizer.end());
+					break;
+				case (magical_grapes):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 2), randomizer.end());
+					break;
+				case (red_potion):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 3), randomizer.end());
+					break;
+				case (green_potion):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 4), randomizer.end());
+					break;
+				case (purple_potion):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 5), randomizer.end());
+					break;
+				case (orange_potion):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 6), randomizer.end());
+					break;
+				case (magical_apple):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 7), randomizer.end());
+					break;
+				case (magical_carrot):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 8), randomizer.end());
+					break;
+				case (food):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 9), randomizer.end());
+					break;
+				case (special_lotus):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 10), randomizer.end());
+					break;
+			}
+		}
+
 		vec2 spawn_pos = registry.get_empty_spawn_location();
-		printf("Spawning object at x %f  y %f\n", spawn_pos.x, spawn_pos.y);
-		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+		createPotion(renderer, camera.adjust_to_player(spawn_pos), randomizer);
+		//for (size_t i = 0; i < randomizer.size(); ++i) {
+		//	printf("%d ", randomizer[i]);
+		//}
+		//printf("\n");
 		num_of_item_on_screen++;
 	}
 
@@ -323,6 +366,7 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
+	save_state.loadInventory();
 	printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -402,36 +446,36 @@ void WorldSystem::handle_collisions() {
 		if (registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
 		
-			//// Checking Player - Wall collisions
-			//if (registry.impenetrables.has(entity_other)) {
-			//
-			//	Motion& motion = registry.motions.get(entity);
-			//	// Can adjust this
-			//	float offset = 10.0f;
-   //             // Mix_PlayChannel(-1, tree_collision_sound, 0);
-			//
-			//	if (playerDirection == UP) {
-			//		//printf("Collided with North wall");
-			//		blockedNorth = true;
-			//		// Offset player position to stop from going through
-			//		motion.position = motion.position - vec2(0, -offset);
-			//	}
-			//	if (playerDirection == DOWN) {
-			//		//printf("Collided with South wall");
-			//		blockedSouth = true;
-			//		motion.position = motion.position - vec2(0, offset);
-			//	}
-			//	if (playerDirection == LEFT) {
-			//		//printf("Collided with West wall");
-			//		blockedWest = true;
-			//		motion.position = motion.position - vec2(-offset, 0);
-			//	}
-			//	if (playerDirection == RIGHT) {
-			//		//printf("Collided with East wall");
-			//		blockedEast = true;
-			//		motion.position = motion.position - vec2(offset, 0);
-			//	}
-			//}
+			// Checking Player - Wall collisions
+			if (registry.impenetrables.has(entity_other)) {
+			
+				Motion& motion = registry.motions.get(entity);
+				// Can adjust this
+				float offset = 10.0f;
+                // Mix_PlayChannel(-1, tree_collision_sound, 0);
+			
+				if (playerDirection == UP) {
+					//printf("Collided with North wall");
+					blockedNorth = true;
+					// Offset player position to stop from going through
+					motion.position = motion.position - vec2(0, -offset);
+				}
+				if (playerDirection == DOWN) {
+					//printf("Collided with South wall");
+					blockedSouth = true;
+					motion.position = motion.position - vec2(0, offset);
+				}
+				if (playerDirection == LEFT) {
+					//printf("Collided with West wall");
+					blockedWest = true;
+					motion.position = motion.position - vec2(-offset, 0);
+				}
+				if (playerDirection == RIGHT) {
+					//printf("Collided with East wall");
+					blockedEast = true;
+					motion.position = motion.position - vec2(offset, 0);
+				}
+			}
 
 			// Checking Player - Enemy collisions
 			if (registry.enemies.has(entity_other)) {
@@ -509,23 +553,33 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// remove items from slot on num key press
 	if (action == GLFW_RELEASE && key == GLFW_KEY_1 && registry.inventory.get(registry.players.entities[0]).holding[0] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[0] = nullval;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_2 && registry.inventory.get(registry.players.entities[0]).holding[1] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[1] = nullval;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_3 && registry.inventory.get(registry.players.entities[0]).holding[2] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[2] = nullval;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_4 && registry.inventory.get(registry.players.entities[0]).holding[3] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[3] = nullval;
-		inventory--;
+		num_of_item_on_screen -= 1;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_5 && registry.inventory.get(registry.players.entities[0]).holding[4] != nullval) {
 		registry.inventory.get(registry.players.entities[0]).holding[4] = nullval;
+		num_of_item_on_screen -= 1;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
+		//std::cout << "in here!" << std::endl;
+		while (registry.enemies.entities.size() > 0)
+			registry.remove_all_components_of(registry.enemies.entities.back());
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
@@ -536,6 +590,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
+		save_state.saveInventory();
 		glfwSetWindowShouldClose(window, true);
 	}
 
@@ -547,11 +602,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         restart_game();
 	}
 
-	// Exiting game
-	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
-		printf("ESC key pressed, close window");
-		glfwSetWindowShouldClose(window, true);
-	}
+	//// Exiting game
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+	//	printf("ESC key pressed, close window");
+	//	glfwSetWindowShouldClose(window, true);
+	//}
 
 
     // Changing game scene to day
@@ -696,10 +751,10 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
-		vec2 spawn_pos = registry.get_empty_spawn_location();
-		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
-		//createPotion(renderer, camera.adjust_to_player(spawn_pos));
-		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+//		vec2 spawn_pos = registry.get_empty_spawn_location();
+//		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
+//		createPotion(renderer, camera.adjust_to_player(spawn_pos));
+//		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//if (points <= 5) {
 		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//}
