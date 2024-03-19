@@ -47,25 +47,21 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 		gl_has_errors();
 
 		glEnableVertexAttribArray(in_texcoord_loc);
-		glVertexAttribPointer(
-			in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-			(void *)sizeof(
-				vec3)); // note the stride to skip the preceeding vertex position
+		glVertexAttribPointer( in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),(void *)sizeof(vec3)); 
+			// note the stride to skip the preceeding vertex position
 
 		// Enabling and binding texture to slot 0
 		glActiveTexture(GL_TEXTURE0);
 		gl_has_errors();
 
 		assert(registry.renderRequests.has(entity));
-		GLuint texture_id =
-			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+		GLuint texture_id = texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
 
-	else if (render_request.used_effect == EFFECT_ASSET_ID::INVENTORY_LINE)
-	{
+	else if (render_request.used_effect == EFFECT_ASSET_ID::INVENTORY_LINE) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_color_loc = glGetAttribLocation(program, "in_color");
 		gl_has_errors();
@@ -80,8 +76,7 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 			sizeof(ColoredVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
-	}
-	else {
+	} else {
 		assert(false && "Type of render request not supported");
 	}
 
@@ -174,8 +169,7 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
-	}
-	else {
+	} else {
 		assert(false && "Type of render request not supported");
 	}
 
@@ -257,10 +251,43 @@ void RenderSystem::drawToScreen() {
 	gl_has_errors();
 
 	// Bind our texture in Texture Unit 0
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + 0);
 
 	glBindTexture(GL_TEXTURE_2D, off_screen_render_buffer_color);
 	gl_has_errors();
+	// also bind the shadow overlays  ///////////////////////////////////////////////////////////////////////////////////////
+	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
+	glUniform1i(torch_mode, screen.torch_mode);
+	//gl_has_errors();
+	// texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::SHADOW_00]
+	glActiveTexture(GL_TEXTURE1);
+	GLuint shad_00 = glGetUniformLocation(night_program, "shad00");
+	glUniform1i(shad_00, 1);
+	//glUniform4fv(shad_00, 1, glm::value_ptr(color));
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::SHADOW_00]);
+
+	glActiveTexture(GL_TEXTURE2);
+	GLuint shad_01 = glGetUniformLocation(night_program, "shad01");
+	glUniform1i(shad_01, 2);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::SHADOW_01]);
+
+	glActiveTexture(GL_TEXTURE3);
+	GLuint dark_00 = glGetUniformLocation(night_program, "dark00");
+	glUniform1i(dark_00, 3);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::MIDNIGHT_00]);
+
+	glActiveTexture(GL_TEXTURE4);
+	GLuint dark01 = glGetUniformLocation(night_program, "dark01");
+	glUniform1i(dark01, 4);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::MIDNIGHT_01]);
+
+	glActiveTexture(GL_TEXTURE5);
+	GLuint light_01 = glGetUniformLocation(night_program, "light01");
+	glUniform1i(light_01, 5);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_00]);
+	gl_has_errors();
+	//glUniform1i(shad_00, 0);
+
 	// Draw
 	glDrawElements(
 		GL_TRIANGLES, 3, GL_UNSIGNED_SHORT,
@@ -323,6 +350,10 @@ void RenderSystem::draw() {
                 drawTexturedMesh(entity, projection_2D);
             }
         }
+
+		// add overlay of shadow
+		//drawTexturedStaticMesh(torchEntity, projection_2D);
+
 
         // add help screen to night screen
 //        HelpScreen& help = registry.helpScreen.components[0];

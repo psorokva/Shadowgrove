@@ -69,6 +69,7 @@ private:
     int inventory;
     Entity inventory1;
 	int num_item_on_screen;
+	Entity torchEntity;
 
 	// music references
 	Mix_Music* night_music;

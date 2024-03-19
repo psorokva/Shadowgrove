@@ -240,7 +240,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     Motion& p_motion = registry.motions.get(p);
 
     // Displaying health bar
-	auto healthBar = createLine(vec2(0, 10), vec2(10*player.health, 100));
+	auto healthBar = createLine(vec2(10, 10), vec2(10*player.health, 100));
 	registry.colors.insert(healthBar, { 1, 0, 0 });
 
     // inventory bar position on screen
@@ -253,6 +253,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
         createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
+	//createShadowOverlay(renderer);
 
 	if (num_of_item_on_screen < NUM_POTIONS) {
 		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 };
@@ -355,7 +356,7 @@ void WorldSystem::restart_game() {
 //        registry.remove_all_components_of(registry.screenStates.entities.back());
 	//registry.clear_all_components();
 	generator->clearMap();
-	printf("AFTER CLEARED REGISTRY");
+	//printf("AFTER CLEARED REGISTRY");
 	registry.list_all_components();
 	// Create a new player
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
@@ -367,7 +368,7 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	save_state.loadInventory();
-	printf("MAP AND PLAYER CREATED\n");
+	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
 	Entity compass = createCompass(vec2(155.0,155.0));
@@ -430,7 +431,11 @@ void WorldSystem::restart_game() {
 	}
 	// wait();
 	// Debugging for memory/component leaks
+	//torchEntity = createShadowOverlay(renderer);
+
 	registry.list_all_components();
+
+
 }
 
 // Compute collisions between entities
@@ -608,11 +613,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	//	glfwSetWindowShouldClose(window, true);
 	//}
 
-
+	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_N) {
         printf("N key pressed, switching screen");
-        ScreenState &screen = registry.screenStates.components[0];
+        
         if (screen.game_screen == game_screen_night) {
             screen.game_screen = game_screen_day;
         } else {
@@ -631,6 +636,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             screen.help = 1;
         }
     }
+
+	// Debugging
+	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
+		screen.torch_mode = (screen.torch_mode + 1) %7;
+	
+	}
+
 
 	// Debugging
 	if (key == GLFW_KEY_D) {
