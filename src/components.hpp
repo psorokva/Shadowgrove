@@ -349,3 +349,10 @@ struct RenderRequest {
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 };
 
+struct TextRenderRequest {
+	std::string text = "";
+	vec2 position = vec2(1.0f, 1.0f);
+	float scale = 1.0f;
+	vec3 color = vec3(1.0f, 1.0f, 1.0f); // default white
+};
+

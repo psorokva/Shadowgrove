@@ -12,11 +12,8 @@
 #include "physics_system.hpp"
 
 // Game configuration
-//const int TILE_SIZE = 55;
-//const int MAZE_SIZE = 12;
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
-// std::vector<std::pair<int, int>> generated_maze_map;
 
 bool blockedNorth = false;
 bool blockedSouth = false;
@@ -32,6 +29,8 @@ float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
+
+bool game_paused = false;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0) {
@@ -186,6 +185,14 @@ void WorldSystem::createInventory(vec2 pos) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+
+	// tabbing out of the game or minimizing the window will pause the game
+	int focused = glfwGetWindowAttrib(window, GLFW_FOCUSED);
+	if (!focused) pause_game();
+
+	// Don't do anything if game is paused
+	if (game_paused) return true;
+
 	//	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
 
@@ -350,6 +357,8 @@ void WorldSystem::restart_game() {
 
 	printf("Restarting\n");
 
+	game_paused = false;
+
 	// Reset the game speed
 	current_speed = 1.f;
     inventory = 0;
@@ -453,6 +462,32 @@ void WorldSystem::restart_game() {
 
 }
 
+void WorldSystem::pause_game() {
+
+	game_paused = true;
+	//printf("Game paused \n");
+
+	auto entity = Entity();
+	registry.textRenderRequests.insert(entity,
+		{
+			"PAUSED", vec2(window_width_px / 2 - 70.0, window_height_px / 2) // might need to adjust position
+		});
+	for (Motion& motion : registry.motions.components) {
+		motion.velocity = { 0, 0 };
+	}
+}
+
+void WorldSystem::resume_game() {
+	
+	game_paused = false;
+	// Remove "Paused" text (does it remove too much?)
+	while (registry.textRenderRequests.entities.size() > 0) {
+		registry.remove_all_components_of(registry.textRenderRequests.entities.back());
+	}
+	
+	//printf("Game unpaused \n");
+}
+
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
 	// Loop over all collisions detected by the physics system
@@ -463,7 +498,7 @@ void WorldSystem::handle_collisions() {
 		Entity entity_other = collisionsRegistry.components[i].other;
 
 		// For now, we are only interested in collisions that involve the chicken
-		if (registry.players.has(entity)) {
+		if (!game_paused && registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
 		
 			// Checking Player - Wall collisions
@@ -513,7 +548,7 @@ void WorldSystem::handle_collisions() {
 					else {
 						p.health = 0;
 						registry.deathTimers.emplace(entity);
-						// player shouold stop moving when health is <= 0
+						// player should stop moving when health is <= 0
 						registry.motions.get(player).velocity = { 0, 0 };
 						Mix_PlayChannel(-1, player_death_sound, 0);
 					}
@@ -602,12 +637,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			registry.remove_all_components_of(registry.enemies.entities.back());
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
-		//std::cout << "in here!" << std::endl;
-		while (registry.enemies.entities.size() > 0)
-			registry.remove_all_components_of(registry.enemies.entities.back());
-	}
-
+	// Exiting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		save_state.saveInventory();
@@ -622,11 +652,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         restart_game();
 	}
 
-	//// Exiting game
-	//if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
-	//	printf("ESC key pressed, close window");
-	//	glfwSetWindowShouldClose(window, true);
-	//}
+	// Pausing game
+	if (action == GLFW_RELEASE && key == GLFW_KEY_P) {
+
+		if (!game_paused) {
+			pause_game();
+		}
+		else {
+			resume_game();
+		}
+	}
 
 	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
@@ -652,12 +687,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
     }
 
-	// Debugging
+	// Torch
 	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
 		screen.torch_mode = (screen.torch_mode + 1) %7;
 	
 	}
-
 
 	// Debugging
 	if (key == GLFW_KEY_D) {
@@ -667,7 +701,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			debugging.in_debug_mode = true;
 	}
 
-	if (!registry.deathTimers.has(player)) {
+	if (!game_paused && !registry.deathTimers.has(player)) {
 
 		Motion& motion = registry.motions.get(player);
 
@@ -682,12 +716,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedNorth) {
                     motion.velocity = vec2(0.f, -CHARACTER_SPEED);
                 }
-                // TODO fix this if using angle
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
-                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
-                }*/
             }
 
             // Move Down
@@ -698,12 +726,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedSouth) {
                     motion.velocity = vec2(0.f, CHARACTER_SPEED);
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
-                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
-                }*/
             }
 
             // Move Right
@@ -715,12 +737,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     motion.velocity = vec2(CHARACTER_SPEED, 0.f);
                     motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
-                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
-                }*/
             }
 
             // Move Left
@@ -732,12 +748,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
                     motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
-                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
-                }*/
             }
         }
 
@@ -764,8 +774,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// A1: HANDLE CHICKEN ROTATION HERE
-	// xpos and ypos are relative to the top-left of the window, the chicken's
+	// xpos and ypos are relative to the top-left of the window, the player's
 	// default facing direction is (1, 0)
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
