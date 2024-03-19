@@ -186,6 +186,10 @@ void WorldSystem::createInventory(vec2 pos) {
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
+	// tabbing out of the game or minimizing the window will pause the game
+	int focused = glfwGetWindowAttrib(window, GLFW_FOCUSED);
+	if (!focused) pause_game();
+
 	// Don't do anything if game is paused
 	if (game_paused) return true;
 
@@ -476,9 +480,12 @@ void WorldSystem::pause_game() {
 void WorldSystem::resume_game() {
 	
 	game_paused = false;
-	// Remove "Paused" text
-	registry.remove_all_components_of(registry.textRenderRequests.entities.back());
-	printf("Game unpaused \n");
+	// Remove "Paused" text (does it remove too much?)
+	while (registry.textRenderRequests.entities.size() > 0) {
+		registry.remove_all_components_of(registry.textRenderRequests.entities.back());
+	}
+	
+	//printf("Game unpaused \n");
 }
 
 // Compute collisions between entities
