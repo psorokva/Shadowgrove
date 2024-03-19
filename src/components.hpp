@@ -180,9 +180,15 @@ struct DebugComponent {
 	// Note, an empty struct has size 1
 };
 
-// A timer that will be associated to dying chicken
+// A timer that will be associated to dying player
 struct DeathTimer {
 	float counter_ms = 3000;
+};
+
+// A timer that will switch from night to day
+struct NightTimer {
+	//float counter_ms = 60000; // 1 min
+	float counter_ms = 30000; // 30 sec
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)

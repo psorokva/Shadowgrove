@@ -427,7 +427,7 @@ void RenderSystem::draw() {
 	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));
 	
 	// Render text at the bottom left of the screen
-	renderText("Test", 0.0f, 70.0f, 1.0f, glm::vec3(1.0, 1.0, 1.0), trans); // Note if y value is less than 70 the text gets cut off
+	//renderText("Test", 0.0f, 70.0f, 1.0f, glm::vec3(1.0, 1.0, 1.0), trans); // Note if y value is less than 70 the text gets cut off
 
 	// Truely render to the screen
 	drawToScreen();

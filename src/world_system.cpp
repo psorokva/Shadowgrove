@@ -189,6 +189,24 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
 
+	if (registry.nightTimer.size() > 0) {
+		float min_night_counter_ms = 60000.f;
+		NightTimer& night_counter = registry.nightTimer.components[0];
+		// progress timer
+		night_counter.counter_ms -= elapsed_ms_since_last_update;
+		if (night_counter.counter_ms < min_night_counter_ms) {
+			min_night_counter_ms = night_counter.counter_ms;
+		}
+
+		// switch to day after night timer expired
+		if (night_counter.counter_ms < 0) {
+			registry.nightTimer.clear();
+			screen.game_screen = game_screen_day;
+			restart_game();
+			return true;
+		}
+	}
+
 	animation_elpased_ms += elapsed_ms_since_last_update;
 	keeper_spawn_time += elapsed_ms_since_last_update;
 	if (animation_elpased_ms > ANIMATION_SPEED) {
@@ -226,9 +244,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
 		}
 	}
-
-
-
 
     camera.step();
 	ai.step();
@@ -383,6 +398,7 @@ void WorldSystem::restart_game() {
     ScreenState &screen = registry.screenStates.components[0];
     if (screen.game_screen == game_screen_night) {
         // Playing background music indefinitely
+		createNight();
         Mix_PlayMusic(night_music, -1);
         fprintf(stderr, "Loaded music\n");
         generator->createWorldMap();

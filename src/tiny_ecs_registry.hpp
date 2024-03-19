@@ -12,6 +12,7 @@ public:
 	// Manually created list of all components this game has
 	// TODO: A1 add a LightUp component
 	ComponentContainer<DeathTimer> deathTimers;
+	ComponentContainer<NightTimer> nightTimer;
 	ComponentContainer<Motion> motions;
 	ComponentContainer<Immobile> immobiles;
 	ComponentContainer<Collision> collisions;
@@ -36,6 +37,7 @@ public:
 	// IMPORTANT: Don't forget to add any newly added containers!
 	ECSRegistry() {
 		registry_list.push_back(&deathTimers);
+		registry_list.push_back(&nightTimer);
 		registry_list.push_back(&motions);
 		registry_list.push_back(&immobiles);
 		registry_list.push_back(&collisions);
