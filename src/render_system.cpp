@@ -429,6 +429,13 @@ void RenderSystem::draw() {
 	// Render text at the bottom left of the screen
 	//renderText("Test", 0.0f, 70.0f, 1.0f, glm::vec3(1.0, 1.0, 1.0), trans); // Note if y value is less than 70 the text gets cut off
 
+	// Render all text in the registry
+	for (Entity entity : registry.textRenderRequests.entities)
+	{
+		TextRenderRequest request = registry.textRenderRequests.get(entity);
+		renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+	}
+
 	// Truely render to the screen
 	drawToScreen();
 

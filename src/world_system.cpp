@@ -12,11 +12,8 @@
 #include "physics_system.hpp"
 
 // Game configuration
-//const int TILE_SIZE = 55;
-//const int MAZE_SIZE = 12;
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
-// std::vector<std::pair<int, int>> generated_maze_map;
 
 bool blockedNorth = false;
 bool blockedSouth = false;
@@ -32,6 +29,8 @@ float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
+
+bool game_paused = false;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0) {
@@ -186,6 +185,10 @@ void WorldSystem::createInventory(vec2 pos) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+
+	// Don't do anything if game is paused
+	if (game_paused) return true;
+
 	//	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
 
@@ -350,6 +353,8 @@ void WorldSystem::restart_game() {
 
 	printf("Restarting\n");
 
+	game_paused = false;
+
 	// Reset the game speed
 	current_speed = 1.f;
     inventory = 0;
@@ -453,6 +458,29 @@ void WorldSystem::restart_game() {
 
 }
 
+void WorldSystem::pause_game() {
+
+	game_paused = true;
+	//printf("Game paused \n");
+
+	auto entity = Entity();
+	registry.textRenderRequests.insert(entity,
+		{
+			"PAUSED", vec2(window_width_px / 2 - 70.0, window_height_px / 2) // might need to adjust position
+		});
+	for (Motion& motion : registry.motions.components) {
+		motion.velocity = { 0, 0 };
+	}
+}
+
+void WorldSystem::resume_game() {
+	
+	game_paused = false;
+	// Remove "Paused" text
+	registry.remove_all_components_of(registry.textRenderRequests.entities.back());
+	printf("Game unpaused \n");
+}
+
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
 	// Loop over all collisions detected by the physics system
@@ -463,7 +491,7 @@ void WorldSystem::handle_collisions() {
 		Entity entity_other = collisionsRegistry.components[i].other;
 
 		// For now, we are only interested in collisions that involve the chicken
-		if (registry.players.has(entity)) {
+		if (!game_paused && registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
 		
 			// Checking Player - Wall collisions
@@ -617,6 +645,17 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         restart_game();
 	}
 
+	// Pausing game
+	if (action == GLFW_RELEASE && key == GLFW_KEY_P) {
+
+		if (!game_paused) {
+			pause_game();
+		}
+		else {
+			resume_game();
+		}
+	}
+
 	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_N) {
@@ -655,7 +694,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			debugging.in_debug_mode = true;
 	}
 
-	if (!registry.deathTimers.has(player)) {
+	if (!game_paused && !registry.deathTimers.has(player)) {
 
 		Motion& motion = registry.motions.get(player);
 

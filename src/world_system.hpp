@@ -36,6 +36,10 @@ public:
 	// Steps the game ahead by ms milliseconds
 	bool step(float elapsed_ms);
 
+	// Pause/unpause game
+	void pause_game();
+	void resume_game();
+
 	// Check for collisions
 	void handle_collisions();
 
