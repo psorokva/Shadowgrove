@@ -431,3 +431,18 @@ Entity createHelp() {
 
     return entity;
 }
+
+Entity createShadowOverlay(RenderSystem* renderer) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = vec2(window_width_px*0.5, window_height_px * 0.5);
+	//motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ window_width_px, window_height_px });
+	registry.debugComponents.emplace(entity);
+	//registry.debugComponents.emplace(entity);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::SHADOW_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+

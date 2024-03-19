@@ -64,6 +64,22 @@ void PhysicsSystem::setCompass(Entity* entity, Immobile* immobile) {
 
 void PhysicsSystem::step(float elapsed_ms) {
 	//printf("HELLO physics \n");
+	ComponentContainer<Motion>& motion_container = registry.motions;
+		//// Check for collisions between player and walls
+	ComponentContainer<Immobile>& immobiles_container = registry.immobiles;
+	Entity player = registry.players.entities[0];
+	Motion& player_motion = motion_container.components[0];
+
+	for (uint i = 0; i < immobiles_container.components.size(); i++) {
+		Immobile& fixed_i = immobiles_container.components[i];
+		Entity entity_i = immobiles_container.entities[i];
+		if (collides(player_motion, fixed_i)) {
+			// Create a collisions event
+			registry.collisions.emplace_with_duplicates(player, entity_i);
+			//player_motion.velocity = vec2(0, 0);
+		}
+	}
+
 
 	// Move bug based on how much time has passed, this is to (partially) avoid
 	// having entities move at different speed based on the machine.
@@ -71,7 +87,7 @@ void PhysicsSystem::step(float elapsed_ms) {
 	for (uint i = 0; i < motion_registry.size(); i++) {
 		// !!! TODO A1: update motion.position based on step_seconds and motion.velocity
 		Motion& motion = motion_registry.components[i];
-
+		
 		Entity entity = motion_registry.entities[i];
 		float step_seconds = elapsed_ms / 1000.f;
 
@@ -130,7 +146,7 @@ void PhysicsSystem::step(float elapsed_ms) {
 	}
 
 	// Check for collisions between all moving entities
-    ComponentContainer<Motion> &motion_container = registry.motions;
+   
 	for(uint i = 0; i<motion_container.components.size(); i++) {
 		Motion& motion_i = motion_container.components[i];
 		Entity entity_i = motion_container.entities[i];
@@ -148,18 +164,6 @@ void PhysicsSystem::step(float elapsed_ms) {
 		}
 	}
 
-	//// Check for collisions between player and walls
-	ComponentContainer<Immobile>& immobiles_container = registry.immobiles;
-	Entity player = registry.players.entities[0];
-	Motion& player_motion = motion_container.components[0];
 
-	for (uint i = 0; i < immobiles_container.components.size(); i++) {
-		Immobile& fixed_i = immobiles_container.components[i];
-		Entity entity_i = immobiles_container.entities[i];
-			if (collides(player_motion, fixed_i)) {
-				// Create a collisions event
-				registry.collisions.emplace_with_duplicates(player, entity_i);
-			}
-	}
 }
 

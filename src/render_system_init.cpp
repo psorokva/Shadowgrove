@@ -211,7 +211,7 @@ RenderSystem::~RenderSystem() {
 	glDeleteRenderbuffers(1, &off_screen_render_buffer_depth);
 	gl_has_errors();
 
-	for(uint i = 0; i < effect_count; i++) {
+	for (uint i = 0; i < effect_count; i++) {
 		glDeleteProgram(effects[i]);
 	}
 	// delete allocated resources
@@ -219,8 +219,10 @@ RenderSystem::~RenderSystem() {
 	gl_has_errors();
 
 	// remove all entities created by the render system
-	while (registry.renderRequests.entities.size() > 0)
-	    registry.remove_all_components_of(registry.renderRequests.entities.back());
+	while (registry.renderRequests.entities.size() > 0) {
+		registry.remove_all_components_of(registry.renderRequests.entities.back());
+
+	}
 }
 
 // Initialize the screen texture from a standard sprite
