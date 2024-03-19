@@ -513,7 +513,7 @@ void WorldSystem::handle_collisions() {
 					else {
 						p.health = 0;
 						registry.deathTimers.emplace(entity);
-						// player shouold stop moving when health is <= 0
+						// player should stop moving when health is <= 0
 						registry.motions.get(player).velocity = { 0, 0 };
 						Mix_PlayChannel(-1, player_death_sound, 0);
 					}
@@ -602,12 +602,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			registry.remove_all_components_of(registry.enemies.entities.back());
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
-		//std::cout << "in here!" << std::endl;
-		while (registry.enemies.entities.size() > 0)
-			registry.remove_all_components_of(registry.enemies.entities.back());
-	}
-
+	// Exiting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		save_state.saveInventory();
@@ -621,12 +616,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
         restart_game();
 	}
-
-	//// Exiting game
-	//if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
-	//	printf("ESC key pressed, close window");
-	//	glfwSetWindowShouldClose(window, true);
-	//}
 
 	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
@@ -652,12 +641,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
     }
 
-	// Debugging
+	// Torch
 	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
 		screen.torch_mode = (screen.torch_mode + 1) %7;
 	
 	}
-
 
 	// Debugging
 	if (key == GLFW_KEY_D) {
@@ -682,12 +670,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedNorth) {
                     motion.velocity = vec2(0.f, -CHARACTER_SPEED);
                 }
-                // TODO fix this if using angle
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
-                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
-                }*/
             }
 
             // Move Down
@@ -698,12 +680,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedSouth) {
                     motion.velocity = vec2(0.f, CHARACTER_SPEED);
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
-                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
-                }*/
             }
 
             // Move Right
@@ -715,12 +691,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     motion.velocity = vec2(CHARACTER_SPEED, 0.f);
                     motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
-                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
-                }*/
             }
 
             // Move Left
@@ -732,12 +702,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
                     motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
-                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
-                }*/
             }
         }
 
@@ -764,8 +728,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// A1: HANDLE CHICKEN ROTATION HERE
-	// xpos and ypos are relative to the top-left of the window, the chicken's
+	// xpos and ypos are relative to the top-left of the window, the player's
 	// default facing direction is (1, 0)
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
