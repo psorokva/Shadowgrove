@@ -40,6 +40,8 @@ const int MAZE_SIZE = 16;
 static bool DEBUG_PRINT = true;
 enum Direction { UP, DOWN, LEFT, RIGHT };
 
+const float NIGHT_DURATION = 30000.f; // 30 sec
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif
