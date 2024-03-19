@@ -212,6 +212,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			restart_game();
 			return true;
 		}
+		screen.night_counter_ms = night_counter.counter_ms;
 	}
 
 	animation_elpased_ms += elapsed_ms_since_last_update;
@@ -687,9 +688,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
     }
 
-	// Torch
+	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
 	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
-		screen.torch_mode = (screen.torch_mode + 1) %7;
+		screen.torch_mode = (screen.torch_mode + 1) %2;
 	
 	}
 

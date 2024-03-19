@@ -169,6 +169,7 @@ struct ScreenState {
     Game_screens game_screen = game_screen_day;
 	int torch_mode = 0;
 	int torch_anim = 0;
+	float night_counter_ms = 0;
 };
 
 struct HelpScreen {

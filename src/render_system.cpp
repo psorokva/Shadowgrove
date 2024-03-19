@@ -264,6 +264,27 @@ void RenderSystem::drawToScreen() {
 	glBindTexture(GL_TEXTURE_2D, off_screen_render_buffer_color);
 	gl_has_errors();
 	// also bind the shadow overlays  ///////////////////////////////////////////////////////////////////////////////////////
+
+	//NightTimer& nighttime = registry.nightTimer.components[0];
+	GLuint night_timer = glGetUniformLocation(night_program, "night_timer");
+	glUniform1f(night_timer, screen.night_counter_ms);
+	GLuint night_length_full = glGetUniformLocation(night_program, "night_length_full");
+	glUniform1f(night_length_full, NIGHT_DURATION);
+	
+	GLuint night_length_0 = glGetUniformLocation(night_program, "night_length_0");
+	glUniform1f(night_length_0, NIGHT_DURATION_0);
+	GLuint night_length_1 = glGetUniformLocation(night_program, "night_length_1");
+	glUniform1f(night_length_1, NIGHT_DURATION_1);
+	GLuint night_length_2 = glGetUniformLocation(night_program, "night_length_2");
+	glUniform1f(night_length_2, NIGHT_DURATION_2);
+	GLuint night_length_3 = glGetUniformLocation(night_program, "night_length_3");
+	glUniform1f(night_length_3, NIGHT_DURATION_3);
+	GLuint night_length_4 = glGetUniformLocation(night_program, "night_length_4");
+	glUniform1f(night_length_4, NIGHT_DURATION_4);
+	GLuint night_length_5 = glGetUniformLocation(night_program, "night_length_5");
+	glUniform1f(night_length_5, NIGHT_DURATION_5);
+
+
 	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
 	glUniform1i(torch_mode, screen.torch_mode);
 
