@@ -187,8 +187,7 @@ struct DeathTimer {
 
 // A timer that will switch from night to day
 struct NightTimer {
-	//float counter_ms = 60000; // 1 min
-	float counter_ms = 30000; // 30 sec
+	float counter_ms = NIGHT_DURATION;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
