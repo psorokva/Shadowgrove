@@ -41,6 +41,7 @@ static bool DEBUG_PRINT = true;
 enum Direction { UP, DOWN, LEFT, RIGHT };
 
 const float NIGHT_DURATION = 30000.0f; // 30 sec
+/// These Durations adjust when light changes in the night shader
 const float NIGHT_DURATION_0 = NIGHT_DURATION * 0.1;
 const float NIGHT_DURATION_1 = NIGHT_DURATION * 0.3;
 const float NIGHT_DURATION_2 = NIGHT_DURATION * 0.4;
