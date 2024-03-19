@@ -111,6 +111,8 @@ class RenderSystem {
 			textures_path("daytimesceen.png"),
             textures_path("helpscreen.png"),
 			textures_path("Torchlight_00.png"),
+			textures_path("Torchlight_01.png"),
+			textures_path("Torchlight_03.png"),
 			textures_path("ShadowOverlay_00.png"),
 			textures_path("ShadowOverlay_01.png"),
 			textures_path("MidnightOverlay_00.png"),

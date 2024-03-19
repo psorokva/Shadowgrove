@@ -258,6 +258,9 @@ void RenderSystem::drawToScreen() {
 	// also bind the shadow overlays  ///////////////////////////////////////////////////////////////////////////////////////
 	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
 	glUniform1i(torch_mode, screen.torch_mode);
+
+	GLuint torch_anim = glGetUniformLocation(night_program, "torch_anim");
+	glUniform1i(torch_anim, screen.torch_anim);
 	//gl_has_errors();
 	// texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::SHADOW_00]
 	glActiveTexture(GL_TEXTURE1);
@@ -282,9 +285,19 @@ void RenderSystem::drawToScreen() {
 	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::MIDNIGHT_01]);
 
 	glActiveTexture(GL_TEXTURE5);
-	GLuint light_01 = glGetUniformLocation(night_program, "light01");
-	glUniform1i(light_01, 5);
+	GLuint light_00 = glGetUniformLocation(night_program, "light00");
+	glUniform1i(light_00, 5);
 	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_00]);
+
+	glActiveTexture(GL_TEXTURE6);
+	GLuint light_01 = glGetUniformLocation(night_program, "light01");
+	glUniform1i(light_01, 6);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_01]);
+
+	glActiveTexture(GL_TEXTURE7);
+	GLuint light_02 = glGetUniformLocation(night_program, "light02");
+	glUniform1i(light_02, 7);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_02]);
 	gl_has_errors();
 	//glUniform1i(shad_00, 0);
 

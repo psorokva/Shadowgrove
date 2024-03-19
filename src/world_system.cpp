@@ -186,11 +186,15 @@ void WorldSystem::createInventory(vec2 pos) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+	//	assert(registry.screenStates.components.size() <= 1);
+	ScreenState& screen = registry.screenStates.components[0];
+
 	animation_elpased_ms += elapsed_ms_since_last_update;
 	keeper_spawn_time += elapsed_ms_since_last_update;
 	if (animation_elpased_ms > ANIMATION_SPEED) {
 		animation_elpased_ms = 0.0;
 		animation_cycle++;
+		screen.torch_anim = animation_cycle % 3;
 		animation_cycle %= 4;
 	}
 	//const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
@@ -228,8 +232,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 
-	//	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
+
 
     camera.step();
 	ai.step();

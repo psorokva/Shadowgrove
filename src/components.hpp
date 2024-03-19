@@ -168,6 +168,7 @@ struct ScreenState {
 	float darken_screen_factor = -1;
     Game_screens game_screen = game_screen_day;
 	int torch_mode = 0;
+	int torch_anim = 0;
 };
 
 struct HelpScreen {
@@ -310,7 +311,9 @@ enum class TEXTURE_ASSET_ID {
 	DAY_SCREEN = PLANT_17 + 1,
     HELP_SCREEN = DAY_SCREEN +1,
 	TORCHLIGHT_00 = HELP_SCREEN + 1,
-	SHADOW_00 = TORCHLIGHT_00 + 1,
+	TORCHLIGHT_01 = TORCHLIGHT_00 + 1,
+	TORCHLIGHT_02 = TORCHLIGHT_01 + 1,
+	SHADOW_00 = TORCHLIGHT_02 + 1,
 	SHADOW_01 = SHADOW_00 + 1,
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
