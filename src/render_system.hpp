@@ -8,8 +8,8 @@
 #include "tiny_ecs.hpp"
 
 // fonts
-//#include <ft2build.h>
-//#include FT_FREETYPE_H
+#include <ft2build.h>
+#include FT_FREETYPE_H
 #include <map>
 
 // System responsible for setting up OpenGL and for rendering all the
@@ -110,7 +110,13 @@ class RenderSystem {
 			textures_path("plant_17.png"),
 			textures_path("daytimesceen.png"),
             textures_path("helpscreen.png"),
-
+			textures_path("Torchlight_00.png"),
+			textures_path("Torchlight_01.png"),
+			textures_path("Torchlight_03.png"),
+			textures_path("ShadowOverlay_00.png"),
+			textures_path("ShadowOverlay_01.png"),
+			textures_path("MidnightOverlay_00.png"),
+			textures_path("MidnightOverlay_01.png"),
 
 
 	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
@@ -121,7 +127,8 @@ class RenderSystem {
 		shader_path("coloured"),
 		shader_path("inventory_line"),
 		shader_path("textured"),
-		shader_path("night") };
+		shader_path("night") 
+		};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
@@ -130,8 +137,6 @@ class RenderSystem {
 public:
 	// Initialize the window
 	bool init(GLFWwindow* window);
-
-	void fontInit(GLFWwindow& window, const std::string& font_filename, unsigned int font_default_size);
 
 	template <class T>
 	void bindVBOandIBO(GEOMETRY_BUFFER_ID gid, std::vector<T> vertices, std::vector<uint16_t> indices);
@@ -149,6 +154,12 @@ public:
 	// shader
 	bool initScreenTexture();
 
+	// Initialize fonts to output text to the screen
+	bool initializeFonts(unsigned int font_default_size);
+
+	// Print text to the screen
+	void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
+
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
 
@@ -156,8 +167,6 @@ public:
 	void draw();
 
 	mat3 createProjectionMatrix();
-
-	//void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
 
 private:
 	// Internal drawing functions for each entity type
@@ -168,6 +177,9 @@ private:
 	// Window handle
 	GLFWwindow* window;
 
+	// Use before EnableVertexAttribArray to avoid GL errors
+	GLuint vao;
+
 	// Screen texture handles
 	GLuint frame_buffer;
 	GLuint off_screen_render_buffer_color;
@@ -175,11 +187,6 @@ private:
 
 	Entity screen_state_entity;
 
-	// fonts
-	std::map<char, Character> m_ftCharacters;	// map of all characters and their textures
-	GLuint m_font_shaderProgram;				// drawing the font
-	GLuint m_font_VAO;							// to isolate font things in separate VAO/VBO
-	GLuint m_font_VBO;
 };
 
 bool loadEffectFromFile(

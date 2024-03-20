@@ -201,35 +201,6 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 //}
 
 
-// Not used currently
-void updateTile(RenderSystem* renderer, std::vector<std::vector<Tile>>& maze, int row, int col, int type) {
-	maze[row][col].tile_type = type;
-
-	auto entity = Entity();
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	// TODO: remove position from motion (almost everything gets position but not motion)
-	// Initialize the position, scale, and physics components
-	auto& motion = registry.motions.emplace(entity);
-	motion.angle = 0.f;
-	motion.velocity = { 0, 0 };
-	motion.position = {row * 55, col * 55};
-
-	// Setting initial values, scale is negative to make it face the opposite way
-	motion.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
-
-	if (type == 1) {
-		registry.impenetrables.emplace(entity);
-		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-	}
-	// TODO: add other variations
-	/*else {
-		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-	}*/
-
-}
-
 Entity createLine(vec2 position, vec2 scale) {
 	Entity entity = Entity();
 
@@ -421,6 +392,14 @@ Entity createDay() {
     return entity;
 }
 
+Entity createNight() {
+	auto entity = Entity();
+
+	registry.nightTimer.emplace(entity);
+
+	return entity;
+}
+
 Entity createHelp() {
     auto entity = Entity();
 
@@ -431,3 +410,18 @@ Entity createHelp() {
 
     return entity;
 }
+
+Entity createShadowOverlay(RenderSystem* renderer) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = vec2(window_width_px*0.5, window_height_px * 0.5);
+	//motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ window_width_px, window_height_px });
+	registry.debugComponents.emplace(entity);
+	//registry.debugComponents.emplace(entity);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::SHADOW_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+

@@ -37,38 +37,38 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 	// Input data location as in the vertex buffer
 	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		assert(in_position_loc >= 0);
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
 		gl_has_errors();
 		assert(in_texcoord_loc >= 0);
 
+		glBindVertexArray(vao);
 		glEnableVertexAttribArray(in_position_loc);
+		gl_has_errors();
 		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
 							  sizeof(TexturedVertex), (void *)0);
 		gl_has_errors();
 
 		glEnableVertexAttribArray(in_texcoord_loc);
-		glVertexAttribPointer(
-			in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
-			(void *)sizeof(
-				vec3)); // note the stride to skip the preceeding vertex position
+		glVertexAttribPointer( in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),(void *)sizeof(vec3)); 
+			// note the stride to skip the preceeding vertex position
 
 		// Enabling and binding texture to slot 0
 		glActiveTexture(GL_TEXTURE0);
 		gl_has_errors();
 
 		assert(registry.renderRequests.has(entity));
-		GLuint texture_id =
-			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+		GLuint texture_id = texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
 
-	else if (render_request.used_effect == EFFECT_ASSET_ID::INVENTORY_LINE)
-	{
+	else if (render_request.used_effect == EFFECT_ASSET_ID::INVENTORY_LINE) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_color_loc = glGetAttribLocation(program, "in_color");
 		gl_has_errors();
+		glBindVertexArray(vao);
 
 		glEnableVertexAttribArray(in_position_loc);
 		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
@@ -80,8 +80,7 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 			sizeof(ColoredVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
-	}
-	else {
+	} else {
 		assert(false && "Type of render request not supported");
 	}
 
@@ -141,6 +140,8 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
 	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
 
+	glBindVertexArray(vao);
+
 	// Setting vertex and index buffers
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -174,8 +175,7 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
-	}
-	else {
+	} else {
 		assert(false && "Type of render request not supported");
 	}
 
@@ -230,6 +230,8 @@ void RenderSystem::drawToScreen() {
 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
 
+	glBindVertexArray(vao);
+
 	// Draw the screen texture on the quad geometry
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
@@ -257,10 +259,77 @@ void RenderSystem::drawToScreen() {
 	gl_has_errors();
 
 	// Bind our texture in Texture Unit 0
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0 + 0);
 
 	glBindTexture(GL_TEXTURE_2D, off_screen_render_buffer_color);
 	gl_has_errors();
+	// also bind the shadow overlays  ///////////////////////////////////////////////////////////////////////////////////////
+
+	//NightTimer& nighttime = registry.nightTimer.components[0];
+	GLuint night_timer = glGetUniformLocation(night_program, "night_timer");
+	glUniform1f(night_timer, screen.night_counter_ms);
+	GLuint night_length_full = glGetUniformLocation(night_program, "night_length_full");
+	glUniform1f(night_length_full, NIGHT_DURATION);
+	
+	GLuint night_length_0 = glGetUniformLocation(night_program, "night_length_0");
+	glUniform1f(night_length_0, NIGHT_DURATION_0);
+	GLuint night_length_1 = glGetUniformLocation(night_program, "night_length_1");
+	glUniform1f(night_length_1, NIGHT_DURATION_1);
+	GLuint night_length_2 = glGetUniformLocation(night_program, "night_length_2");
+	glUniform1f(night_length_2, NIGHT_DURATION_2);
+	GLuint night_length_3 = glGetUniformLocation(night_program, "night_length_3");
+	glUniform1f(night_length_3, NIGHT_DURATION_3);
+	GLuint night_length_4 = glGetUniformLocation(night_program, "night_length_4");
+	glUniform1f(night_length_4, NIGHT_DURATION_4);
+	GLuint night_length_5 = glGetUniformLocation(night_program, "night_length_5");
+	glUniform1f(night_length_5, NIGHT_DURATION_5);
+
+
+	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
+	glUniform1i(torch_mode, screen.torch_mode);
+
+	GLuint torch_anim = glGetUniformLocation(night_program, "torch_anim");
+	glUniform1i(torch_anim, screen.torch_anim);
+	//gl_has_errors();
+	// texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::SHADOW_00]
+	glActiveTexture(GL_TEXTURE1);
+	GLuint shad_00 = glGetUniformLocation(night_program, "shad00");
+	glUniform1i(shad_00, 1);
+	//glUniform4fv(shad_00, 1, glm::value_ptr(color));
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::SHADOW_00]);
+
+	glActiveTexture(GL_TEXTURE2);
+	GLuint shad_01 = glGetUniformLocation(night_program, "shad01");
+	glUniform1i(shad_01, 2);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::SHADOW_01]);
+
+	glActiveTexture(GL_TEXTURE3);
+	GLuint dark_00 = glGetUniformLocation(night_program, "dark00");
+	glUniform1i(dark_00, 3);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::MIDNIGHT_00]);
+
+	glActiveTexture(GL_TEXTURE4);
+	GLuint dark01 = glGetUniformLocation(night_program, "dark01");
+	glUniform1i(dark01, 4);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::MIDNIGHT_01]);
+
+	glActiveTexture(GL_TEXTURE5);
+	GLuint light_00 = glGetUniformLocation(night_program, "light00");
+	glUniform1i(light_00, 5);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_00]);
+
+	glActiveTexture(GL_TEXTURE6);
+	GLuint light_01 = glGetUniformLocation(night_program, "light01");
+	glUniform1i(light_01, 6);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_01]);
+
+	glActiveTexture(GL_TEXTURE7);
+	GLuint light_02 = glGetUniformLocation(night_program, "light02");
+	glUniform1i(light_02, 7);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_02]);
+	gl_has_errors();
+	//glUniform1i(shad_00, 0);
+
 	// Draw
 	glDrawElements(
 		GL_TRIANGLES, 3, GL_UNSIGNED_SHORT,
@@ -324,6 +393,10 @@ void RenderSystem::draw() {
             }
         }
 
+		// add overlay of shadow
+		//drawTexturedStaticMesh(torchEntity, projection_2D);
+
+
         // add help screen to night screen
 //        HelpScreen& help = registry.helpScreen.components[0];
 //        if (help.help == 1) {
@@ -368,6 +441,21 @@ void RenderSystem::draw() {
             drawTexturedStaticMesh(helpScreen, projection_2D);
         }
     }
+
+	glm::mat4 trans = glm::mat4(1.0f);
+	// Might need to use rotation and scaling in the future
+	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));
+	
+	// Render text at the bottom left of the screen
+	//renderText("Test", 0.0f, 70.0f, 1.0f, glm::vec3(1.0, 1.0, 1.0), trans); // Note if y value is less than 70 the text gets cut off
+
+	// Render all text in the registry
+	for (Entity entity : registry.textRenderRequests.entities)
+	{
+		TextRenderRequest request = registry.textRenderRequests.get(entity);
+		renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+	}
 
 	// Truely render to the screen
 	drawToScreen();

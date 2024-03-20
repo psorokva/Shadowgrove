@@ -36,6 +36,10 @@ public:
 	// Steps the game ahead by ms milliseconds
 	bool step(float elapsed_ms);
 
+	// Pause/unpause game
+	void pause_game();
+	void resume_game();
+
 	// Check for collisions
 	void handle_collisions();
 
@@ -69,6 +73,7 @@ private:
     int inventory;
     Entity inventory1;
 	int num_item_on_screen;
+	Entity torchEntity;
 
 	// music references
 	Mix_Music* night_music;

@@ -12,11 +12,8 @@
 #include "physics_system.hpp"
 
 // Game configuration
-//const int TILE_SIZE = 55;
-//const int MAZE_SIZE = 12;
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
-// std::vector<std::pair<int, int>> generated_maze_map;
 
 bool blockedNorth = false;
 bool blockedSouth = false;
@@ -32,6 +29,8 @@ float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
+
+bool game_paused = false;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0) {
@@ -186,11 +185,42 @@ void WorldSystem::createInventory(vec2 pos) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
+
+	// tabbing out of the game or minimizing the window will pause the game
+	int focused = glfwGetWindowAttrib(window, GLFW_FOCUSED);
+	if (!focused) pause_game();
+
+	// Don't do anything if game is paused
+	if (game_paused) return true;
+
+	//	assert(registry.screenStates.components.size() <= 1);
+	ScreenState& screen = registry.screenStates.components[0];
+
+	if (registry.nightTimer.size() > 0) {
+		float min_night_counter_ms = 60000.f;
+		NightTimer& night_counter = registry.nightTimer.components[0];
+		// progress timer
+		night_counter.counter_ms -= elapsed_ms_since_last_update;
+		if (night_counter.counter_ms < min_night_counter_ms) {
+			min_night_counter_ms = night_counter.counter_ms;
+		}
+
+		// switch to day after night timer expired
+		if (night_counter.counter_ms < 0) {
+			registry.nightTimer.clear();
+			screen.game_screen = game_screen_day;
+			restart_game();
+			return true;
+		}
+		screen.night_counter_ms = night_counter.counter_ms;
+	}
+
 	animation_elpased_ms += elapsed_ms_since_last_update;
 	keeper_spawn_time += elapsed_ms_since_last_update;
 	if (animation_elpased_ms > ANIMATION_SPEED) {
 		animation_elpased_ms = 0.0;
 		animation_cycle++;
+		screen.torch_anim = animation_cycle % 3;
 		animation_cycle %= 4;
 	}
 	//const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
@@ -208,13 +238,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	title_ss << "FPS: " << fps;
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
-	//vec2 spawn = registry.get_empty_spawn_location();
-	//printf("free tile at: %f, %f\n", spawn.x, spawn.y);
-
 	// Remove debug info from the last step
-	while (registry.debugComponents.entities.size() > 0) {
-		registry.remove_all_components_of(registry.debugComponents.entities.back());
-	}
+	while (registry.debugComponents.entities.size() > 0)
+	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 	// Animating enemy entities
 	auto& enemies = registry.enemies.components;
@@ -227,10 +253,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-
-	//	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
-
     camera.step();
 	ai.step();
 
@@ -240,7 +262,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     Motion& p_motion = registry.motions.get(p);
 
     // Displaying health bar
-	auto healthBar = createLine(vec2(0, 10), vec2(10*player.health, 100));
+	auto healthBar = createLine(vec2(10, 10), vec2(10*player.health, 100));
 	registry.colors.insert(healthBar, { 1, 0, 0 });
 
     // inventory bar position on screen
@@ -253,6 +275,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
         createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
     }
+	//createShadowOverlay(renderer);
 
 	if (num_of_item_on_screen < NUM_POTIONS) {
 		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 };
@@ -356,6 +379,8 @@ void WorldSystem::restart_game() {
 
 	printf("Restarting\n");
 
+	game_paused = false;
+
 	// Reset the game speed
 	current_speed = 1.f;
     inventory = 0;
@@ -376,7 +401,7 @@ void WorldSystem::restart_game() {
 //        registry.remove_all_components_of(registry.screenStates.entities.back());
 	//registry.clear_all_components();
 	generator->clearMap();
-	printf("AFTER CLEARED REGISTRY");
+	//printf("AFTER CLEARED REGISTRY");
 	registry.list_all_components();
 	// Create a new player
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
@@ -388,7 +413,7 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	save_state.loadInventory();
-	printf("MAP AND PLAYER CREATED\n");
+	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
 	Entity compass = createCompass(vec2(155.0,155.0));
@@ -404,6 +429,7 @@ void WorldSystem::restart_game() {
     ScreenState &screen = registry.screenStates.components[0];
     if (screen.game_screen == game_screen_night) {
         // Playing background music indefinitely
+		createNight();
         Mix_PlayMusic(night_music, -1);
         fprintf(stderr, "Loaded music\n");
         generator->createWorldMap();
@@ -451,7 +477,37 @@ void WorldSystem::restart_game() {
 	}
 	// wait();
 	// Debugging for memory/component leaks
+	//torchEntity = createShadowOverlay(renderer);
+
 	registry.list_all_components();
+
+
+}
+
+void WorldSystem::pause_game() {
+
+	game_paused = true;
+	//printf("Game paused \n");
+
+	auto entity = Entity();
+	registry.textRenderRequests.insert(entity,
+		{
+			"PAUSED", vec2(window_width_px / 2 - 70.0, window_height_px / 2) // might need to adjust position
+		});
+	for (Motion& motion : registry.motions.components) {
+		motion.velocity = { 0, 0 };
+	}
+}
+
+void WorldSystem::resume_game() {
+	
+	game_paused = false;
+	// Remove "Paused" text (does it remove too much?)
+	while (registry.textRenderRequests.entities.size() > 0) {
+		registry.remove_all_components_of(registry.textRenderRequests.entities.back());
+	}
+	
+	//printf("Game unpaused \n");
 }
 
 // Compute collisions between entities
@@ -464,7 +520,7 @@ void WorldSystem::handle_collisions() {
 		Entity entity_other = collisionsRegistry.components[i].other;
 
 		// For now, we are only interested in collisions that involve the chicken
-		if (registry.players.has(entity)) {
+		if (!game_paused && registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
 		
 			// Checking Player - Wall collisions
@@ -527,7 +583,7 @@ void WorldSystem::handle_collisions() {
 					else {
 						p.health = 0;
 						registry.deathTimers.emplace(entity);
-						// player shouold stop moving when health is <= 0
+						// player should stop moving when health is <= 0
 						registry.motions.get(player).velocity = { 0, 0 };
 						Mix_PlayChannel(-1, player_death_sound, 0);
 					}
@@ -616,12 +672,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			registry.remove_all_components_of(registry.enemies.entities.back());
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
-		//std::cout << "in here!" << std::endl;
-		while (registry.enemies.entities.size() > 0)
-			registry.remove_all_components_of(registry.enemies.entities.back());
-	}
-
+	// Exiting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
 		save_state.saveInventory();
@@ -636,17 +687,22 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         restart_game();
 	}
 
-	//// Exiting game
-	//if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
-	//	printf("ESC key pressed, close window");
-	//	glfwSetWindowShouldClose(window, true);
-	//}
+	// Pausing game
+	if (action == GLFW_RELEASE && key == GLFW_KEY_P) {
 
+		if (!game_paused) {
+			pause_game();
+		}
+		else {
+			resume_game();
+		}
+	}
 
+	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_N) {
         printf("N key pressed, switching screen");
-        ScreenState &screen = registry.screenStates.components[0];
+        
         if (screen.game_screen == game_screen_night) {
             screen.game_screen = game_screen_day;
         } else {
@@ -666,6 +722,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
     }
 
+	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
+	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
+		screen.torch_mode = (screen.torch_mode + 1) %2;
+	
+	}
+
 	// Debugging
 	if (key == GLFW_KEY_D) {
 		if (action == GLFW_RELEASE)
@@ -674,7 +736,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			debugging.in_debug_mode = true;
 	}
 
-	if (!registry.deathTimers.has(player)) {
+	if (!game_paused && !registry.deathTimers.has(player)) {
 
 		Motion& motion = registry.motions.get(player);
 
@@ -689,12 +751,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedNorth) {
                     motion.velocity = vec2(0.f, -CHARACTER_SPEED);
                 }
-                // TODO fix this if using angle
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
-                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
-                }*/
             }
 
             // Move Down
@@ -705,12 +761,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedSouth) {
                     motion.velocity = vec2(0.f, CHARACTER_SPEED);
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-                    motion.velocity.x = motion.velocity.x * cos(motion.angle);
-                    motion.velocity.y = motion.velocity.y * sin(motion.angle);
-                }*/
             }
 
             // Move Right
@@ -722,12 +772,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     motion.velocity = vec2(CHARACTER_SPEED, 0.f);
                     motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(CHARACTER_SPEED, CHARACTER_SPEED);
-                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
-                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
-                }*/
             }
 
             // Move Left
@@ -739,12 +783,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
                     motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
-
-                /*if (motion.angle != 0.f)	{
-                    motion.velocity = vec2(-CHARACTER_SPEED, -CHARACTER_SPEED);
-                    motion.velocity.y = motion.velocity.y * cos(motion.angle);
-                    motion.velocity.x = motion.velocity.x * sin(motion.angle);
-                }*/
             }
         }
 
@@ -771,8 +809,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// A1: HANDLE CHICKEN ROTATION HERE
-	// xpos and ypos are relative to the top-left of the window, the chicken's
+	// xpos and ypos are relative to the top-left of the window, the player's
 	// default facing direction is (1, 0)
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

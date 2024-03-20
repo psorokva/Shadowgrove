@@ -163,8 +163,7 @@ struct Debug {
 };
 extern Debug debugging;
 
-enum Game_screens
-{
+enum Game_screens {
     game_screen_main_menu,
     game_screen_night,
     game_screen_day,
@@ -175,6 +174,9 @@ enum Game_screens
 struct ScreenState {
 	float darken_screen_factor = -1;
     Game_screens game_screen = game_screen_day;
+	int torch_mode = 0;
+	int torch_anim = 0;
+	float night_counter_ms = 0;
 };
 
 struct HelpScreen {
@@ -186,9 +188,14 @@ struct DebugComponent {
 	// Note, an empty struct has size 1
 };
 
-// A timer that will be associated to dying chicken
+// A timer that will be associated to dying player
 struct DeathTimer {
 	float counter_ms = 3000;
+};
+
+// A timer that will switch from night to day
+struct NightTimer {
+	float counter_ms = NIGHT_DURATION;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
@@ -316,7 +323,14 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_17 = PLANT_16 + 1,
 	DAY_SCREEN = PLANT_17 + 1,
     HELP_SCREEN = DAY_SCREEN +1,
-	TEXTURE_COUNT = HELP_SCREEN + 1
+	TORCHLIGHT_00 = HELP_SCREEN + 1,
+	TORCHLIGHT_01 = TORCHLIGHT_00 + 1,
+	TORCHLIGHT_02 = TORCHLIGHT_01 + 1,
+	SHADOW_00 = TORCHLIGHT_02 + 1,
+	SHADOW_01 = SHADOW_00 + 1,
+	MIDNIGHT_00 = SHADOW_01 + 1,
+	MIDNIGHT_01 = MIDNIGHT_00 + 1,
+	TEXTURE_COUNT = MIDNIGHT_01 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -341,5 +355,12 @@ struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+};
+
+struct TextRenderRequest {
+	std::string text = "";
+	vec2 position = vec2(1.0f, 1.0f);
+	float scale = 1.0f;
+	vec3 color = vec3(1.0f, 1.0f, 1.0f); // default white
 };
 

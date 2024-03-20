@@ -12,6 +12,7 @@ public:
 	// Manually created list of all components this game has
 	// TODO: A1 add a LightUp component
 	ComponentContainer<DeathTimer> deathTimers;
+	ComponentContainer<NightTimer> nightTimer;
 	ComponentContainer<Motion> motions;
 	ComponentContainer<Immobile> immobiles;
 	ComponentContainer<Collision> collisions;
@@ -33,11 +34,13 @@ public:
     ComponentContainer<HelpScreen> helpScreen;
     ComponentContainer<HitTimer> hitTimers;
     ComponentContainer<Invincible> invincibles;
+	ComponentContainer<TextRenderRequest> textRenderRequests;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
 	ECSRegistry() {
 		registry_list.push_back(&deathTimers);
+		registry_list.push_back(&nightTimer);
 		registry_list.push_back(&motions);
 		registry_list.push_back(&immobiles);
 		registry_list.push_back(&collisions);
@@ -59,6 +62,7 @@ public:
         registry_list.push_back(&helpScreen);
         registry_list.push_back(&hitTimers);
         registry_list.push_back(&invincibles);
+		registry_list.push_back(&textRenderRequests);
 	}
 
 	void clear_all_components() {
@@ -110,8 +114,8 @@ public:
 			}
 		}
 		//Immobile& zero = immobiles.components[0];
-		printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
-		printf("Desired Chunk x %f y %f \n", chunk.campos_x, chunk.campos_y);
+		//printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
+		//printf("Desired Chunk x %f y %f \n", chunk.campos_x, chunk.campos_y);
 		//printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
 		//printf("Zero cam pos x %f y %f \n", zero.camera_position.x, zero.camera_position.y);
 		//printf("Zero pos x %f y %f \n", zero.position.x, zero.position.y);
@@ -137,10 +141,10 @@ public:
 		for (uint i = 0; i < ccc.size(); i++) {
 			// if correct chunk
 			if (ccc[i].x == cl->index_x && ccc[i].y == cl->index_y) {
-				printf("CLICK: x:%f y:%f\n", location.x, location.y);
-				printf("\tCOMPASS: x:%f y:%f\n", p_x, p_y);
-				printf("\tCHUNK: x:%zu y:%zu\n", cl->index_x, cl->index_y);
-				printf("\tCHUNK CELL: x:%zu y:%zu \n", cl->offset_x, cl->offset_y);
+				//printf("CLICK: x:%f y:%f\n", location.x, location.y);
+				//printf("\tCOMPASS: x:%f y:%f\n", p_x, p_y);
+				//printf("\tCHUNK: x:%zu y:%zu\n", cl->index_x, cl->index_y);
+				//printf("\tCHUNK CELL: x:%zu y:%zu \n", cl->offset_x, cl->offset_y);
 				// if spot clear 
 				if ( ccc[i].grid[cl->offset_y][cl->offset_x] == 0 ) {
 					return true;
