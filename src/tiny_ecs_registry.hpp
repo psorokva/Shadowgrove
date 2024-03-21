@@ -35,6 +35,7 @@ public:
     ComponentContainer<HitTimer> hitTimers;
     ComponentContainer<Invincible> invincibles;
 	ComponentContainer<TextRenderRequest> textRenderRequests;
+    ComponentContainer<Daytime> daytimes;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -63,6 +64,7 @@ public:
         registry_list.push_back(&hitTimers);
         registry_list.push_back(&invincibles);
 		registry_list.push_back(&textRenderRequests);
+        registry_list.push_back(&daytimes);
 	}
 
 	void clear_all_components() {

@@ -380,14 +380,33 @@ Entity createDay() {
     auto entity = Entity();
 
     auto& day = registry.screenStates.emplace(entity);
+    Daytime& sign = registry.daytimes.emplace(entity);
 
     auto& fixed = registry.immobiles.emplace(entity);
-    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
+//    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
+    fixed.position = { window_width_px / 2, 0.5 * window_height_px };
     fixed.scale = { window_width_px, window_height_px };
 //    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
 
     // TEXTURE_COUNT indicates that no txture is needed
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}
+
+Entity createSign() {
+    auto entity = Entity();
+
+    auto& day = registry.screenStates.emplace(entity);
+
+    auto& fixed = registry.immobiles.emplace(entity);
+    fixed.position = { 0.15 * window_width_px, 0.85 * window_height_px };
+    fixed.scale = { 300, 300 };
+
+    Daytime& sign = registry.daytimes.emplace(entity);
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::SIGN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
 }
@@ -425,3 +444,16 @@ Entity createShadowOverlay(RenderSystem* renderer) {
 }
 
 
+Entity createDog(vec2 position) {
+    auto entity = Entity();
+
+    Immobile& immobile = registry.immobiles.emplace(entity);
+    immobile.position = position;
+    immobile.scale = vec2({ 1.5 * 135, 1.5 * 60 });
+    immobile.camera_position = { window_width_px / 4, window_height_px / 4 };
+
+    Daytime& dog = registry.daytimes.emplace(entity);
+
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DOG, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+}
