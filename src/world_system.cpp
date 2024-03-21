@@ -19,6 +19,7 @@ bool blockedNorth = false;
 bool blockedSouth = false;
 bool blockedEast = false;
 bool blockedWest = false;
+int out_of_bounds = 0;
 
 Direction playerDirection;
 const uint NUM_POTIONS = 8;
@@ -215,22 +216,24 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		screen.night_counter_ms = night_counter.counter_ms;
 	}
 
-	animation_elpased_ms += elapsed_ms_since_last_update;
-	keeper_spawn_time += elapsed_ms_since_last_update;
-	if (animation_elpased_ms > ANIMATION_SPEED) {
-		animation_elpased_ms = 0.0;
-		animation_cycle++;
-		screen.torch_anim = animation_cycle % 3;
-		animation_cycle %= 4;
-	}
-	//const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
-	//f//loat keeper_spawn_time = 0.0f;
-	if (keeper_spawn_time > KEEPER_SPAWN_FREQ) {
-		keeper_spawn_time = 0.0;
-		vec2 spawn_pos = registry.get_empty_spawn_location();
-		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
-	}
-	
+    if (screen.game_screen == game_screen_night) {
+        animation_elpased_ms += elapsed_ms_since_last_update;
+        keeper_spawn_time += elapsed_ms_since_last_update;
+        if (animation_elpased_ms > ANIMATION_SPEED) {
+            animation_elpased_ms = 0.0;
+            animation_cycle++;
+            screen.torch_anim = animation_cycle % 3;
+            animation_cycle %= 4;
+        }
+        //const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+        //f//loat keeper_spawn_time = 0.0f;
+        if (keeper_spawn_time > KEEPER_SPAWN_FREQ) {
+            keeper_spawn_time = 0.0;
+            vec2 spawn_pos = registry.get_empty_spawn_location();
+            createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+        }
+    }
+
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
@@ -246,7 +249,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	auto& enemies = registry.enemies.components;
 	for (int i = 0; i < enemies.size(); i++ ) {
 		RenderRequest& r = registry.renderRequests.get( enemies[i].e_id );
-		if (animation_cycle % 2 == 1) { 
+		if (animation_cycle % 2 == 1) {
 			r.used_texture = TEXTURE_ASSET_ID::KEEPER2;
 		} else {
 			r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
@@ -254,7 +257,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
     camera.step();
-	ai.step();
+
+    ai.step();
 
 	Player& player = registry.players.components[0];
 
@@ -348,6 +352,27 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// reduce window brightness if any of the present is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
+    // on collision with enemy
+    float hit_counter_ms = 3000.f;
+    for (Entity entity : registry.hitTimers.entities)
+    {
+        // progress timer
+        HitTimer &counter = registry.hitTimers.get(entity);
+        counter.counter_ms -= elapsed_ms_since_last_update;
+
+        if (counter.counter_ms < hit_counter_ms)
+        {
+            hit_counter_ms = counter.counter_ms;
+        }
+
+        if (counter.counter_ms < 0)
+        {
+            registry.invincibles.remove(entity);
+            registry.hitTimers.remove(entity);
+            return true;
+        }
+    }
+
 	return true;
 }
 
@@ -420,6 +445,9 @@ void WorldSystem::restart_game() {
 
         Entity day = createDay();
         printf("day entity init %zu\n", day);
+
+        createDog({ window_width_px / 2, window_height_px - 200 });
+        createSign();
     }
 
     createHelp();
@@ -504,12 +532,12 @@ void WorldSystem::handle_collisions() {
 		
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
-			
+
 				Motion& motion = registry.motions.get(entity);
 				// Can adjust this
 				float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
-			
+
 				if (playerDirection == UP) {
 					//printf("Collided with North wall");
 					blockedNorth = true;
@@ -537,11 +565,24 @@ void WorldSystem::handle_collisions() {
 			if (registry.enemies.has(entity_other)) {
 				Enemy& e = registry.enemies.get(entity_other);
 				// initiate death unless already dying
-				if (!registry.deathTimers.has(entity)) {
+				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity)) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
 
 					if ((p.health - e.attack) > 0) {
 						p.health = p.health - e.attack;
+                        // make player temporarily invincible
+                        if (!registry.invincibles.has(entity))
+                        {
+                            registry.invincibles.emplace(entity);
+                            printf("hellooo chicken wing\n");
+                        }
+
+                        if (!registry.hitTimers.has(entity))
+                        {
+                            registry.hitTimers.emplace(entity);
+                            printf("hellooo chicken nugget\n");
+                        }
+
 						// Move enemy slightly back after collision (so that player doesn't die instantly)
 						enemy_motion.position = enemy_motion.position + (enemy_motion.velocity * vec2(-0.5, -0.5));
 						Mix_PlayChannel(-1, player_hit_sound, 0); // TODO: replace with "hit" sound
@@ -594,6 +635,50 @@ void WorldSystem::handle_collisions() {
 	blockedSouth = false;
 	blockedWest = false;
 	blockedEast = false;
+
+    // handle boundaries during daytime
+    ScreenState& screen = registry.screenStates.components[0];
+    if (screen.game_screen == game_screen_day) {
+        Motion& player_motion = registry.motions.get(player);
+        float x_pos = player_motion.position.x;
+        float y_pos = player_motion.position.y;
+        float half_width = PLAYER_WIDTH / 2;
+        float half_height = PLAYER_HEIGHT / 2;
+
+        // check left
+        if (x_pos - half_width < 0) {
+            player_motion.position.x = half_width;
+        }
+        // check right
+        else if (x_pos + half_width > window_width_px) {
+            player_motion.position.x = window_width_px - half_width;
+        }
+        // check right shed
+        else if (x_pos > 814 && y_pos < 470) {
+            out_of_bounds = 1;
+        }
+        // check top left corner
+        else if (y_pos - half_height < 170 && x_pos < 460) {
+            player_motion.position.y = half_height + 170;
+        }
+        // check top right corner
+        else if (y_pos - half_height < 170 && x_pos > 630) {
+            player_motion.position.y = half_height + 170;
+        }
+        else if (y_pos - half_height < 0 && x_pos > 460 && x_pos < 630) {
+            screen.game_screen = game_screen_night;
+            restart_game();
+        }
+        // check bottom
+        else if (y_pos + half_height > window_height_px) {
+            player_motion.position.y = window_height_px - half_height;
+        }
+        else {
+            out_of_bounds = 0;
+        }
+
+    }
+
 }
 
 // Should the game be over ?
@@ -703,11 +788,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	}
 
 	if (!game_paused && !registry.deathTimers.has(player)) {
-
-		Motion& motion = registry.motions.get(player);
+		auto& motion = registry.motions.get(player);
 
         ScreenState& screen = registry.screenStates.components[0];
-        if (screen.game_screen == game_screen_night) {
+        // if (screen.game_screen == game_screen_night) {
             // Character movement
             // Move Up
             if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
@@ -717,6 +801,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedNorth) {
                     motion.velocity = vec2(0.f, -CHARACTER_SPEED);
                 }
+                printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
             // Move Down
@@ -727,6 +812,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedSouth) {
                     motion.velocity = vec2(0.f, CHARACTER_SPEED);
                 }
+                printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
             // Move Right
@@ -738,6 +824,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     motion.velocity = vec2(CHARACTER_SPEED, 0.f);
                     motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
                 }
+                printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
             // Move Left
@@ -749,8 +836,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
                     motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
+                printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
-        }
+        // }
 
 		// Stop moving when key is released
 		if (action == GLFW_RELEASE) {

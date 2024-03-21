@@ -7,11 +7,16 @@
 void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
 
 	Motion &motion = registry.motions.get(entity);
+    ScreenState& screen = registry.screenStates.components[0];
 	// Transformation code, see Rendering and Transformation in the template
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
 	Transform transform;
-	transform.translate(motion.camera_position);
+    if (screen.game_screen == game_screen_night) {
+        transform.translate(motion.camera_position);
+    } else {
+        transform.translate(motion.position);
+    }
 	transform.scale(motion.scale);
 
 	assert(registry.renderRequests.has(entity));
@@ -117,12 +122,17 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 
 //    printf("in textured static mesh with entity %zu done \n", entity);
 	Immobile& immobile = registry.immobiles.get(entity);
+    ScreenState& screen = registry.screenStates.components[0];
 //    printf("entity immobile %zu done\n", entity);
 	// Transformation code, see Rendering and Transformation in the template
 	// specification for more info Incrementally updates transformation matrix,
 	// thus ORDER IS IMPORTANT
 	Transform transform;
-	transform.translate(immobile.camera_position);
+    if (screen.game_screen == game_screen_night) {
+        transform.translate(immobile.camera_position);
+    } else {
+        transform.translate(immobile.position);
+    }
 	transform.scale(immobile.scale);
 
 	assert(registry.renderRequests.has(entity));
@@ -411,23 +421,23 @@ void RenderSystem::draw() {
 //        }
 
     } else if (screen.game_screen == game_screen_day) {
-        for (Entity entity: registry.renderRequests.entities) {
-            // for non-moving entities (plants and potions)
-            if (registry.immobiles.has(entity)) {
-                if (registry.screenStates.has(entity)) {
-//                    printf("day entity %zu\n", entity);
-                    drawTexturedStaticMesh(entity, projection_2D);
-                }
-            }
-        }
+        Entity background = registry.daytimes.entities[0];
+        drawTexturedStaticMesh(background, projection_2D);
 
+        // render dog
+        Entity dog = registry.daytimes.entities[1];
+        drawTexturedStaticMesh(dog, projection_2D);
+
+        // render player
         Entity player = registry.players.entities[0];
-        if (!registry.immobiles.has(player)) {
-            Immobile& player_im = registry.immobiles.emplace(player);
-            player_im.position = { 0.60 * window_width_px, 1.1 * window_height_px };
-            player_im.scale = { 2 * 60, 2 * 80 };
-        }
-        drawTexturedStaticMesh(player, projection_2D);
+        Motion& player_motion = registry.motions.get(player);
+        player_motion.scale = { 2 * 60, 2 * 80 };
+        drawTexturedMesh(player, projection_2D);
+
+        // render sign last
+        Entity sign = registry.daytimes.entities[2];
+        drawTexturedStaticMesh(sign, projection_2D);
+
 
         HelpScreen& help = registry.helpScreen.components[0];
         if (help.help == 1) {
@@ -453,8 +463,8 @@ void RenderSystem::draw() {
 	// Render all text in the registry
 	for (Entity entity : registry.textRenderRequests.entities)
 	{
-		TextRenderRequest request = registry.textRenderRequests.get(entity);
-		renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+		// TextRenderRequest request = registry.textRenderRequests.get(entity);
+		// renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
 	}
 
 	// Truely render to the screen

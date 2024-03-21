@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="shadowgrove"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\ext\;CMake Files\ext\glm\;CMake Files\ext\glm\cmake\;CMake Files\ext\glm\cmake\glm\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/madpenner/Desktop/Team6-Shadowgrove"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="shadowgrove">
+				<Option output="/Users/madpenner/Desktop/Team6-Shadowgrove/shadowgrove" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/madpenner/Desktop/Team6-Shadowgrove"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/opt/homebrew/include"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/src"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/stb_image"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/gl3w"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/OpenGL.framework"/>
+					<Add directory="/usr/local/Cellar/glfw/3.3.9/include"/>
+					<Add directory="/usr/local/include/SDL2"/>
+					<Add directory="/usr/local/opt/freetype/include/freetype2"/>
+					<Add directory="/usr/local/opt/libpng/include/libpng16"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/Cocoa.framework"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/CoreFoundation.framework"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/glm"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 shadowgrove"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="shadowgrove/fast">
+				<Option output="/Users/madpenner/Desktop/Team6-Shadowgrove/shadowgrove" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/madpenner/Desktop/Team6-Shadowgrove"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/opt/homebrew/include"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/src"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/stb_image"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/gl3w"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/OpenGL.framework"/>
+					<Add directory="/usr/local/Cellar/glfw/3.3.9/include"/>
+					<Add directory="/usr/local/include/SDL2"/>
+					<Add directory="/usr/local/opt/freetype/include/freetype2"/>
+					<Add directory="/usr/local/opt/libpng/include/libpng16"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/Cocoa.framework"/>
+					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/CoreFoundation.framework"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/glm"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 shadowgrove/fast"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/madpenner/Desktop/Team6-Shadowgrove"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/madpenner/Desktop/Team6-Shadowgrove"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/Users/madpenner/Desktop/Team6-Shadowgrove/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/ai_system.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/ai_system.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/camera_system.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/camera_system.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/common.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/common.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/components.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/components.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/main.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/map_generator.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/map_generator.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/physics_system.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/physics_system.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/render_system.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/render_system.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/render_system_init.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/save_state.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/save_state.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/tiny_ecs.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/tiny_ecs.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/tiny_ecs_registry.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/tiny_ecs_registry.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/world_init.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/world_init.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/world_system.cpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/src/world_system.hpp">
+			<Option target="shadowgrove"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/project_path.hpp.in">
+			<Option virtualFolder="CMake Files\ext\"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/glm/cmake/glm/glmConfig-version.cmake">
+			<Option virtualFolder="CMake Files\ext\glm\cmake\glm\"/>
+		</Unit>
+		<Unit filename="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/glm/cmake/glm/glmConfig.cmake">
+			<Option virtualFolder="CMake Files\ext\glm\cmake\glm\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
