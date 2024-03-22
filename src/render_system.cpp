@@ -278,6 +278,7 @@ void RenderSystem::drawToScreen() {
 	//NightTimer& nighttime = registry.nightTimer.components[0];
 	GLuint night_timer = glGetUniformLocation(night_program, "night_timer");
 	glUniform1f(night_timer, screen.night_counter_ms);
+	glUniform1f(night_timer, screen.night_counter_ms);
 	GLuint night_length_full = glGetUniformLocation(night_program, "night_length_full");
 	glUniform1f(night_length_full, NIGHT_DURATION);
 	

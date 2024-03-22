@@ -25,7 +25,7 @@ Direction playerDirection;
 const uint NUM_POTIONS = 8;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
-const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+const float KEEPER_SPAWN_FREQ = 8.0 * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
@@ -194,7 +194,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Don't do anything if game is paused
 	if (game_paused) return true;
 
-
 	//	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
     Player& player_component = registry.players.components[0];
@@ -211,36 +210,34 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             min_night_counter_ms = night_counter.counter_ms;
         }
 
-        // switch to day after night timer expired
-        if (night_counter.counter_ms < 0) {
-            // if (player_component.alive == 1) {
-            registry.nightTimer.clear();
-            screen.game_screen = game_screen_day;
-            restart_game();
-            return true;
-            // }
-        }
-        screen.night_counter_ms = night_counter.counter_ms;
-    }
+		// switch to day after night timer expired
+		if (night_counter.counter_ms < 0) {
+			registry.nightTimer.clear();
+			screen.game_screen = game_screen_day;
+			screen.torch_mode = 0;
 
-    if (screen.game_screen == game_screen_night) {
-        animation_elpased_ms += elapsed_ms_since_last_update;
-        keeper_spawn_time += elapsed_ms_since_last_update;
-        if (animation_elpased_ms > ANIMATION_SPEED) {
-            animation_elpased_ms = 0.0;
-            animation_cycle++;
-            screen.torch_anim = animation_cycle % 3;
-            animation_cycle %= 4;
-        }
-        //const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
-        //f//loat keeper_spawn_time = 0.0f;
-        if (keeper_spawn_time > KEEPER_SPAWN_FREQ) {
-            keeper_spawn_time = 0.0;
-            vec2 spawn_pos = registry.get_empty_spawn_location();
-            createKeeper(renderer, camera.adjust_to_player(spawn_pos));
-        }
-    }
+			restart_game();
+			return true;
+		}
+		screen.night_counter_ms = night_counter.counter_ms;
+	}
 
+	animation_elpased_ms += elapsed_ms_since_last_update;
+	keeper_spawn_time += elapsed_ms_since_last_update;
+	if (animation_elpased_ms > ANIMATION_SPEED) {
+		animation_elpased_ms = 0.0;
+		animation_cycle++;
+		screen.torch_anim = animation_cycle % 3;
+		animation_cycle %= 4;
+	}
+	//const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+	//f//loat keeper_spawn_time = 0.0f;
+	if (keeper_spawn_time > KEEPER_SPAWN_FREQ && screen.game_screen == game_screen_night) {
+		keeper_spawn_time = 0.0;
+		vec2 spawn_pos = registry.get_empty_spawn_location();
+		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+	}
+	
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
@@ -415,7 +412,12 @@ void WorldSystem::restart_game() {
 	//printf("AFTER CLEARED REGISTRY");
 	registry.list_all_components();
 	// Create a new player
-	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
+	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
+	player = createPlayer(renderer, { start_x, start_y });
+	//player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+
+	// vec2(start_x, start_y);
 	registry.inventory.emplace(player);
     Player& player_component = registry.players.components[0];
 
@@ -446,6 +448,9 @@ void WorldSystem::restart_game() {
         fprintf(stderr, "Loaded music\n");
         generator->createWorldMap();
         createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+    } else if (screen.game_screen == game_screen_day) {
+		Motion& player_motion = registry.motions.get(player);
+		player_motion.position = { window_width_px / 2, window_height_px - 200 };
     } else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
@@ -780,6 +785,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         
         if (screen.game_screen == game_screen_night) {
             screen.game_screen = game_screen_day;
+			screen.torch_mode = 0;
+			screen.night_counter_ms = 0;
+			NightTimer& night_counter = registry.nightTimer.components[0];
+			night_counter.counter_ms = 0;
         } else {
             screen.game_screen = game_screen_night;
         }
@@ -798,7 +807,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     }
 
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
-	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
+	if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night) {
 		screen.torch_mode = (screen.torch_mode + 1) %2;
 	
 	}

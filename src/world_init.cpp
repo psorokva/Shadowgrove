@@ -15,6 +15,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
 	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+
 	motion.camera_position = { window_width_px / 2, window_height_px / 2 };
 	
 
