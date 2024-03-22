@@ -145,4 +145,7 @@ void main() {
         vec4 night_color = in_color * vec4(dark_color.r*dark_color.a, dark_color.g*dark_color.a, dark_color.b*dark_color.a, 1.0);
         color = day_portion * day_color + eve_portion * eve_color + dark_portion * night_color;
     }
+
+    // don't do night stuff for easier debugging rn
+    color = in_color;
 }

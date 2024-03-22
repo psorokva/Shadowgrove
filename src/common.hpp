@@ -22,6 +22,7 @@
 using namespace glm;
 
 #include "tiny_ecs.hpp"
+//#include "components.hpp"
 
 // Simple utility functions to avoid mistyping directory name
 // audio_path("audio.ogg") -> data/audio/audio.ogg
@@ -40,7 +41,12 @@ const int MAZE_SIZE = 16;
 static bool DEBUG_PRINT = true;
 enum Direction { UP, DOWN, LEFT, RIGHT };
 
-const float NIGHT_DURATION = 30000.0f; // 30 sec
+struct MazeLocation {
+	int row;
+	int col;
+};
+
+const float NIGHT_DURATION = 3000000.0f; // more than 30 sec
 const float NIGHT_DURATION_0 = NIGHT_DURATION * 0.1;
 const float NIGHT_DURATION_1 = NIGHT_DURATION * 0.3;
 const float NIGHT_DURATION_2 = NIGHT_DURATION * 0.4;

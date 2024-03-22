@@ -17,16 +17,18 @@ public:
 	void step();
 private:
 	inline bool check_step(const Motion& motion, const Immobile& immobile, const vec2& direction);
+	inline std::vector<Direction> get_possible_directions(vec2 location);
+
 
 	const int enemy_velocity_multipler = 80;
 	const int step_size = PLAYER_HEIGHT / 2;
 	const int frames_till_update = 30;
 	const int chase_distance = 500;
-	std::unordered_map<Direction, vec2> direction_to_velocity = {
-		{LEFT, {-enemy_velocity_multipler, 0} },
-		{RIGHT, {enemy_velocity_multipler, 0} },
-		{UP, {0, -enemy_velocity_multipler} },
-		{DOWN, {0, enemy_velocity_multipler} }
-	};
+	//std::unordered_map<Direction, vec2> direction_to_velocity = {
+	//	{LEFT, {-enemy_velocity_multipler, 0} },
+	//	{RIGHT, {enemy_velocity_multipler, 0} },
+	//	{UP, {0, -enemy_velocity_multipler} },
+	//	{DOWN, {0, enemy_velocity_multipler} }
+	//};
 	std::default_random_engine rng;
 };

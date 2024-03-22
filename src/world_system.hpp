@@ -50,6 +50,7 @@ private:
 	void on_key(int key, int, int action, int mod);
 	void on_mouse_move(vec2 pos);
 	void on_mouse_click(int button, int action, int mods);
+	void draw_chunk_borders();
 
 	// restart level
 	void restart_game();
@@ -59,6 +60,9 @@ private:
 
 	// Number of bug eaten by the chicken, displayed in the window title
 	unsigned int points;
+
+	// chunk borders
+	bool chunk_border;
 
 	// Game state
 	SaveState save_state;

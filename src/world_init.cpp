@@ -215,7 +215,7 @@ Entity createLine(vec2 position, vec2 scale) {
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-//	motion.position = position;
+	motion.position = position;
 	motion.scale = scale;
 	motion.camera_position = position;
 
