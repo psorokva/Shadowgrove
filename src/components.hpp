@@ -183,6 +183,7 @@ enum Game_screens {
     game_screen_night,
     game_screen_day,
     game_screen_game_over,
+    game_screen_win,
 };
 
 // Sets the brightness of the screen

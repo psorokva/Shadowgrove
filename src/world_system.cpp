@@ -448,14 +448,13 @@ void WorldSystem::restart_game() {
         fprintf(stderr, "Loaded music\n");
         generator->createWorldMap();
         createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
-    } else if (screen.game_screen == game_screen_day) {
-		Motion& player_motion = registry.motions.get(player);
-		player_motion.position = { window_width_px / 2, window_height_px - 200 };
     } else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
 
+        Motion& player_motion = registry.motions.get(player);
+        player_motion.position = { window_width_px / 2, window_height_px - 200 };
         // put player alive again
         player_component.alive = 1;
 
@@ -471,11 +470,25 @@ void WorldSystem::restart_game() {
         }
 
     } else if (screen.game_screen == game_screen_game_over) {
+
         Entity end_keeper = createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
         Motion& keeper_motion = registry.motions.get(end_keeper);
-        keeper_motion.position = { 0, window_height_px / 2 };
+        keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
         keeper_motion.scale *= 4;
-//        keeper_motion.velocity = {0,0};
+        keeper_motion.velocity = {0,0};
+    } else if (screen.game_screen == game_screen_win) {
+        //  change music to victory music
+        Mix_PlayMusic(day_music, -1);
+        fprintf(stderr, "Loaded music\n");
+
+        Motion& player_motion = registry.motions.get(player);
+        player_motion.position = { window_width_px / 2, window_height_px - 200 };
+
+        Entity day = createDay();
+        printf("day entity init %zu\n", day);
+
+        createDog({ window_width_px / 2, window_height_px - 200 });
+
     }
 
     createHelp();
@@ -683,9 +696,9 @@ void WorldSystem::handle_collisions() {
             player_motion.position.x = window_width_px - half_width;
         }
         // check right shed
-        else if (x_pos > 814 && y_pos < 470) {
-            out_of_bounds = 1;
-        }
+//        else if (x_pos > 814 && y_pos < 470) {
+//            out_of_bounds = 1;
+//        }
         // check top left corner
         else if (y_pos - half_height < 170 && x_pos < 460) {
             player_motion.position.y = half_height + 170;
@@ -893,9 +906,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     if (screen.game_screen == game_screen_game_over) {
         if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
             screen.game_screen = game_screen_main_menu;
-//            Player& player_component = registry.players.components[0];
-//            player_component.alive = 1;
-            registry.nightTimer.clear();
+            screen.torch_mode = 0;
+            screen.night_counter_ms = 0;
+            NightTimer& night_counter = registry.nightTimer.components[0];
+            night_counter.counter_ms = 0;
             restart_game();
         }
     }
