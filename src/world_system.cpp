@@ -208,7 +208,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		// switch to day after night timer expired
 		if (night_counter.counter_ms < 0) {
 			registry.nightTimer.clear();
-			screen.game_screen = game_screen_day;
+			screen.game_screen = game_screen_day; 
+			screen.torch_mode = 0;
+
 			restart_game();
 			return true;
 		}
@@ -678,6 +680,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         
         if (screen.game_screen == game_screen_night) {
             screen.game_screen = game_screen_day;
+			screen.torch_mode = 0;
+			screen.night_counter_ms = 0;
+			NightTimer& night_counter = registry.nightTimer.components[0];
+			night_counter.counter_ms = 0;
         } else {
             screen.game_screen = game_screen_night;
         }
@@ -696,7 +702,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     }
 
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
-	if (key == GLFW_KEY_T && action == GLFW_RELEASE) {
+	if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night) {
 		screen.torch_mode = (screen.torch_mode + 1) %2;
 	
 	}

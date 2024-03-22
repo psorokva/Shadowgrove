@@ -202,21 +202,21 @@ bool MapGen::createWorldMap() {
 				}
 				//printf("\n");
 			} else {// if (chunk1->x != -1 && chunk2->x != -1 && chunk1->y == chunk2->y) {
-				printf("Style WE\n");
+				//printf("Style WE\n");
 				int s = rand() % stitch_var_we.size();
 				std::vector<std::vector<int>> style = stitch_var_we[s];
 				// North to south connection 
 				for (int r = 0; r < style.size(); r++) {
 					for (int c = 0; c < style[0].size(); c++) {
 						// from top left corner of fill region job.location * 6 + 2 to bottom right
-						printf("Stitched WE %d at (%i,%i) and (%i,%i)\n", style[r][c], job.location * 6 + 2 + r, MAZE_SIZE - 3 + c, job.location * 6 + 2 + r, c);
-						printf("%d ", style[r][c]);
+						//printf("Stitched WE %d at (%i,%i) and (%i,%i)\n", style[r][c], job.location * 6 + 2 + r, MAZE_SIZE - 3 + c, job.location * 6 + 2 + r, c);
+						//printf("%d ", style[r][c]);
 						chunk1->grid[job.location * 6 + 2 + r][MAZE_SIZE - 3 + c] = style[r][c];
 						chunk2->grid[job.location * 6 + 2 + r][c] = style[r][c];
 					}
-					printf("\n");
+					//printf("\n");
 				}
-				printf("\n");
+				//printf("\n");
 			} //else {
 			//	printf("Invalid JOB\n");
 			//}
@@ -227,7 +227,7 @@ bool MapGen::createWorldMap() {
 	}
 
 	for (Chunk& chunk : chunks) {
-		printf("Chunk:\n");
+	//	printf("Chunk:\n");
 	//	//printf("position: x= %x, y= %x \n",chunk.x,chunk.y);
 	//	//printf("offset: x= %f, y= %f \n", chunk.offset_x, chunk.offset_y);
 
@@ -261,26 +261,29 @@ bool MapGen::createWorldMap() {
 	//	//		}
 	//	//	}
 	//	//}
+	// PRINT 
 	//	//printf("  ");
 	//	//for (int c = 0; c < 11; c++) {
 	//	//	printf(" %d", c);
 	//	//}
-		printf("\n");
-		for (int r = 0; r < MAZE_SIZE; r++) {
-			printf("%d: ",r);
-			for (int c = 0; c < MAZE_SIZE; c++) {
-				// print chunk
-				if (chunk.grid[r][c] == 1) {
-					printf("%c%c", (char)219u, (char)219u);
-				} else {
-					printf("  ");
-				}
-					
-				//printf(" %x ", chunk.grid[r][c]);
-			}
-			printf("\n");
-		}
-		printf("--------\n");
+
+		//PRINT OUT MAP STUFF
+		//printf("\n");
+		//for (int r = 0; r < MAZE_SIZE; r++) {
+		//	printf("%d: ",r);
+		//	for (int c = 0; c < MAZE_SIZE; c++) {
+		//		// print chunk
+		//		if (chunk.grid[r][c] == 1) {
+		//			printf("%c%c", (char)219u, (char)219u);
+		//		} else {
+		//			printf("  ");
+		//		}
+		//			
+		//		//printf(" %x ", chunk.grid[r][c]);
+		//	}
+		//	printf("\n");
+		//}
+		//printf("--------\n");
 	}
 	return true;
 }
@@ -368,7 +371,7 @@ void MapGen::getStitchingVector(std::vector<ChunkStitch>& stiching_tasks, int ro
 			if (!path_stack.empty()) {
 				int topx = path_stack.top().x;
 				int topy = path_stack.top().y;
-				printf("Top (%i,%i) finds:\t", topx,topy);
+				//printf("Top (%i,%i) finds:\t", topx,topy);
 				if (topy > 0 && ( (maze[topy-1][topx] & VISITED ) == 0) ) {
 					neighbours.push_back(NORTH);
 				}
@@ -385,7 +388,7 @@ void MapGen::getStitchingVector(std::vector<ChunkStitch>& stiching_tasks, int ro
 				// grab rando available direction
 				if (!neighbours.empty()) {
 					int next_cell_dir = neighbours[rand() % neighbours.size()];
-					printf(" %i \n", next_cell_dir);
+					//printf(" %i \n", next_cell_dir);
 					int stitch_location = rand() % 4;
 					ChunkStitch stitch = ChunkStitch();
 					stitch.location = stitch_location;
@@ -468,9 +471,9 @@ void MapGen::getStitchingVector(std::vector<ChunkStitch>& stiching_tasks, int ro
 		//}
 
 	}
-	for (ChunkStitch& cs: stiching_tasks) {
-		printf("ChunkStitch (%d,%d) (%d,%d) :%d\n",cs.ch1x, cs.ch1y, cs.ch2x, cs.ch2y, cs.location );
-	}
+	//for (ChunkStitch& cs: stiching_tasks) {
+	//	printf("ChunkStitch (%d,%d) (%d,%d) :%d\n",cs.ch1x, cs.ch1y, cs.ch2x, cs.ch2y, cs.location );
+	//}
 	//return &stiching_tasks;
 }
 
@@ -593,7 +596,7 @@ Chunk& MapGen::createMapChunk(vec2 position) {
 			}
 		}
 	}
-	printf("\n");
+	//printf("\n");
 	while (!path_stack.empty()) {
 		path_stack.pop();
 	}
