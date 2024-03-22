@@ -453,15 +453,22 @@ void RenderSystem::draw() {
         Entity dog = registry.daytimes.entities[1];
         drawTexturedStaticMesh(dog, projection_2D);
 
+//        for (Entity entity: registry.renderRequests.entities) {
+//            if (registry.motions.has(entity)) {
+//                if (registry.players.has(entity)) {
+//                    drawTexturedMesh(entity, projection_2D);
+//                }
+//            }
+//        }
+
         // render player
-        Motion& player_motion = registry.motions.get(player);
-        player_motion.scale = { 2 * 60, 2 * 80 };
+//        Motion& player_motion = registry.motions.get(player);
+//        player_motion.scale = { 2 * 60, 2 * 80 };
         drawTexturedMesh(player, projection_2D);
 
         // render sign last
         Entity sign = registry.daytimes.entities[2];
         drawTexturedStaticMesh(sign, projection_2D);
-
 
         HelpScreen& help = registry.helpScreen.components[0];
         if (help.help == 1) {
@@ -478,6 +485,10 @@ void RenderSystem::draw() {
     else if (screen.game_screen == game_screen_game_over) {
         for (Entity entity: registry.renderRequests.entities) {
             if (registry.enemies.has(entity)) {
+                Motion& keeper_motion = registry.motions.get(entity);
+                keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
+                keeper_motion.scale = {200, 400};
+                keeper_motion.velocity = {0,0};
                  drawTexturedMesh(entity, projection_2D);
             }
         }

@@ -457,6 +457,7 @@ void WorldSystem::restart_game() {
         player_motion.position = { window_width_px / 2, window_height_px - 200 };
         // put player alive again
         player_component.alive = 1;
+        player_motion.scale = { 2 * 60, 2 * 80 };
 
         Entity day = createDay();
         printf("day entity init %zu\n", day);
@@ -470,7 +471,6 @@ void WorldSystem::restart_game() {
         }
 
     } else if (screen.game_screen == game_screen_game_over) {
-
         Entity end_keeper = createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
         Motion& keeper_motion = registry.motions.get(end_keeper);
         keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
@@ -868,7 +868,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 if (!blockedEast) {
                     motion.velocity = vec2(CHARACTER_SPEED, 0.f);
-                    motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
+                    if (screen.game_screen == game_screen_day) {
+                        motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
+                    } else {
+                        motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
+                    }
                 }
                 printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
@@ -880,7 +884,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 r.used_texture = (TEXTURE_ASSET_ID) (animation_cycle + 1);
                 if (!blockedWest) {
                     motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
-                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
+                    if (screen.game_screen == game_screen_day) {
+                        motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
+                    } else {
+                        motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
+                    }
                 }
                 printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
