@@ -279,7 +279,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     }
 	//createShadowOverlay(renderer);
 
-	if (num_of_item_on_screen < NUM_POTIONS && screen.game_screen == game_screen_night) {
+	if (num_of_item_on_screen < NUM_POTIONS ) { // && screen.game_screen == game_screen_night
 		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 };
 		for (int i = 0; i < 5; i++) {
 			Item& item = registry.inventory.get(p).holding[i];
@@ -413,9 +413,8 @@ void WorldSystem::restart_game() {
 
 
     ScreenState &screen = registry.screenStates.components[0];
-	screen.torch_mode = 0;
-	screen.night_counter_ms = 0;
-	NightTimer& night_counter = registry.nightTimer.components[0];
+
+
 	//night_counter.counter_ms = NIGHT_DURATION;
 
 
@@ -435,6 +434,8 @@ void WorldSystem::restart_game() {
 
         Entity day = createDay();
         printf("day entity init %zu\n", day);
+		//screen.torch_mode = 0;
+		//screen.night_counter_ms = 0;
     }
 
     createHelp();
