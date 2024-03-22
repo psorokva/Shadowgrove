@@ -457,3 +457,20 @@ Entity createDog(vec2 position) {
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DOG, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
 }
+
+Entity createLogo() {
+    auto entity = Entity();
+
+    auto& day = registry.screenStates.emplace(entity);
+
+    auto& fixed = registry.immobiles.emplace(entity);
+    fixed.position = { 0.5 * window_width_px, 0.5 * window_height_px };
+    fixed.scale = { 600, 300 };
+
+    Daytime& logo = registry.daytimes.emplace(entity);
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::LOGO_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}

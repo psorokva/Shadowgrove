@@ -20,6 +20,7 @@ uniform float night_length_2;
 uniform float night_length_3;
 uniform float night_length_4;
 uniform float night_length_5;
+uniform int alive;
 
 in vec2 texcoord;
 in float dist_to_player;
@@ -80,35 +81,42 @@ void main() {
     float day_portion = 1.0;
     float eve_portion = 0.0;
     float dark_portion = 0.0;
-    
-    if (night_timer <= night_length_0 ) {
-       eve_portion = night_timer / night_length_0;
-       day_portion = 1.0 - eve_portion;
-    } else if (night_timer <= night_length_1) {
-        day_portion = 0.0;
-        eve_portion = 1.0;
-    } else if (night_timer <= night_length_2) {
-        day_portion = 0.0;
-        dark_portion = (night_timer - night_length_1) / (night_length_2 - night_length_1);
-        eve_portion = 1.0 - dark_portion;
-    } else if (night_timer <= night_length_3) {
-        day_portion = 0.0;
-        eve_portion = 0.0;
-        dark_portion = 1.0;
-    } else if (night_timer <= night_length_4) {
-        eve_portion = (night_timer - night_length_3) / (night_length_4 - night_length_3);
-        dark_portion = 1.0 - eve_portion;
-        day_portion = 0.0;
-    } else if (night_timer <= night_length_5) {
-        dark_portion = 0.0;
-        eve_portion = 1.0;
-        day_portion = 0.0;
-    } else if (night_timer <= night_length_full) {
-        day_portion = (night_timer - night_length_5) / (night_length_full - night_length_5);
-        eve_portion = 1.0 - day_portion;
-        dark_portion = 0.0;
-    }
 
+//    if (alive == 1) {
+        if (night_timer <= night_length_0 ) {
+            eve_portion = night_timer / night_length_0;
+            day_portion = 1.0 - eve_portion;
+        } else if (night_timer <= night_length_1) {
+            day_portion = 0.0;
+            eve_portion = 1.0;
+        } else if (night_timer <= night_length_2) {
+            day_portion = 0.0;
+            dark_portion = (night_timer - night_length_1) / (night_length_2 - night_length_1);
+            eve_portion = 1.0 - dark_portion;
+        } else if (night_timer <= night_length_3) {
+            day_portion = 0.0;
+            eve_portion = 0.0;
+            dark_portion = 1.0;
+        } else if (night_timer <= night_length_4) {
+            eve_portion = (night_timer - night_length_3) / (night_length_4 - night_length_3);
+            dark_portion = 1.0 - eve_portion;
+            day_portion = 0.0;
+        } else if (night_timer <= night_length_5) {
+            dark_portion = 0.0;
+            eve_portion = 1.0;
+            day_portion = 0.0;
+        } else if (night_timer <= night_length_full) {
+            day_portion = (night_timer - night_length_5) / (night_length_full - night_length_5);
+            eve_portion = 1.0 - day_portion;
+            dark_portion = 0.0;
+        }
+//    }
+
+//    if (alive == 0) {
+//        day_portion = 0;
+//        eve_portion = 1.0;
+//        dark_portion = 0.0;
+//    }
     /// DAYTIME and Home Screen 
     color = in_color;
 

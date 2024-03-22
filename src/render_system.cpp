@@ -294,6 +294,10 @@ void RenderSystem::drawToScreen() {
 	GLuint night_length_5 = glGetUniformLocation(night_program, "night_length_5");
 	glUniform1f(night_length_5, NIGHT_DURATION_5);
 
+    GLuint alive = glGetUniformLocation(night_program, "alive");
+    Player& player = registry.players.components[0];
+    glUniform1i(alive, player.alive);
+
 
 	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
 	glUniform1i(torch_mode, screen.torch_mode);
@@ -375,37 +379,56 @@ void RenderSystem::draw() {
 
     ScreenState &screen = registry.screenStates.components[0];
 
-    if (screen.game_screen == game_screen_night) {
+    Entity player = registry.players.entities[0];
+    if (screen.game_screen == game_screen_main_menu) {
+        Entity background = registry.daytimes.entities[0];
+        drawTexturedStaticMesh(background, projection_2D);
 
-        // Draw all textured meshes that have a position and size component
-        for (Entity entity: registry.renderRequests.entities) {
-            if (registry.motions.has(entity)) {
-                if (!registry.debugComponents.has(entity)) {
-                    if (!registry.helpScreen.has(entity)) {
-                        drawTexturedMesh(entity, projection_2D);
+        // render dog
+        Entity dog = registry.daytimes.entities[1];
+        drawTexturedStaticMesh(dog, projection_2D);
+
+        // render sign last
+        Entity logo = registry.daytimes.entities[2];
+        drawTexturedStaticMesh(logo, projection_2D);
+
+        // render player
+        Motion& player_motion = registry.motions.get(player);
+        player_motion.scale = { 2 * 60, 2 * 80 };
+        drawTexturedMesh(player, projection_2D);
+
+    }
+    else if (screen.game_screen == game_screen_night) {
+        // if (!registry.deathTimers.has(player)) {
+            // Draw all textured meshes that have a position and size component
+            for (Entity entity: registry.renderRequests.entities) {
+                if (registry.motions.has(entity)) {
+                    if (!registry.debugComponents.has(entity)) {
+                        if (!registry.helpScreen.has(entity)) {
+                            drawTexturedMesh(entity, projection_2D);
+                        }
                     }
                 }
+                    // for non-moving entities (plants and potions)
+                else if (registry.immobiles.has(entity)) {
+                    if (!registry.helpScreen.has(entity)) {
+                        drawTexturedStaticMesh(entity, projection_2D);
+                    }
+                }
+
+                // Note, its not very efficient to access elements indirectly via the entity
+                // albeit iterating through all Sprites in sequence. A good point to optimize
             }
-                // for non-moving entities (plants and potions)
-            else if (registry.immobiles.has(entity)) {
-                if (!registry.helpScreen.has(entity)) {
-                    drawTexturedStaticMesh(entity, projection_2D);
+            // render inventory lines last?
+            for (Entity entity: registry.renderRequests.entities) {
+                if (registry.debugComponents.has(entity)) {
+                    drawTexturedMesh(entity, projection_2D);
                 }
             }
-
-            // Note, its not very efficient to access elements indirectly via the entity
-            // albeit iterating through all Sprites in sequence. A good point to optimize
-        }
-        // render inventory lines last?
-        for (Entity entity: registry.renderRequests.entities) {
-            if (registry.debugComponents.has(entity)) {
-                drawTexturedMesh(entity, projection_2D);
-            }
-        }
+        // }
 
 		// add overlay of shadow
 		//drawTexturedStaticMesh(torchEntity, projection_2D);
-
 
         // add help screen to night screen
 //        HelpScreen& help = registry.helpScreen.components[0];
@@ -420,7 +443,8 @@ void RenderSystem::draw() {
 //            drawTexturedMesh(helpScreen, projection_2D);
 //        }
 
-    } else if (screen.game_screen == game_screen_day) {
+    }
+    else if (screen.game_screen == game_screen_day) {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
 
@@ -429,7 +453,6 @@ void RenderSystem::draw() {
         drawTexturedStaticMesh(dog, projection_2D);
 
         // render player
-        Entity player = registry.players.entities[0];
         Motion& player_motion = registry.motions.get(player);
         player_motion.scale = { 2 * 60, 2 * 80 };
         drawTexturedMesh(player, projection_2D);
@@ -449,6 +472,13 @@ void RenderSystem::draw() {
                 fixed.scale = {0.5 * window_width_px, 0.5 * window_height_px};
             }
             drawTexturedStaticMesh(helpScreen, projection_2D);
+        }
+    }
+    else if (screen.game_screen == game_screen_game_over) {
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.deadlys.has(entity)) {
+                 drawTexturedMesh(entity, projection_2D);
+            }
         }
     }
 

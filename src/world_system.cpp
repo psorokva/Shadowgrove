@@ -135,7 +135,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
         player_death_sound == nullptr || inventory_full_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n make sure the data directory is present",
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n %s \n make sure the data directory is present",
             audio_path("forest_night.wav").c_str(),
             audio_path("day.wav").c_str(),
             audio_path("bird_noises.wav").c_str(),
@@ -194,27 +194,34 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Don't do anything if game is paused
 	if (game_paused) return true;
 
+
 	//	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
+    Player& player_component = registry.players.components[0];
 
-	if (registry.nightTimer.size() > 0) {
-		float min_night_counter_ms = 60000.f;
-		NightTimer& night_counter = registry.nightTimer.components[0];
-		// progress timer
-		night_counter.counter_ms -= elapsed_ms_since_last_update;
-		if (night_counter.counter_ms < min_night_counter_ms) {
-			min_night_counter_ms = night_counter.counter_ms;
-		}
+    // dont do anything if player is dead
+    if (player_component.alive == 0) return true;
 
-		// switch to day after night timer expired
-		if (night_counter.counter_ms < 0) {
-			registry.nightTimer.clear();
-			screen.game_screen = game_screen_day;
-			restart_game();
-			return true;
-		}
-		screen.night_counter_ms = night_counter.counter_ms;
-	}
+    if (registry.nightTimer.size() > 0) {
+        float min_night_counter_ms = 60000.f;
+        NightTimer& night_counter = registry.nightTimer.components[0];
+        // progress timer
+        night_counter.counter_ms -= elapsed_ms_since_last_update;
+        if (night_counter.counter_ms < min_night_counter_ms) {
+            min_night_counter_ms = night_counter.counter_ms;
+        }
+
+        // switch to day after night timer expired
+        if (night_counter.counter_ms < 0) {
+            // if (player_component.alive == 1) {
+            registry.nightTimer.clear();
+            screen.game_screen = game_screen_day;
+            restart_game();
+            return true;
+            // }
+        }
+        screen.night_counter_ms = night_counter.counter_ms;
+    }
 
     if (screen.game_screen == game_screen_night) {
         animation_elpased_ms += elapsed_ms_since_last_update;
@@ -260,13 +267,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
     ai.step();
 
-	Player& player = registry.players.components[0];
-
     Entity p = registry.players.entities[0];
     Motion& p_motion = registry.motions.get(p);
 
     // Displaying health bar
-	auto healthBar = createLine(vec2(10, 10), vec2(10*player.health, 100));
+	auto healthBar = createLine(vec2(10, 10), vec2(10*player_component.health, 100));
 	registry.colors.insert(healthBar, { 1, 0, 0 });
 
     // inventory bar position on screen
@@ -345,7 +350,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (counter.counter_ms < 0) {
 			registry.deathTimers.remove(entity);
 			screen.darken_screen_factor = 0;
-            restart_game();
+            screen.game_screen = game_screen_game_over;
+            player_component.alive = 0;
+//            restart_game();
 			return true;
 		}
 	}
@@ -410,6 +417,7 @@ void WorldSystem::restart_game() {
 	// Create a new player
 	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 	registry.inventory.emplace(player);
+    Player& player_component = registry.players.components[0];
 
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
@@ -438,16 +446,31 @@ void WorldSystem::restart_game() {
         fprintf(stderr, "Loaded music\n");
         generator->createWorldMap();
         createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
-    } else if (screen.game_screen == game_screen_day) {
+    } else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
+
+        // put player alive again
+        player_component.alive = 1;
 
         Entity day = createDay();
         printf("day entity init %zu\n", day);
 
         createDog({ window_width_px / 2, window_height_px - 200 });
-        createSign();
+
+        if (screen.game_screen == game_screen_day) {
+            createSign();
+        } else {
+            createLogo();
+        }
+
+    } else if (screen.game_screen == game_screen_game_over) {
+        Entity end_keeper = createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+        Motion& keeper_motion = registry.motions.get(end_keeper);
+        keeper_motion.position = { 0, window_height_px / 2 };
+        keeper_motion.scale *= 4;
+//        keeper_motion.velocity = {0,0};
     }
 
     createHelp();
@@ -525,6 +548,7 @@ void WorldSystem::handle_collisions() {
 		// The entity and its collider
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other;
+        Player& player_component = registry.players.components[0];
 
 		// For now, we are only interested in collisions that involve the chicken
 		if (!game_paused && registry.players.has(entity)) {
@@ -565,7 +589,7 @@ void WorldSystem::handle_collisions() {
 			if (registry.enemies.has(entity_other)) {
 				Enemy& e = registry.enemies.get(entity_other);
 				// initiate death unless already dying
-				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity)) {
+				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && player_component.alive == 1) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
 
 					if ((p.health - e.attack) > 0) {
@@ -791,7 +815,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		auto& motion = registry.motions.get(player);
 
         ScreenState& screen = registry.screenStates.components[0];
-        // if (screen.game_screen == game_screen_night) {
+        if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day) {
             // Character movement
             // Move Up
             if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
@@ -838,7 +862,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 }
                 printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
-        // }
+        }
 
 		// Stop moving when key is released
 		if (action == GLFW_RELEASE) {
@@ -847,6 +871,25 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1;
 		}
 	}
+
+    // space to start game
+    if (screen.game_screen == game_screen_main_menu) {
+        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+            screen.game_screen = game_screen_day;
+            restart_game();
+        }
+    }
+
+    // space to restart
+    if (screen.game_screen == game_screen_game_over) {
+        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+            screen.game_screen = game_screen_main_menu;
+//            Player& player_component = registry.players.components[0];
+//            player_component.alive = 1;
+            registry.nightTimer.clear();
+            restart_game();
+        }
+    }
 
 	// Control the current speed with `<` `>`
 	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {

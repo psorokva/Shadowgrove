@@ -64,6 +64,7 @@ struct Impenetrable {
 // Player component
 struct Player {
 	unsigned int health;
+    int alive = 1;
 };
 
 struct Daytime {
@@ -177,7 +178,7 @@ enum Game_screens {
 // Sets the brightness of the screen
 struct ScreenState {
 	float darken_screen_factor = -1;
-    Game_screens game_screen = game_screen_day;
+    Game_screens game_screen = game_screen_main_menu;
 	int torch_mode = 0;
 	int torch_anim = 0;
 	float night_counter_ms = 0;
@@ -335,7 +336,9 @@ enum class TEXTURE_ASSET_ID {
 	SHADOW_01 = SHADOW_00 + 1,
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
-	TEXTURE_COUNT = MIDNIGHT_01 + 1
+    LOGO_00 = MIDNIGHT_01 + 1,
+    LOGO_01 = LOGO_00 + 1,
+	TEXTURE_COUNT = LOGO_01 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
