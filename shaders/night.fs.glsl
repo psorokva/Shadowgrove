@@ -130,7 +130,7 @@ void main() {
     
         // MIGNIGHT WITH TORCH
         vec4 night_color = in_color * vec4(dark1_color.r*dark1_color.a, dark1_color.g*dark1_color.a, dark1_color.b*dark1_color.a, 1.0);
-        night_color = color + 0.4 * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
+        night_color = night_color + 0.4 * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
       
         color = day_portion * day_color + eve_portion * eve_color + dark_portion * night_color;
     }

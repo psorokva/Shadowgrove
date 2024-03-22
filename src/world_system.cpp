@@ -24,7 +24,7 @@ Direction playerDirection;
 const uint NUM_POTIONS = 8;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
-const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+const float KEEPER_SPAWN_FREQ = 8.0 * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
@@ -225,7 +225,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 	//const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
 	//f//loat keeper_spawn_time = 0.0f;
-	if (keeper_spawn_time > KEEPER_SPAWN_FREQ) {
+	if (keeper_spawn_time > KEEPER_SPAWN_FREQ && screen.game_screen == game_screen_night) {
 		keeper_spawn_time = 0.0;
 		vec2 spawn_pos = registry.get_empty_spawn_location();
 		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
@@ -383,7 +383,12 @@ void WorldSystem::restart_game() {
 	//printf("AFTER CLEARED REGISTRY");
 	registry.list_all_components();
 	// Create a new player
-	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
+	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
+	player = createPlayer(renderer, { start_x, start_y });
+	//player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+
+	// vec2(start_x, start_y);
 	registry.inventory.emplace(player);
 
 	registry.inventory.get(player).holding.push_back(nullval);
@@ -414,6 +419,8 @@ void WorldSystem::restart_game() {
         generator->createWorldMap();
         createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
     } else if (screen.game_screen == game_screen_day) {
+		Motion& player_motion = registry.motions.get(player);
+		player_motion.position = { window_width_px / 2, window_height_px - 200 };
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
