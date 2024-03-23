@@ -73,8 +73,18 @@ void PhysicsSystem::step(float elapsed_ms) {
 	ComponentContainer<Immobile>& immobiles_container = registry.immobiles;
 	Entity player = registry.players.entities[0];
 	Motion& player_motion = motion_container.components[0];
-	Motion prev_player_motion = player_motion;
-	float step_seconds = elapsed_ms / 1000.f;
+
+	for (uint i = 0; i < immobiles_container.components.size(); i++) {
+		Immobile& fixed_i = immobiles_container.components[i];
+		Entity entity_i = immobiles_container.entities[i];
+		if (collides(player_motion, fixed_i)) {
+			// Create a collisions event
+			registry.collisions.emplace_with_duplicates(player, entity_i);
+			//player_motion.velocity *= -1.0f;
+			//player_motion.position -= elapsed_ms / 1000.0f * player_motion.velocity *1.1f;
+		}
+	}
+
 
 	// Move bug based on how much time has passed, this is to (partially) avoid
 	// having entities move at different speed based on the machine.

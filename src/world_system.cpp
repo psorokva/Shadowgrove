@@ -729,6 +729,19 @@ void WorldSystem::pause_game() {
 	}
 }
 
+// !! TEMP, move to physics_system when done
+// Returns the local bounding coordinates scaled by the current size of the entity
+vec2 get_bounding_box2(const Motion& motion) {
+	// abs is to avoid negative scale due to the facing direction.
+	return { abs(motion.scale.x), abs(motion.scale.y) };
+}
+
+// Duplicate for collision with walls, might need to change
+vec2 get_bounding_box2(const Immobile& immobile) {
+	// abs is to avoid negative scale due to the facing direction.
+	return { abs(immobile.scale.x), abs(immobile.scale.y) };
+}
+
 void WorldSystem::resume_game() {
 	
 	game_paused = false;
@@ -754,8 +767,9 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 		
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
-			
-				Motion& motion = registry.motions.get(entity);
+				printf("colliding with a wall\n");
+				Motion& motion_p = registry.motions.get(entity);
+				Immobile& motion_w = registry.immobiles.get(entity_other);
 				// Can adjust this
 				//float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
@@ -1103,6 +1117,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     } else {
                         motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
                     }
+                    //motion.velocity = vec2(CHARACTER_SPEED, 0.f);
+					motion.velocity.x += CHARACTER_SPEED;
+                    motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT );
                 }
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
@@ -1121,6 +1138,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                     }
                 }
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
+                    //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
+					motion.velocity.x -= CHARACTER_SPEED;
+                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
+                }
             }
 			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
 			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
