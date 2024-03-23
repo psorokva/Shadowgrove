@@ -118,6 +118,8 @@ class RenderSystem {
 			textures_path("ShadowOverlay_01.png"),
 			textures_path("MidnightOverlay_00.png"),
 			textures_path("MidnightOverlay_01.png"),
+			textures_path("NightHelpOverlay.png"),
+			textures_path("NightHelpTorchlight.png"),
             textures_path("logo_00.png"),
             textures_path("logo_01.png"),
 
