@@ -152,25 +152,6 @@ public:
 		return false;
 	}
 
-	int get_chunk_value(MazeLocation location) {
-		int x = location.row % MAZE_SIZE;
-		int y = location.col % MAZE_SIZE;
-
-		for (const Chunk& chunk : chunks.components) {
-			if (chunk.x == x && chunk.y == y) {
-				return chunk.grid[location.row][location.col];
-			}
-		}
-		return -1;
-	}
-
-	MazeLocation get_maze_location(vec2 location) {
-		int row = (int)(location.y / TILE_SIZE);
-		int col = (int)(location.x / TILE_SIZE);
-
-		return MazeLocation{ row, col };
-	}
-
 };
 
 extern ECSRegistry registry;

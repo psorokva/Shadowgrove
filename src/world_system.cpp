@@ -263,7 +263,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     camera.step();
 	//std::cout << "AFTER" << std::endl;
 	//std::cout << "line x: " << line_motion.position.x << " line y: " << line_motion.position.y << " line camera x: " << line_motion.camera_position.x << "line camera y: " << line_motion.camera_position.y << std::endl;
-	ai.step();
+	
+	//ai.step();
 
 	
 
@@ -618,6 +619,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
+	// ai stepping
+	if (action == GLFW_RELEASE && key == GLFW_KEY_B)
+	{
+		ai.step();
+	}
+
+
 	if (action == GLFW_RELEASE && key == GLFW_KEY_L) {
 		chunk_border = !chunk_border;
 	}
@@ -808,11 +816,13 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
 	const Motion& player_motion = registry.motions.get(player);
-	std::cout << "x: " << player_motion.position.x << ", y: " << player_motion.position.y << std::endl;
+	vec2 mouse_pos = camera.adjust_to_player({ xpos, ypos });
+	std::cout << "x: " << mouse_pos.x << ", y: " << mouse_pos.y << std::endl;
 	//int chunk_value = registry.get_chunk_value(camera.adjust_to_player(vec2{xpos, ypos}));
-	MazeLocation mazeLoc = registry.get_maze_location(camera.adjust_to_player(vec2{ xpos, ypos }));
-	int chunk_value = registry.get_chunk_value(mazeLoc);
-	std::cout << "CHUNK VALUE: " << chunk_value << std::endl;
+	//MazeLocation mazeLoc = registry.get_maze_location(camera.adjust_to_player(vec2{ xpos, ypos }));
+	//std::cout << "x: " << mazeLoc.col << " y: " << mazeLoc.row << std::endl;
+	//int chunk_value = registry.get_chunk_value(mazeLoc);
+	//std::cout << "CHUNK VALUE: " << chunk_value << std::endl;
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
 //		vec2 spawn_pos = registry.get_empty_spawn_location();

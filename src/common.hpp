@@ -39,11 +39,12 @@ const int window_height_px = 800; // 1400;
 const int TILE_SIZE = 55;
 const int MAZE_SIZE = 16;
 static bool DEBUG_PRINT = true;
-enum Direction { UP, DOWN, LEFT, RIGHT };
+enum Direction { UP, DOWN, LEFT, RIGHT, NONE };
 
+// Location in overall maze. Not limited to within one chunk
 struct MazeLocation {
-	int row;
-	int col;
+	int x;
+	int y;
 };
 
 const float NIGHT_DURATION = 3000000.0f; // more than 30 sec

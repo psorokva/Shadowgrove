@@ -70,8 +70,8 @@ struct Player {
 struct Enemy {
 	unsigned int attack;
 	int frame_count = 0;
-	std::set<Direction> last_possible_directions;
-	Direction last_direction;
+	//std::set<Direction> last_possible_directions;
+	Direction last_direction = Direction::NONE;
 	Entity e_id;
 };
 
