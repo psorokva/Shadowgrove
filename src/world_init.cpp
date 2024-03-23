@@ -463,5 +463,5 @@ Entity createDog(vec2 position) {
     Daytime& dog = registry.daytimes.emplace(entity);
 
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DOG, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-
+	return entity;
 }
