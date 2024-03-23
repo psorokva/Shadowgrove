@@ -578,7 +578,9 @@ void WorldSystem::restart_game() {
     else if (screen.game_screen == game_screen_night) {
         printf("in game night screen\n");
         // Playing background music indefinitely
-		createNight();
+		// !! TODO uncomment
+		//createNight();
+
         Mix_PlayMusic(night_music, -1);
         fprintf(stderr, "Loaded music\n");
 		generator->makeNoise(level);
@@ -728,6 +730,19 @@ void WorldSystem::pause_game() {
 	}
 }
 
+// !! TEMP, move to physics_system when done
+// Returns the local bounding coordinates scaled by the current size of the entity
+vec2 get_bounding_box2(const Motion& motion) {
+	// abs is to avoid negative scale due to the facing direction.
+	return { abs(motion.scale.x), abs(motion.scale.y) };
+}
+
+// Duplicate for collision with walls, might need to change
+vec2 get_bounding_box2(const Immobile& immobile) {
+	// abs is to avoid negative scale due to the facing direction.
+	return { abs(immobile.scale.x), abs(immobile.scale.y) };
+}
+
 void WorldSystem::resume_game() {
 	
 	game_paused = false;
@@ -738,7 +753,7 @@ void WorldSystem::resume_game() {
 }
 
 // Compute collisions between entities
-void WorldSystem::handle_collisions() {
+void WorldSystem::handle_collisions(float elapsed_ms) {
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -753,33 +768,50 @@ void WorldSystem::handle_collisions() {
 		
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
-
+			
 				Motion& motion = registry.motions.get(entity);
 				// Can adjust this
 				float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
-
-				if (playerDirection == UP) {
-					//printf("Collided with North wall");
-					blockedNorth = true;
-					// Offset player position to stop from going through
-					motion.position = motion.position - vec2(0, -offset);
-				}
-				if (playerDirection == DOWN) {
-					//printf("Collided with South wall");
-					blockedSouth = true;
-					motion.position = motion.position - vec2(0, offset);
-				}
-				if (playerDirection == LEFT) {
-					//printf("Collided with West wall");
-					blockedWest = true;
-					motion.position = motion.position - vec2(-offset, 0);
-				}
-				if (playerDirection == RIGHT) {
-					//printf("Collided with East wall");
-					blockedEast = true;
-					motion.position = motion.position - vec2(offset, 0);
-				}
+				
+				//!! TEMP, move back to physics_system after
+				// Change this to AABB
+				vec2 dp = motion_p.position - motion_w.position;
+				float dist_squared = dot(dp, dp);
+				const vec2 other_bonding_box = get_bounding_box2(motion_p) / 2.f;
+				const float other_r_squared = dot(other_bonding_box, other_bonding_box);
+				const vec2 my_bonding_box = get_bounding_box2(motion_w) / 2.f;
+				const float my_r_squared = dot(my_bonding_box, my_bonding_box);
+				const float r_squared = max(other_r_squared, my_r_squared);
+				
+				float multiplier = r_squared / dist_squared;
+				
+				//if (dist_squared < r_squared) {
+				
+				motion_p.position = motion_w.position + dp * (float)pow(multiplier,0.5);
+				//motion.velocity = vec2(0.0f, 0.0f);
+			
+				//if (playerDirection == UP) {
+				//	//printf("Collided with North wall");
+				//	blockedNorth = true;
+				//	// Offset player position to stop from going through
+				//	motion.position = motion.position - vec2(0, -offset);
+				//}
+				//if (playerDirection == DOWN) {
+				//	//printf("Collided with South wall");
+				//	blockedSouth = true;
+				//	motion.position = motion.position - vec2(0, offset);
+				//}
+				//if (playerDirection == LEFT) {
+				//	//printf("Collided with West wall");
+				//	blockedWest = true;
+				//	motion.position = motion.position - vec2(-offset, 0);
+				//}
+				//if (playerDirection == RIGHT) {
+				//	//printf("Collided with East wall");
+				//	blockedEast = true;
+				//	motion.position = motion.position - vec2(offset, 0);
+				//}
 			}
 
 			// Checking Player - Enemy collisions
@@ -1078,7 +1110,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 RenderRequest& r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 if (!blockedNorth) {
-                    motion.velocity = vec2(0.f, -CHARACTER_SPEED);
+                    //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
+					motion.velocity.y -= CHARACTER_SPEED;
                 }
                // printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
@@ -1089,7 +1122,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 RenderRequest& r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 if (!blockedSouth) {
-                    motion.velocity = vec2(0.f, CHARACTER_SPEED);
+                    //motion.velocity = vec2(0.f, CHARACTER_SPEED);
+					motion.velocity.y += CHARACTER_SPEED;
                 }
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
@@ -1125,6 +1159,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 }
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
+			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
+			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
         }
 
 		// Stop moving when key is released
