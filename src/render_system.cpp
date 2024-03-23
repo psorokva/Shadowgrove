@@ -499,8 +499,8 @@ void RenderSystem::draw() {
 	// Render all text in the registry
 	for (Entity entity : registry.textRenderRequests.entities)
 	{
-		// TextRenderRequest request = registry.textRenderRequests.get(entity);
-		// renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+		TextRenderRequest request = registry.textRenderRequests.get(entity);
+		renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
 	}
 
 	// Truely render to the screen
