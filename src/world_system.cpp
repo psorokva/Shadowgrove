@@ -829,11 +829,14 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         if (screen.help == 1) {
            // printf("H key pressed, closing help screen\n");
             screen.help = 0;
-            resume_game();
+            game_paused = false;
         } else {
             //printf("H key pressed, opening help screen\n");
             screen.help = 1;
-            pause_game();
+            game_paused = true;
+            for (Motion& motion : registry.motions.components) {
+                motion.velocity = { 0, 0 };
+            }
         }
     }
 

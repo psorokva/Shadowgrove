@@ -162,17 +162,4 @@ void main() {
         vec4 night_color = in_color * vec4(dark_color.r*dark_color.a, dark_color.g*dark_color.a, dark_color.b*dark_color.a, 1.0);
         color = day_portion * day_color + eve_portion * eve_color + dark_portion * night_color;
     }
-
-    //if (help == 1) {
-    //    /// DAYTIME WITH TORCH
-    //    vec4 day_color = in_color + 0.2 * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
-    //    // vec4 color = in_color * 1.05 * vec4(dark1_color.r*dark1_color.a, dark1_color.g*dark1_color.a, dark1_color.b*dark1_color.a, 1.0);
-    //    /// EVE TORCH
-    //    vec4 eve_color = in_color * vec4(shad1_color.r*shad1_color.a, shad1_color.g*shad1_color.a, shad1_color.b*shad1_color.a, 1.0);
-    //    eve_color += 0.4 * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
-    //    // MIGNIGHT WITH TORCH
-    //    vec4 night_color = in_color * vec4(dark1_color.r*dark1_color.a, dark1_color.g*dark1_color.a, dark1_color.b*dark1_color.a, 1.0);
-    //   night_color = night_color + 0.4 * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
-    //    color = day_portion * day_color + eve_portion * eve_color + dark_portion * night_color;
-    //}
 }
