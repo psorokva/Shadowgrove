@@ -116,6 +116,7 @@ struct Inventory {
 	unsigned int size = 0;
 	std::vector<Item> holding;
 	std::vector<unsigned int> crafted;
+	unsigned int select_state = 0;
 };
 
 
@@ -323,7 +324,8 @@ enum class TEXTURE_ASSET_ID {
 	SHADOW_01 = SHADOW_00 + 1,
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
-	TEXTURE_COUNT = MIDNIGHT_01 + 1
+	TORCH_00 = MIDNIGHT_01 + 1,
+	TEXTURE_COUNT = TORCH_00 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

@@ -21,7 +21,7 @@ bool blockedEast = false;
 bool blockedWest = false;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 8;
+const uint NUM_POTIONS = 24;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
@@ -273,12 +273,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         Inventory& player_inv = registry.inventory.get(p);
         auto& item = player_inv.holding[i];
 
-        createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
+        Entity localItem = createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
+		if (player_inv.select_state == i) {
+			registry.motions.get(localItem).scale = { 100, 100 };
+		}
+		else {
+			registry.motions.get(localItem).scale = { 50, 50 };
+		}
     }
 	//createShadowOverlay(renderer);
 
 	if (num_of_item_on_screen < NUM_POTIONS) {
-		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 };
+		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10,11 };
 		for (int i = 0; i < 5; i++) {
 			Item& item = registry.inventory.get(p).holding[i];
 			switch (item) {
@@ -314,6 +320,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					break;
 				case (special_lotus):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 10), randomizer.end());
+					break;
+				case (torch):
 					break;
 			}
 		}
@@ -607,29 +615,24 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
 	// remove items from slot on num key press
-	if (action == GLFW_RELEASE && key == GLFW_KEY_1 && registry.inventory.get(registry.players.entities[0]).holding[0] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[0] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 0;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_2 && registry.inventory.get(registry.players.entities[0]).holding[1] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[1] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_2) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 1;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_3 && registry.inventory.get(registry.players.entities[0]).holding[2] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[2] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_3) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 2;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_4 && registry.inventory.get(registry.players.entities[0]).holding[3] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[3] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_4) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 3;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_5 && registry.inventory.get(registry.players.entities[0]).holding[4] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[4] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_5) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 4;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
