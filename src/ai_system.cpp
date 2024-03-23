@@ -29,25 +29,10 @@ inline MazeLocation get_maze_location(vec2 location) {
 	return MazeLocation{ col, row };
 }
 
-
-inline std::vector<Direction> get_possible_directions(vec2 location) {
+inline std::vector<Direction> get_possible_directions(MazeLocation loc) {
 	std::vector<Direction> directions;
-	float buffer = 10.0;
-
-	MazeLocation loc = get_maze_location(location);
 
 	// can only go right if we can go right and right and up (loc is bottom part of keeper)
-	// get plant location in real world
-	vec2 real_plant_location = vec2{ (loc.x + 1) * TILE_SIZE + TILE_SIZE / 2, loc.y * TILE_SIZE + TILE_SIZE / 2 };
-	// want top of plant
-	real_plant_location.y = real_plant_location.y - TILE_SIZE / 2;
-	float test = location.y - real_plant_location.y;
-	std::cout << "TESTING: " << test << std::endl;
-	std::cout << "KEEPER X: " << location.x  << " KEEPER Y: " << location.y << std::endl;
-	std::cout << "REAL_PLANT_LOCATION X: " << real_plant_location.x << " REAL_PLANT_LOCATION Y: " << real_plant_location.y << std::endl;
-
-	bool can_right = true;
-	if 
 	int right = get_chunk_value({ loc.x + 1, loc.y });
 	int right_and_up = get_chunk_value({ loc.x + 1, loc.y - 1 });
 	if (right == 0 && right_and_up == 0)
@@ -77,7 +62,7 @@ inline std::vector<Direction> get_possible_directions(vec2 location) {
 		directions.push_back(Direction::UP);
 	}
 
-	print_directions(directions);
+	//print_directions(directions);
 
 	return directions;
 }
@@ -121,12 +106,30 @@ void AISystem::step()
 		const Entity& keeper_entity = enemies_container.entities[i];
 		Enemy& keeper = enemies_container.components[i];
 		Motion& keeper_motion = motion_container.get(keeper_entity);
+
+		// chasing
+		float xDiff = player_motion.position[0] - keeper_motion.position[0];
+		float yDiff = player_motion.position[1] - keeper_motion.position[1];
+		float distance = std::sqrt(pow(xDiff, 2) + pow(yDiff, 2));
+
+		if (distance < chase_distance)
+		{
+			if (!registry.colors.has(keeper_entity))
+			{
+				registry.colors.insert(keeper_entity, vec3{ 1.0, 0.0, 0.0 });
+			}
+		}
+		else
+		{
+			registry.colors.remove(keeper_entity);
+		}
+
 		vec2 adjusted_keeper_pos = keeper_motion.position;
-		adjusted_keeper_pos.y = adjusted_keeper_pos.y + (KEEPER_HEIGHT / 2) - 10;
+		adjusted_keeper_pos.y = adjusted_keeper_pos.y + (KEEPER_HEIGHT / 2) - (TILE_SIZE / 2);
 
 		// get possible directions within overall maze
-		std::vector<Direction> directions = get_possible_directions(adjusted_keeper_pos);
-		continue;
+		MazeLocation loc = get_maze_location(adjusted_keeper_pos);
+		std::vector<Direction> directions = get_possible_directions(loc);
 
 		// only pick a new direction if the last direction isn't available
 		bool dead_end = true;

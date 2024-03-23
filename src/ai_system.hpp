@@ -11,7 +11,7 @@
 #include <algorithm>
 
 inline int get_chunk_value(MazeLocation location);
-inline MazeLocation get_maze_location(vec2 location);
+inline MazeLocation get_maze_location(MazeLocation loc);
 inline std::vector<Direction> get_possible_directions(vec2 location);
 void print_directions(std::vector<Direction> directions);
 
@@ -23,7 +23,7 @@ private:
 	const int enemy_velocity_multipler = 80;
 	const int step_size = PLAYER_HEIGHT / 2;
 	const int frames_till_update = 30;
-	const int chase_distance = 500;
+	const int chase_distance = 300;
 	std::unordered_map<Direction, vec2> direction_to_velocity = {
 		{LEFT, {-enemy_velocity_multipler, 0} },
 		{RIGHT, {enemy_velocity_multipler, 0} },
