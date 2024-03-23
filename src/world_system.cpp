@@ -22,7 +22,7 @@ bool blockedWest = false;
 int out_of_bounds = 0;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 8;
+const uint NUM_POTIONS = 24;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const float KEEPER_SPAWN_FREQ = 8.0 * 1000.0;
@@ -163,6 +163,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg, Physic
 }
 
 void WorldSystem::createInventory(vec2 pos) {
+	Entity backgroundLine = createLine({ pos.x, pos.y }, { 308, 70 });
     Entity topLine = createLine({pos.x, pos.y - 35}, {308, 8});
     Entity bottomLine = createLine({pos.x, pos.y + 35}, {308, 8});
     Entity sideLine1 = createLine({pos.x - 150, pos.y}, {8, 70});
@@ -173,6 +174,8 @@ void WorldSystem::createInventory(vec2 pos) {
     Entity sideLine6 = createLine({pos.x + 150, pos.y}, {8, 70});
 
     vec3 green = {0.07, 0.5, 0.05};
+	vec3 bg_colour = { 0.1, 0.3, 0.1 };
+	registry.colors.insert(backgroundLine, bg_colour);
     registry.colors.insert(topLine, green);
     registry.colors.insert(bottomLine, green);
     registry.colors.insert(sideLine1, green);
@@ -268,7 +271,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     Motion& p_motion = registry.motions.get(p);
 
     // Displaying health bar
-	auto healthBar = createLine(vec2(10, 10), vec2(10*player_component.health, 100));
+	auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
+	registry.colors.insert(healthBG, { 0, 0, 0 });
+
+	auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
 	registry.colors.insert(healthBar, { 1, 0, 0 });
 
     // inventory bar position on screen
@@ -280,12 +286,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         Inventory& player_inv = registry.inventory.get(p);
         auto& item = player_inv.holding[i];
 
-        createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
+        Entity localItem = createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
+		if (player_inv.select_state == i) {
+			registry.motions.get(localItem).scale = { 100, 100 };
+		}
+		else {
+			registry.motions.get(localItem).scale = { 50, 50 };
+		}
     }
 	//createShadowOverlay(renderer);
 
-	if (num_of_item_on_screen < NUM_POTIONS ) { // && screen.game_screen == game_screen_night
-		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 };
+	if (num_of_item_on_screen < NUM_POTIONS) {
+		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10,11 };
 		for (int i = 0; i < 5; i++) {
 			Item& item = registry.inventory.get(p).holding[i];
 			switch (item) {
@@ -321,6 +333,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					break;
 				case (special_lotus):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 10), randomizer.end());
+					break;
+				case (torch):
 					break;
 			}
 		}
@@ -740,29 +754,24 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
 	// remove items from slot on num key press
-	if (action == GLFW_RELEASE && key == GLFW_KEY_1 && registry.inventory.get(registry.players.entities[0]).holding[0] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[0] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 0;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_2 && registry.inventory.get(registry.players.entities[0]).holding[1] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[1] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_2) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 1;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_3 && registry.inventory.get(registry.players.entities[0]).holding[2] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[2] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_3) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 2;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_4 && registry.inventory.get(registry.players.entities[0]).holding[3] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[3] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_4) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 3;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_5 && registry.inventory.get(registry.players.entities[0]).holding[4] != nullval) {
-		registry.inventory.get(registry.players.entities[0]).holding[4] = nullval;
-		num_of_item_on_screen -= 1;
+	if (action == GLFW_RELEASE && key == GLFW_KEY_5) {
+		registry.inventory.get(registry.players.entities[0]).select_state = 4;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
@@ -818,11 +827,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
         HelpScreen &screen = registry.helpScreen.components[0];
         if (screen.help == 1) {
-            printf("H key pressed, closing help screen\n");
+           // printf("H key pressed, closing help screen\n");
             screen.help = 0;
             resume_game();
         } else {
-            printf("H key pressed, opening help screen\n");
+            //printf("H key pressed, opening help screen\n");
             screen.help = 1;
             pause_game();
         }
@@ -856,7 +865,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedNorth) {
                     motion.velocity = vec2(0.f, -CHARACTER_SPEED);
                 }
-                printf("pos: %f %f \n", motion.position.x, motion.position.y);
+               // printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
             // Move Down
@@ -867,7 +876,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 if (!blockedSouth) {
                     motion.velocity = vec2(0.f, CHARACTER_SPEED);
                 }
-                printf("pos: %f %f \n", motion.position.x, motion.position.y);
+                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
             // Move Right
@@ -883,7 +892,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                         motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
                     }
                 }
-                printf("pos: %f %f \n", motion.position.x, motion.position.y);
+                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
             // Move Left
@@ -899,7 +908,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                         motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
                     }
                 }
-                printf("pos: %f %f \n", motion.position.x, motion.position.y);
+                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
         }
 
@@ -934,11 +943,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// Control the current speed with `<` `>`
 	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
 		current_speed -= 0.1f;
-		printf("Current speed = %f\n", current_speed);
+		//printf("Current speed = %f\n", current_speed);
 	}
 	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
 		current_speed += 0.1f;
-		printf("Current speed = %f\n", current_speed);
+		//printf("Current speed = %f\n", current_speed);
 	}
 
 	current_speed = fmax(0.f, current_speed);

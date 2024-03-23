@@ -290,6 +290,10 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 			registry.healers.get(entity).item_name = special_lotus;
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break;
+		case (11):
+			registry.healers.get(entity).item_name = torch;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
 	}
 	
 
@@ -371,6 +375,10 @@ Entity createInventoryPotion(Item& item, vec2 position) {
             registry.healers.get(entity).item_name = special_lotus;
             registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INGR_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
             break;
+		case Item::torch:
+			registry.healers.get(entity).item_name = torch;
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			break;
     }
 
 
@@ -428,11 +436,11 @@ Entity createHelp() {
     Motion& help_motion = registry.motions.emplace(entity);
 //    help_motion.position = {2000, 2000};
     help_motion.scale = {0.5 * window_width_px, 0.5 * window_height_px};
-    help_motion.camera_position = {window_width_px / 2, 0.5 * window_height_px};
+    help_motion.camera_position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
 
     auto &fixed = registry.immobiles.emplace(entity);
-    fixed.position = {window_width_px / 2, 0.5 * window_height_px};
-    fixed.scale = {0.5 * window_width_px, 0.5 * window_height_px};
+    fixed.position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+    fixed.scale = {0.5 * window_width_px +2.0, 0.5 * window_height_px};
     // TEXTURE_COUNT indicates that no txture is needed
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::HELP_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
@@ -464,7 +472,7 @@ Entity createDog(vec2 position) {
     Daytime& dog = registry.daytimes.emplace(entity);
 
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DOG, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-
+	return entity;
 }
 
 Entity createLogo() {
