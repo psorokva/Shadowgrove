@@ -131,6 +131,7 @@ struct Inventory {
 	unsigned int size = 0;
 	std::vector<Item> holding;
 	std::vector<unsigned int> crafted;
+	unsigned int select_state = 0;
 };
 
 struct Invincible {
@@ -351,7 +352,8 @@ enum class TEXTURE_ASSET_ID {
 	HELPTORCH = HELPNIGHT + 1,
     LOGO_00 = HELPTORCH + 1,
     LOGO_01 = LOGO_00 + 1,
-	TEXTURE_COUNT = LOGO_01 + 1
+	TORCH_00 = LOGO_01 + 1,
+	TEXTURE_COUNT = TORCH_00 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
