@@ -66,6 +66,10 @@ struct Player {
 	unsigned int health;
 };
 
+struct Daytime {
+
+};
+
 // Enemy component
 struct Enemy {
 	unsigned int attack;
@@ -119,6 +123,13 @@ struct Inventory {
 	unsigned int select_state = 0;
 };
 
+struct Invincible {
+
+};
+
+struct HitTimer {
+    float counter_ms = 3000;
+};
 
 // All data relevant to the shape and motion of entities
 struct Motion {
@@ -317,7 +328,8 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_17 = PLANT_16 + 1,
 	DAY_SCREEN = PLANT_17 + 1,
     HELP_SCREEN = DAY_SCREEN +1,
-	TORCHLIGHT_00 = HELP_SCREEN + 1,
+    SIGN = HELP_SCREEN + 1,
+	TORCHLIGHT_00 = SIGN + 1,
 	TORCHLIGHT_01 = TORCHLIGHT_00 + 1,
 	TORCHLIGHT_02 = TORCHLIGHT_01 + 1,
 	SHADOW_00 = TORCHLIGHT_02 + 1,
