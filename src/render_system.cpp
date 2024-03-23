@@ -268,7 +268,7 @@ void RenderSystem::drawToScreen() {
 	//NightTimer& nighttime = registry.nightTimer.components[0];
 	GLuint night_timer = glGetUniformLocation(night_program, "night_timer");
 	glUniform1f(night_timer, screen.night_counter_ms);
-	glUniform1f(night_timer, screen.night_counter_ms);
+
 	GLuint night_length_full = glGetUniformLocation(night_program, "night_length_full");
 	glUniform1f(night_length_full, NIGHT_DURATION);
 	
@@ -285,6 +285,9 @@ void RenderSystem::drawToScreen() {
 	GLuint night_length_5 = glGetUniformLocation(night_program, "night_length_5");
 	glUniform1f(night_length_5, NIGHT_DURATION_5);
 
+	HelpScreen& helppopupscreen = registry.helpScreen.components[0];
+	GLuint helpscreen = glGetUniformLocation(night_program, "helpscreen");
+	glUniform1i(helpscreen, helppopupscreen.help);
 
 	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
 	glUniform1i(torch_mode, screen.torch_mode);
@@ -328,6 +331,17 @@ void RenderSystem::drawToScreen() {
 	GLuint light_02 = glGetUniformLocation(night_program, "light02");
 	glUniform1i(light_02, 7);
 	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_02]);
+	gl_has_errors();
+
+	glActiveTexture(GL_TEXTURE8);
+	GLuint helpnight = glGetUniformLocation(night_program, "helpnight");
+	glUniform1i(helpnight, 8);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::HELPNIGHT]);
+
+	glActiveTexture(GL_TEXTURE9);
+	GLuint helptorch = glGetUniformLocation(night_program, "helptorch");
+	glUniform1i(helptorch, 9);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::HELPTORCH]);
 	gl_has_errors();
 	//glUniform1i(shad_00, 0);
 

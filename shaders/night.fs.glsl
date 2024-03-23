@@ -8,6 +8,9 @@ uniform sampler2D dark01;
 uniform sampler2D light00;
 uniform sampler2D light01;
 uniform sampler2D light02;
+uniform sampler2D helpnight;
+uniform sampler2D helptorch;
+uniform int helpscreen;
 uniform int torch_mode;
 uniform int torch_anim;
 uniform float time;
@@ -77,6 +80,16 @@ void main() {
     vec4 dark1_color = texture(dark01, texcoord); 
     vec4 light_color = texture(light00, texcoord); 
    
+    /// Help Screen
+    if (helpscreen == 1 ){
+        light_color = texture(helptorch, texcoord); 
+        shad_color = texture(helpnight, texcoord); 
+        shad1_color = texture(helpnight, texcoord); 
+        dark_color = texture(helpnight, texcoord); 
+        dark1_color = texture(helpnight, texcoord); 
+    }
+
+
     float day_portion = 1.0;
     float eve_portion = 0.0;
     float dark_portion = 0.0;
@@ -145,4 +158,9 @@ void main() {
         vec4 night_color = in_color * vec4(dark_color.r*dark_color.a, dark_color.g*dark_color.a, dark_color.b*dark_color.a, 1.0);
         color = day_portion * day_color + eve_portion * eve_color + dark_portion * night_color;
     }
+
+
+
+
+
 }
