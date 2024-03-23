@@ -22,10 +22,10 @@ bool blockedWest = false;
 int out_of_bounds = 0;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 24;
+const uint NUM_POTIONS = 8;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
-const float KEEPER_SPAWN_FREQ = 8.0 * 1000.0;
+const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
