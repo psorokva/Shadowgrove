@@ -274,6 +274,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     // inventory bar position on screen
     vec2 pos = {720, 60};
     createInventory(pos);
+    createHelp();
 
     for (int i = 0; i < 5; i++) {
         Inventory& player_inv = registry.inventory.get(p);
@@ -490,8 +491,6 @@ void WorldSystem::restart_game() {
         createDog({ window_width_px / 2, window_height_px - 200 });
 
     }
-
-    createHelp();
 
 	// Create empty "path" maze
 	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
@@ -810,12 +809,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
     // Opening help screen
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
-        printf("H key pressed, opening help screen");
         HelpScreen &screen = registry.helpScreen.components[0];
         if (screen.help == 1) {
+            printf("H key pressed, closing help screen\n");
             screen.help = 0;
+            resume_game();
         } else {
+            printf("H key pressed, opening help screen\n");
             screen.help = 1;
+            pause_game();
         }
     }
 
