@@ -76,7 +76,8 @@ void PhysicsSystem::step(float elapsed_ms) {
 		if (collides(player_motion, fixed_i)) {
 			// Create a collisions event
 			registry.collisions.emplace_with_duplicates(player, entity_i);
-			//player_motion.velocity = vec2(0, 0);
+			//player_motion.velocity *= -1.0f;
+			//player_motion.position -= elapsed_ms / 1000.0f * player_motion.velocity *1.1f;
 		}
 	}
 

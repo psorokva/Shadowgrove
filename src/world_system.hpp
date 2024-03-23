@@ -41,7 +41,7 @@ public:
 	void resume_game();
 
 	// Check for collisions
-	void handle_collisions();
+	void handle_collisions(float elapsed_ms);
 
 	// Should the game be over ?
 	bool is_over()const;
