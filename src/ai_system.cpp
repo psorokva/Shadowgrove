@@ -2,6 +2,7 @@
 #include "ai_system.hpp"
 #include <iostream>
 #include <algorithm>
+#include <queue>
 
 
 // MazeLocation is value within overall maze. Not limited to one chunk.
@@ -94,6 +95,87 @@ AISystem::AISystem() {
 	auto rng = std::default_random_engine{};
 }
 
+
+int compute_heuristic(MazeLocation start, MazeLocation end)
+{
+	int xDiff = abs(start.x - end.x);
+	int yDiff = abs(start.y - end.y);
+
+	return xDiff + yDiff;
+}
+
+Direction AISystem::AStar(vec2 player_location, vec2 keeper_location)
+{
+
+	int steps = 0;
+	std::priority_queue<AStarNode, std::vector<AStarNode>, std::greater<AStarNode>> pq;
+	//std::set<AStarNode> openSet;
+	std::map<MazeLocation, int> gScore;
+
+	MazeLocation keeper_loc = get_maze_location(keeper_location);
+	MazeLocation player_loc = get_maze_location(player_location);
+
+	AStarNode start;
+	start.maze_loc = keeper_loc;
+	start.gScore = 0;
+	start.fScore = compute_heuristic(keeper_loc, player_loc) + start.gScore;
+	gScore[start.maze_loc] =  0;
+	pq.push(start);
+	//start.came_from = 
+
+	bool first_step = true;
+
+	while (pq.size() > 0)
+	{
+		AStarNode current = pq.top();
+
+		if (current.maze_loc == player_loc)
+		{
+			//std::cout << "we made it" << std::endl;
+			return current.parent;
+		}
+		pq.pop();
+
+		std::vector<Direction> directions = get_possible_directions(current.maze_loc);
+
+		for (const auto& direction : directions)
+		{
+			AStarNode neighborNode;
+			MazeLocation step = direction_to_location[direction];
+			MazeLocation new_loc = current.maze_loc;
+			new_loc.x = new_loc.x + step.x;
+			new_loc.y = new_loc.y + step.y;
+			neighborNode.maze_loc = new_loc;
+			neighborNode.gScore = gScore[current.maze_loc] + 1;
+			if (first_step)
+			{
+				neighborNode.parent = direction;
+			}
+			else
+			{
+				neighborNode.parent = current.parent;
+			}
+			bool new_node = false;
+			if (gScore.find(neighborNode.maze_loc) == gScore.end())
+			{
+				gScore[neighborNode.maze_loc] = neighborNode.gScore;
+				new_node = true;
+			}
+			if (neighborNode.gScore < gScore[neighborNode.maze_loc] || new_node)
+			{
+				gScore[neighborNode.maze_loc] = neighborNode.gScore;
+				neighborNode.fScore = neighborNode.gScore + compute_heuristic(neighborNode.maze_loc, player_loc);
+				pq.push(neighborNode);
+
+			}
+		}
+		first_step = false;
+	}
+
+	return Direction::NONE;
+}
+
+
 void AISystem::step() 
 {
 	ComponentContainer<Enemy>& enemies_container = registry.enemies;
@@ -118,6 +200,10 @@ void AISystem::step()
 			{
 				registry.colors.insert(keeper_entity, vec3{ 1.0, 0.0, 0.0 });
 			}
+			Direction toGo = AStar(player_motion.position, keeper_motion.position);
+			keeper.last_direction = toGo;
+			keeper_motion.velocity = direction_to_velocity[toGo];
+			continue;
 		}
 		else
 		{
@@ -152,8 +238,5 @@ void AISystem::step()
 		keeper.last_direction = new_keeper_direction;
 		keeper_motion.velocity = direction_to_velocity[new_keeper_direction];
 	}
-
-
-
 	return;
 }

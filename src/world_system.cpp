@@ -264,7 +264,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//std::cout << "AFTER" << std::endl;
 	//std::cout << "line x: " << line_motion.position.x << " line y: " << line_motion.position.y << " line camera x: " << line_motion.camera_position.x << "line camera y: " << line_motion.camera_position.y << std::endl;
 	
-	//ai.step();
+	ai.step();
 
 	
 

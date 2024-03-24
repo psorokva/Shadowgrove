@@ -45,6 +45,16 @@ enum Direction { UP, DOWN, LEFT, RIGHT, NONE };
 struct MazeLocation {
 	int x;
 	int y;
+
+	bool operator == (const MazeLocation& loc) const
+	{
+		return (x == loc.x && y == loc.y);
+	}
+
+	bool operator < (const MazeLocation& loc) const
+	{
+		return (x < loc.x) || ((x == loc.x) && (y < loc.y));
+	}
 };
 
 const float NIGHT_DURATION = 3000000.0f; // more than 30 sec
