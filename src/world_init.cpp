@@ -591,8 +591,8 @@ Entity createLogo() {
     auto& day = registry.screenStates.emplace(entity);
 
     auto& fixed = registry.immobiles.emplace(entity);
-    fixed.position = { 0.5 * window_width_px, 0.5 * window_height_px };
-    fixed.scale = { 1100, 500 };
+    fixed.position = { 0.5 * window_width_px, 0.4 * window_height_px };
+    fixed.scale = { 1100, 300 };
 
     Daytime& logo = registry.daytimes.emplace(entity);
 
