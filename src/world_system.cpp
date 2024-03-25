@@ -281,7 +281,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     // inventory bar position on screen
     vec2 pos = {720, 60};
     createInventory(pos);
-    createHelp();
+//    createHelp();
 
     for (int i = 0; i < 5; i++) {
         Inventory& player_inv = registry.inventory.get(p);
@@ -412,6 +412,12 @@ void WorldSystem::restart_game() {
 	num_of_item_on_screen = 0;
 	// Remove all entities that we created
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
+//    for (Entity entity : registry.motions.entities)
+//    {
+//        if (!registry.helpScreen.has(entity)) {
+//            registry.remove_all_components_of(entity);
+//        }
+//    }
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
 	while (registry.immobiles.entities.size() > 0)
@@ -449,6 +455,8 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	save_state.loadInventory();
+
+    createHelp();
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -991,11 +999,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // space to restart
     if (screen.game_screen == game_screen_game_over) {
         if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+            printf("in game over screen on key \n");
             screen.game_screen = game_screen_main_menu;
             screen.torch_mode = 0;
             screen.night_counter_ms = 0;
             NightTimer& night_counter = registry.nightTimer.components[0];
             night_counter.counter_ms = 0;
+            registry.nightTimer.clear();
             restart_game();
         }
     }
