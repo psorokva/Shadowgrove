@@ -209,6 +209,7 @@ void AISystem::step()
 				registry.colors.insert(keeper_entity, vec3{ 1.0, 0.0, 0.0 });
 			}
 			Direction toGo = AStar(adjusted_player_pos, adjusted_keeper_pos);
+			// in case AStar somehow fails we have a check
 			if (toGo != Direction::NONE)
 			{
 				keeper_motion.velocity = direction_to_velocity[toGo] + direction_to_velocity[toGo];
