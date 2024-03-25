@@ -32,19 +32,24 @@ bool collides(const Motion& motion1, const Motion& motion2) {
 	return false;
 }
 
-// Duplicate for collision with walls, might need to change
-bool collides(const Motion& motion1, const Immobile& immobile) {
-	vec2 dp = motion1.position - immobile.position;
-	float dist_squared = dot(dp, dp);
-	const vec2 other_bonding_box = get_bounding_box(motion1) / 2.f;
-	const float other_r_squared = dot(other_bonding_box, other_bonding_box);
-	const vec2 my_bonding_box = get_bounding_box(immobile) / 2.f;
-	const float my_r_squared = dot(my_bonding_box, my_bonding_box);
-	const float r_squared = max(other_r_squared, my_r_squared);
-	if (dist_squared < r_squared) {
-		return true;
-	}
-	return false;
+// Collision with walls (AABB)
+bool collides(const Motion& motionA, const Immobile& motionB) {
+	return motionA.position.x < motionB.position.x + abs(motionB.scale.x) / 2//might need to divide scales by 2
+		&& motionA.position.x + abs(motionA.scale.x) / 2 > motionB.position.x
+		&& motionA.position.y < motionB.position.y + abs(motionB.scale.y) / 2
+		&& motionA.position.y + abs(motionA.scale.y) / 2 > motionB.position.y;
+
+	//vec2 dp = motion1.position - immobile.position;
+	//float dist_squared = dot(dp, dp);
+	//const vec2 other_bonding_box = get_bounding_box(motion1) / 2.f;
+	//const float other_r_squared = dot(other_bonding_box, other_bonding_box);
+	//const vec2 my_bonding_box = get_bounding_box(immobile) / 2.f;
+	//const float my_r_squared = dot(my_bonding_box, my_bonding_box);
+	//const float r_squared = max(other_r_squared, my_r_squared);
+	//if (dist_squared < r_squared) {
+	//	return true;
+	//}
+	//return false;
 }
 
 //returns chunk and place within chunk
