@@ -30,10 +30,10 @@
 					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/stb_image"/>
 					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/gl3w"/>
 					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/OpenGL.framework"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/freetype/include"/>
 					<Add directory="/usr/local/Cellar/glfw/3.3.9/include"/>
 					<Add directory="/usr/local/include/SDL2"/>
-					<Add directory="/usr/local/opt/freetype/include/freetype2"/>
-					<Add directory="/usr/local/opt/libpng/include/libpng16"/>
+					<Add directory="/usr/local/include/freetype2"/>
 					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/Cocoa.framework"/>
 					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/CoreFoundation.framework"/>
 					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/glm"/>
@@ -58,10 +58,10 @@
 					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/stb_image"/>
 					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/gl3w"/>
 					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/OpenGL.framework"/>
+					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/freetype/include"/>
 					<Add directory="/usr/local/Cellar/glfw/3.3.9/include"/>
 					<Add directory="/usr/local/include/SDL2"/>
-					<Add directory="/usr/local/opt/freetype/include/freetype2"/>
-					<Add directory="/usr/local/opt/libpng/include/libpng16"/>
+					<Add directory="/usr/local/include/freetype2"/>
 					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/Cocoa.framework"/>
 					<Add directory="/Library/Developer/CommandLineTools/SDKs/MacOSX14.2.sdk/System/Library/Frameworks/CoreFoundation.framework"/>
 					<Add directory="/Users/madpenner/Desktop/Team6-Shadowgrove/ext/glm"/>

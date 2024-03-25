@@ -36,6 +36,7 @@ public:
     ComponentContainer<Invincible> invincibles;
 	ComponentContainer<TextRenderRequest> textRenderRequests;
     ComponentContainer<Daytime> daytimes;
+    ComponentContainer<Pause> pauses;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -65,6 +66,7 @@ public:
         registry_list.push_back(&invincibles);
 		registry_list.push_back(&textRenderRequests);
         registry_list.push_back(&daytimes);
+        registry_list.push_back(&pauses);
 	}
 
 	void clear_all_components() {

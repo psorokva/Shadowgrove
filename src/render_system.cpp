@@ -299,6 +299,9 @@ void RenderSystem::drawToScreen() {
     Player& player = registry.players.components[0];
     glUniform1i(alive, player.alive);
 
+    GLuint hit = glGetUniformLocation(night_program, "hit");
+    glUniform1i(hit, player.hit);
+
     GLuint help = glGetUniformLocation(night_program, "help");
     HelpScreen& help_screen = registry.helpScreen.components[0];
     glUniform1i(help, help_screen.help);
@@ -460,10 +463,14 @@ void RenderSystem::draw() {
         Entity dog = registry.daytimes.entities[1];
         drawTexturedStaticMesh(dog, projection_2D);
 
-        // render player 3rd
+        // render danger sign 3rd
+        Entity sign2 = registry.daytimes.entities[3];
+        drawTexturedStaticMesh(sign2, projection_2D);
+
+        // render player 2nd last
         drawTexturedMesh(player, projection_2D);
 
-        // render sign last
+        // render instruction sign last
         Entity sign = registry.daytimes.entities[2];
         drawTexturedStaticMesh(sign, projection_2D);
 
@@ -510,8 +517,8 @@ void RenderSystem::draw() {
 	// Render all text in the registry
 	for (Entity entity : registry.textRenderRequests.entities)
 	{
-		// TextRenderRequest request = registry.textRenderRequests.get(entity);
-		// renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+		TextRenderRequest request = registry.textRenderRequests.get(entity);
+		renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
 	}
 
 	// Truely render to the screen

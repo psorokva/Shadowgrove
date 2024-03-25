@@ -150,6 +150,7 @@ class RenderSystem {
 			textures_path("daytimescreen.png"),
             textures_path("helpscreen.png"),
             textures_path("sign.png"),
+            textures_path("sign2.png"),
 			textures_path("Torchlight_00.png"),
 			textures_path("Torchlight_01.png"),
 			textures_path("Torchlight_03.png"),
