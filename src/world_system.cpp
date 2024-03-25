@@ -34,7 +34,7 @@ int level = 0;
 bool game_paused = false;
 
 // Create the bug world
-WorldSystem::WorldSystem() : points(0) {
+WorldSystem::WorldSystem() : points(0), chunk_border(false) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
@@ -239,7 +239,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (keeper_spawn_time > KEEPER_SPAWN_FREQ && screen.game_screen == game_screen_night) {
 		keeper_spawn_time = 0.0;
 		vec2 spawn_pos = registry.get_empty_spawn_location();
-		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+		//createKeeper(renderer, camera.adjust_to_player(spawn_pos));
 	}
 	
 	// Updating window title with points
@@ -264,9 +264,22 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-    camera.step();
+	draw_chunk_borders();
 
-    ai.step();
+	//std::cout << "BEFORE" << std::endl;
+	//std::cout << "line x: " << line_motion.position.x << " line y: " << line_motion.position.y << " line camera x: " << line_motion.camera_position.x << "line camera y: " << line_motion.position.y << std::endl;
+
+
+
+    camera.step();
+	//std::cout << "AFTER" << std::endl;
+	//std::cout << "line x: " << line_motion.position.x << " line y: " << line_motion.position.y << " line camera x: " << line_motion.camera_position.x << "line camera y: " << line_motion.camera_position.y << std::endl;
+	
+	ai.step();
+
+	
+
+	Player& player = registry.players.components[0];
 
     Entity p = registry.players.entities[0];
     Motion& p_motion = registry.motions.get(p);
@@ -572,8 +585,9 @@ void WorldSystem::restart_game() {
 				if ( c.grid[row][col] > 0) {
 					int major_row = c.y * MAZE_SIZE + row;
 					int major_col = c.x * MAZE_SIZE + col;
-					int plant_x = c.offset_x + col * TILE_SIZE;
-					int plant_y = c.offset_y + row * TILE_SIZE;
+					// add the TILE_SIZE / 2 so that plants are aligned with their respective cell
+					int plant_x = c.offset_x + col * TILE_SIZE + TILE_SIZE / 2;
+					int plant_y = c.offset_y + row * TILE_SIZE + TILE_SIZE / 2;
 					// TODO store plant type in // c.grid[row][col]
 					createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); //
 					//printf("tile: %d %d ", c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col);
@@ -810,6 +824,23 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
+	// ai stepping
+	if (action == GLFW_RELEASE && key == GLFW_KEY_B)
+	{
+		ai.step();
+	}
+
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_L) {
+		chunk_border = !chunk_border;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_O) {
+		for (const auto& chunk : registry.chunks.components) {
+			std::cout << "x: " << chunk.x << " y: " << chunk.y << " offset_x: " << chunk.offset_x << " offset_y: " << chunk.offset_y << std::endl;
+		}
+	}
+
 	// remove items from slot on num key press
 	if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
 		registry.inventory.get(registry.players.entities[0]).select_state = 0;
@@ -1023,15 +1054,22 @@ void WorldSystem::on_mouse_move(vec2 mouse_position) {
 }
 
 void WorldSystem::on_mouse_click(int button, int action, int mods) {
-	//std::cout << "x: " << mouse_position[0] << ", y: " << mouse_position[1] << std::endl;
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
+	const Motion& player_motion = registry.motions.get(player);
+	vec2 mouse_pos = camera.adjust_to_player({ xpos, ypos });
+	std::cout << "x: " << mouse_pos.x << ", y: " << mouse_pos.y << std::endl;
+	//int chunk_value = registry.get_chunk_value(camera.adjust_to_player(vec2{xpos, ypos}));
+	//MazeLocation mazeLoc = registry.get_maze_location(camera.adjust_to_player(vec2{ xpos, ypos }));
+	//std::cout << "x: " << mazeLoc.col << " y: " << mazeLoc.row << std::endl;
+	//int chunk_value = registry.get_chunk_value(mazeLoc);
+	//std::cout << "CHUNK VALUE: " << chunk_value << std::endl;
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
 //		vec2 spawn_pos = registry.get_empty_spawn_location();
 //		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
 //		createPotion(renderer, camera.adjust_to_player(spawn_pos));
-//		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//if (points <= 5) {
 		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//}
@@ -1039,4 +1077,32 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	}
 	
 	
+}
+
+void WorldSystem::draw_chunk_borders() {
+	if (!chunk_border) {
+		return;
+	}
+	int maze_pixel_size = MAZE_SIZE * TILE_SIZE;
+	int line_width = 10;
+	//std::cout << position_vec.x << ", " << position_vec.y << std::endl;
+	//vec2 scale_vec = 
+	vec3 blue = { 0, 0, 1.0 };
+	for (const auto& chunk : registry.chunks.components) {
+
+		// for grid lines
+		// 
+		for (int i = 0; i < MAZE_SIZE; i++) {
+			Entity vertical_line = createLine(vec2{ chunk.offset_x + i * TILE_SIZE, chunk.offset_y + maze_pixel_size / 2 }, vec2{line_width, maze_pixel_size});
+			Entity horizontal_line = createLine(vec2{ chunk.offset_x + maze_pixel_size / 2, chunk.offset_y + i * TILE_SIZE }, vec2{ maze_pixel_size, line_width });
+			registry.colors.insert(vertical_line, blue);
+			registry.colors.insert(horizontal_line, blue);
+		}
+
+		Entity left_line = createLine(vec2{ chunk.offset_x, chunk.offset_y + maze_pixel_size / 2 }, vec2{ line_width, maze_pixel_size });
+		Entity right_line = createLine(vec2{ chunk.offset_x + maze_pixel_size, chunk.offset_y + maze_pixel_size / 2 }, vec2{ line_width, maze_pixel_size });
+		Entity top_line = createLine(vec2{ chunk.offset_x + maze_pixel_size / 2, chunk.offset_y }, vec2{ maze_pixel_size, line_width });
+		Entity bottom_line = createLine(vec2{ chunk.offset_x + maze_pixel_size / 2, chunk.offset_y + maze_pixel_size }, vec2{ maze_pixel_size, line_width });
+
+	}
 }
