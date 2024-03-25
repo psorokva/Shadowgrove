@@ -350,30 +350,27 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 
-    if (screen.game_screen == game_screen_night) {
-        float min_counter_ms = 3000.f;
-        for (Entity entity : registry.deathTimers.entities) {
-            // progress timer
-            DeathTimer& counter = registry.deathTimers.get(entity);
-            counter.counter_ms -= elapsed_ms_since_last_update;
-            if(counter.counter_ms < min_counter_ms){
-                min_counter_ms = counter.counter_ms;
-            }
+    float min_counter_ms = 3000.f;
+	for (Entity entity : registry.deathTimers.entities) {
+		// progress timer
+		DeathTimer& counter = registry.deathTimers.get(entity);
+		counter.counter_ms -= elapsed_ms_since_last_update;
+		if(counter.counter_ms < min_counter_ms){
+		    min_counter_ms = counter.counter_ms;
+		}
 
-            // restart the game once the death timer expired
-            if (counter.counter_ms < 0) {
-                registry.deathTimers.remove(entity);
-                screen.darken_screen_factor = 0;
-                screen.game_screen = game_screen_game_over;
-                player_component.alive = 0;
-                restart_game();
-                return true;
-            }
-        }
-        // reduce window brightness if any of the present is dying
-        screen.darken_screen_factor = 1 - min_counter_ms / 3000;
-    }
-
+		// restart the game once the death timer expired
+		if (counter.counter_ms < 0) {
+			registry.deathTimers.remove(entity);
+			screen.darken_screen_factor = 0;
+            screen.game_screen = game_screen_game_over;
+            player_component.alive = 0;
+            restart_game();
+			return true;
+		}
+	}
+	// reduce window brightness if any of the present is dying
+	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
     // on collision with enemy
     float hit_counter_ms = 3000.f;
@@ -1008,6 +1005,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             screen.night_counter_ms = 0;
             NightTimer& night_counter = registry.nightTimer.components[0];
             night_counter.counter_ms = 0;
+            registry.nightTimer.clear();
             restart_game();
         }
     }
