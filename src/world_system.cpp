@@ -742,6 +742,27 @@ vec2 get_bounding_box2(const Immobile& immobile) {
 	return { abs(immobile.scale.x), abs(immobile.scale.y) };
 }
 
+// AABB collision
+// might need to reverse motionA & immobileB
+vec2 get_collision_overlap(const Motion& motionA, const Immobile& motionB) {
+	//return motionA.position.x < motionB.position.x + abs(motionB.scale.x)//might need to divide scales by 2
+	//	&& motionA.position.x + abs(motionA.scale.x) > motionB.position.x
+	//	&& motionA.position.y < motionB.position.y + abs(motionB.scale.y)
+	//	&& motionA.position.y + abs(motionA.scale.y) > motionB.position.y;
+
+	// return smaller value for x and y
+	float val_x = motionB.position.x + (abs(motionB.scale.x) / 2) - motionA.position.x;
+	printf("Valx: %f\n", val_x);
+	float val_y = motionB.position.y + (abs(motionB.scale.y) / 2) - motionA.position.y;
+	printf("Valy: %f\n", val_y);
+	/*if (abs(val_x) > abs(val_y)) {
+		return vec2(val_x, 0.f);
+	}
+	else {
+		return vec2(0.f, val_y);
+	}*/
+}
+
 void WorldSystem::resume_game() {
 	
 	game_paused = false;
@@ -773,6 +794,29 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				// Can adjust this
 				//float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
+				
+				//!! TEMP, move back to physics_system after
+				// Change this to AABB
+				
+				vec2 diff = get_collision_overlap(motion_p, motion_w);
+				motion_p.position = motion_p.position - diff * 0.5f;
+
+				//printf("within the box\n");
+				
+				//vec2 dp = motion_p.position - motion_w.position;
+				//float dist_squared = dot(dp, dp);
+				//const vec2 other_bonding_box = get_bounding_box2(motion_p) / 2.f;
+				//const float other_r_squared = dot(other_bonding_box, other_bonding_box);
+				//const vec2 my_bonding_box = get_bounding_box2(motion_w) / 2.f;
+				//const float my_r_squared = dot(my_bonding_box, my_bonding_box);
+				//const float r_squared = max(other_r_squared, my_r_squared);
+				//
+				//float multiplier = r_squared / dist_squared;
+				//
+				////if (dist_squared < r_squared) {
+				
+				//motion_p.position = motion_w.position + dp * (float)pow(multiplier,0.5);
+				motion_p.velocity = vec2(0.0f, 0.0f);
 			
 				//if (playerDirection == UP) {
 				//	//printf("Collided with North wall");

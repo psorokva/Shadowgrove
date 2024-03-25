@@ -38,6 +38,7 @@ bool collides(const Motion& motionA, const Immobile& motionB) {
 		&& motionA.position.x + abs(motionA.scale.x) / 2 > motionB.position.x
 		&& motionA.position.y < motionB.position.y + abs(motionB.scale.y) / 2
 		&& motionA.position.y + abs(motionA.scale.y) / 2 > motionB.position.y;
+
 	//vec2 dp = motion1.position - immobile.position;
 	//float dist_squared = dot(dp, dp);
 	//const vec2 other_bonding_box = get_bounding_box(motion1) / 2.f;
