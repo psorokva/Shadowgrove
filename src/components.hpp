@@ -106,6 +106,10 @@ struct Escaper {
 
 };
 
+struct Torches {
+	float t_timer = 5000;
+};
+
 struct Deadly {
 
 };
@@ -121,6 +125,8 @@ struct Inventory {
 	std::vector<Item> holding;
 	std::vector<unsigned int> crafted;
 	unsigned int select_state = 0;
+	bool is_open = false;
+	std::vector<Item> inUI;
 };
 
 struct Invincible {
@@ -337,7 +343,8 @@ enum class TEXTURE_ASSET_ID {
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
 	TORCH_00 = MIDNIGHT_01 + 1,
-	TEXTURE_COUNT = TORCH_00 + 1
+	CRAFTING = TORCH_00 + 1,
+	TEXTURE_COUNT = CRAFTING + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

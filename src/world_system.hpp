@@ -35,6 +35,7 @@ public:
 
 	// Steps the game ahead by ms milliseconds
 	bool step(float elapsed_ms);
+	void checkCrafted();
 
 	// Pause/unpause game
 	void pause_game();

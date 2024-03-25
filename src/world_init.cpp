@@ -310,6 +310,17 @@ Entity createCompass(vec2 position) {
 	return entity;
 }
 
+Entity createCraftingUI(vec2 position) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ 800, 600 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CRAFTING, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
+
 Entity createInventoryPotion(Item& item, vec2 position) {
     auto entity = Entity();
 
