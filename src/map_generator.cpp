@@ -15,20 +15,12 @@ void MapGen::clearMap() {
 	chunks.clear();
 }
 
-
-
-MapGen::MapGen(int maprows, int mapcols) {
-	initPaths();
-
-	// init noise grid withnoise levels of noise
-	rows = maprows;
-	cols = mapcols;
+void MapGen::makeNoise(int level) {
+	const int BIOMES = 4;
 	const int RARITY = 14;
 	const int NOISE_LEVELS = 10;
 	const int BIG_WIDTH = cols * MAZE_SIZE;
 	const int BIG_HEIGHT = rows * MAZE_SIZE;
-	chunks = std::vector<Chunk>();
-	bignoise = new int* [BIG_HEIGHT];
 	for (int i = 0; i < BIG_HEIGHT; ++i) {
 		bignoise[i] = new int[BIG_WIDTH];
 		for (int j = 0; j < BIG_WIDTH; ++j) {
@@ -37,13 +29,10 @@ MapGen::MapGen(int maprows, int mapcols) {
 		}
 		//printf("\n");
 	}
-
-	// init biome filter grid with 1s
-	biome_filter = new int* [BIG_HEIGHT];
 	for (int i = 0; i < BIG_HEIGHT; ++i) {
 		biome_filter[i] = new int[BIG_WIDTH];
 		for (int j = 0; j < BIG_WIDTH; ++j) {
-			biome_filter[i][j] = 1;
+			biome_filter[i][j] = level;
 		}
 	}
 	for (int i = 0; i < BIG_HEIGHT; ++i) {
@@ -90,8 +79,28 @@ MapGen::MapGen(int maprows, int mapcols) {
 					}
 				}
 			}
+
+			biome_filter[i][j] = (  biome_filter[i][j] % (BIOMES + level) )  % 10;
+			
 		}
 	}
+}
+
+
+MapGen::MapGen(int maprows, int mapcols) {
+	initPaths();
+	// init noise grid withnoise levels of noise
+	rows = maprows;
+	cols = mapcols;
+	const int RARITY = 14;
+	const int NOISE_LEVELS = 10;
+	const int BIG_WIDTH = cols * MAZE_SIZE;
+	const int BIG_HEIGHT = rows * MAZE_SIZE;
+	chunks = std::vector<Chunk>();
+	bignoise = new int* [BIG_HEIGHT];
+	// init biome filter grid with 1s
+	biome_filter = new int* [BIG_HEIGHT];
+	makeNoise(1);
 	//for (int i = 0; i < BIG_HEIGHT; ++i) {
 	//	for (int j = 0; j < BIG_WIDTH; ++j) {
 	//		printf(" %x", biome_filter[i][j]);

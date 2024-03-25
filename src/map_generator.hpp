@@ -42,6 +42,7 @@ public:
 	void initPaths();
 	//bool createChunkGrid(Chunk& chunk);
 	void getStitchingVector(std::vector<ChunkStitch> & stitching_jobs, int rowz, int colz, int paths);
+	void makeNoise(int level);
 	bool createWorldMap();
 	Chunk& createMapChunk(vec2 position);
 };

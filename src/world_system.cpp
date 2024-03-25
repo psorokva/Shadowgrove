@@ -29,6 +29,7 @@ float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
+int level = 0;
 
 bool game_paused = false;
 
@@ -472,7 +473,11 @@ void WorldSystem::restart_game() {
 		createNight();
         Mix_PlayMusic(night_music, -1);
         fprintf(stderr, "Loaded music\n");
+		generator->makeNoise(level);
         generator->createWorldMap();
+		if (level < 9) {
+			level++;
+		}
         createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
     } else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
