@@ -26,6 +26,7 @@ Entity createShadowOverlay(RenderSystem* renderer);
 Entity createLine(vec2 position, vec2 size);
 Entity createDay();
 Entity createSign();
+Entity createSign2();
 Entity createNight();
 Entity createHelp();
 Entity createDog(vec2 position);

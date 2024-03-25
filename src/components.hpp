@@ -75,9 +75,14 @@ struct Impenetrable {
 struct Player {
 	unsigned int health;
     int alive = 1;
+    int hit = 0;
 };
 
 struct Daytime {
+
+};
+
+struct Pause {
 
 };
 
@@ -340,8 +345,9 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_17 = PLANT_16 + 1,
 	DAY_SCREEN = PLANT_17 + 1,
     HELP_SCREEN = DAY_SCREEN +1,
-    SIGN = HELP_SCREEN + 1,
-	TORCHLIGHT_00 = SIGN + 1,
+    SIGN_01 = HELP_SCREEN + 1,
+    SIGN_02 = SIGN_01 +1,
+	TORCHLIGHT_00 = SIGN_02 + 1,
 	TORCHLIGHT_01 = TORCHLIGHT_00 + 1,
 	TORCHLIGHT_02 = TORCHLIGHT_01 + 1,
 	SHADOW_00 = TORCHLIGHT_02 + 1,

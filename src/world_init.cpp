@@ -415,7 +415,24 @@ Entity createSign() {
     Daytime& sign = registry.daytimes.emplace(entity);
 
     // TEXTURE_COUNT indicates that no txture is needed
-    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::SIGN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::SIGN_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}
+
+Entity createSign2() {
+    auto entity = Entity();
+
+    auto& day = registry.screenStates.emplace(entity);
+
+    auto& fixed = registry.immobiles.emplace(entity);
+    fixed.position = { 0.4 * window_width_px, 0.23 * window_height_px };
+    fixed.scale = { 100, 100 };
+
+    Daytime& sign = registry.daytimes.emplace(entity);
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::SIGN_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
 }
@@ -466,7 +483,7 @@ Entity createDog(vec2 position) {
 
     Immobile& immobile = registry.immobiles.emplace(entity);
     immobile.position = position;
-    immobile.scale = vec2({ 1.5 * 135, 1.5 * 60 });
+    immobile.scale = vec2({ 1.6 * 135, 1.6 * 60 });
     immobile.camera_position = { window_width_px / 4, window_height_px / 4 };
 
     Daytime& dog = registry.daytimes.emplace(entity);
@@ -481,8 +498,8 @@ Entity createLogo() {
     auto& day = registry.screenStates.emplace(entity);
 
     auto& fixed = registry.immobiles.emplace(entity);
-    fixed.position = { 0.5 * window_width_px, 0.5 * window_height_px };
-    fixed.scale = { 1100, 500 };
+    fixed.position = { 0.5 * window_width_px, 0.3 * window_height_px };
+    fixed.scale = { 1000, 500 };
 
     Daytime& logo = registry.daytimes.emplace(entity);
 

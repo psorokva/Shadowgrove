@@ -19,7 +19,6 @@ bool blockedNorth = false;
 bool blockedSouth = false;
 bool blockedEast = false;
 bool blockedWest = false;
-int out_of_bounds = 0;
 
 Direction playerDirection;
 const uint NUM_POTIONS = 8;
@@ -386,6 +385,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
         if (counter.counter_ms < 0)
         {
+            player_component.hit = 0;
             registry.invincibles.remove(entity);
             registry.hitTimers.remove(entity);
             return true;
@@ -460,7 +460,6 @@ void WorldSystem::restart_game() {
 
 	//night_counter.counter_ms = NIGHT_DURATION;
 
-
     if (screen.game_screen == game_screen_night) {
         // Playing background music indefinitely
 		createNight();
@@ -474,7 +473,7 @@ void WorldSystem::restart_game() {
         fprintf(stderr, "Loaded music\n");
 
         Motion& player_motion = registry.motions.get(player);
-        player_motion.position = { window_width_px / 2, window_height_px - 200 };
+        player_motion.position = { 0.6 * window_width_px, 0.75 * window_height_px };
         // put player alive again
         player_component.alive = 1;
         player_motion.scale = { 2 * 60, 2 * 80 };
@@ -482,12 +481,21 @@ void WorldSystem::restart_game() {
         Entity day = createDay();
         printf("day entity init %zu\n", day);
 
-        createDog({ window_width_px / 2, window_height_px - 200 });
-
         if (screen.game_screen == game_screen_day) {
+            createDog({ 0.85 * window_width_px, 0.75 * window_height_px });
+
             createSign();
-        } else {
+            createSign2();
+        } else if (screen.game_screen == game_screen_main_menu) {
+            createDog({ 0.3 * window_width_px, 0.8 * window_height_px });
+
             createLogo();
+
+//            auto entity = Entity();
+//            registry.textRenderRequests.insert(entity,
+//                                               {
+//                                                       "Press space key to start", vec2(0.2 * window_width_px, 0.75 * window_height_px) // might need to adjust position
+//                                               });
         }
 
     } else if (screen.game_screen == game_screen_game_over) {
@@ -496,6 +504,10 @@ void WorldSystem::restart_game() {
         keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
         keeper_motion.scale *= 4;
         keeper_motion.velocity = {0,0};
+
+//        auto entity = Entity();
+//        registry.textRenderRequests.insert(entity,
+//                                           {"Game over", vec2(0.5 * window_width_px, 0.5 * window_height_px)});
     } else if (screen.game_screen == game_screen_win) {
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
@@ -558,9 +570,10 @@ void WorldSystem::pause_game() {
 	//printf("Game paused \n");
 
 	auto entity = Entity();
+    registry.pauses.emplace(entity);
 	registry.textRenderRequests.insert(entity,
 		{
-			"PAUSED", vec2(window_width_px / 2 - 70.0, window_height_px / 2) // might need to adjust position
+			"PAUSED", vec2(window_width_px / 2, window_height_px / 2) // might need to adjust position
 		});
 	for (Motion& motion : registry.motions.components) {
 		motion.velocity = { 0, 0 };
@@ -571,9 +584,11 @@ void WorldSystem::resume_game() {
 	
 	game_paused = false;
 	// Remove "Paused" text (does it remove too much?)
-	while (registry.textRenderRequests.entities.size() > 0) {
-		registry.remove_all_components_of(registry.textRenderRequests.entities.back());
-	}
+//	while (registry.textRenderRequests.entities.size() > 0) {
+//		registry.remove_all_components_of(registry.textRenderRequests.entities.back());
+//	}
+
+    registry.remove_all_components_of(registry.pauses.entities[0]);
 	
 	//printf("Game unpaused \n");
 }
@@ -632,17 +647,16 @@ void WorldSystem::handle_collisions() {
 
 					if ((p.health - e.attack) > 0) {
 						p.health = p.health - e.attack;
+                        p.hit = 1;
                         // make player temporarily invincible
                         if (!registry.invincibles.has(entity))
                         {
                             registry.invincibles.emplace(entity);
-                            printf("hellooo chicken wing\n");
                         }
 
                         if (!registry.hitTimers.has(entity))
                         {
                             registry.hitTimers.emplace(entity);
-                            printf("hellooo chicken nugget\n");
                         }
 
 						// Move enemy slightly back after collision (so that player doesn't die instantly)
@@ -706,6 +720,9 @@ void WorldSystem::handle_collisions() {
         float y_pos = player_motion.position.y;
         float half_width = PLAYER_WIDTH / 2;
         float half_height = PLAYER_HEIGHT / 2;
+        float top = 165;
+        float bottom = window_height_px - (0.8 * PLAYER_HEIGHT);
+        float shed_side = 814;
 
         // check left
         if (x_pos - half_width < 0) {
@@ -716,27 +733,36 @@ void WorldSystem::handle_collisions() {
             player_motion.position.x = window_width_px - half_width;
         }
         // check right shed
-//        else if (x_pos > 814 && y_pos < 470) {
-//            out_of_bounds = 1;
-//        }
+        else if (x_pos > shed_side && y_pos < 470) {
+            if (playerDirection == RIGHT) {
+                player_motion.position.x = shed_side;
+            } else if (playerDirection == UP) {
+                player_motion.position.y = 470;
+            }
+        }
         // check top left corner
-        else if (y_pos - half_height < 170 && x_pos < 460) {
-            player_motion.position.y = half_height + 170;
+        else if (y_pos < top && x_pos < 500) {
+            if (playerDirection == LEFT) {
+                player_motion.position.x = 500;
+            } else if (playerDirection == UP) {
+                player_motion.position.y = top;
+            }
         }
         // check top right corner
-        else if (y_pos - half_height < 170 && x_pos > 630) {
-            player_motion.position.y = half_height + 170;
+        else if (y_pos < top && x_pos > 600) {
+            if (playerDirection == RIGHT) {
+                player_motion.position.x = 600;
+            } else if (playerDirection == UP) {
+                player_motion.position.y = top;
+            }
         }
-        else if (y_pos - half_height < 0 && x_pos > 460 && x_pos < 630) {
+        else if (y_pos < half_height) {
             screen.game_screen = game_screen_night;
             restart_game();
         }
         // check bottom
-        else if (y_pos + half_height > window_height_px) {
-            player_motion.position.y = window_height_px - half_height;
-        }
-        else {
-            out_of_bounds = 0;
+        else if (y_pos > bottom) {
+            player_motion.position.y = bottom;
         }
 
     }
