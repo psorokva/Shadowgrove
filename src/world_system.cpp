@@ -239,7 +239,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (keeper_spawn_time > KEEPER_SPAWN_FREQ && screen.game_screen == game_screen_night) {
 		keeper_spawn_time = 0.0;
 		vec2 spawn_pos = registry.get_empty_spawn_location();
-		//createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+		createKeeper(renderer, spawn_pos);
 	}
 	
 	// Updating window title with points
@@ -348,7 +348,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 
 		vec2 spawn_pos = registry.get_empty_spawn_location();
-		createPotion(renderer, camera.adjust_to_player(spawn_pos), randomizer);
+		createPotion(renderer, spawn_pos, randomizer);
 		//for (size_t i = 0; i < randomizer.size(); ++i) {
 		//	printf("%d ", randomizer[i]);
 		//}
@@ -1062,7 +1062,7 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	glfwGetCursorPos(window, &xpos, &ypos);
 	const Motion& player_motion = registry.motions.get(player);
 	vec2 mouse_pos = camera.adjust_to_player({ xpos, ypos });
-	std::cout << "x: " << mouse_pos.x << ", y: " << mouse_pos.y << std::endl;
+	//std::cout << "x: " << mouse_pos.x << ", y: " << mouse_pos.y << std::endl;
 	//int chunk_value = registry.get_chunk_value(camera.adjust_to_player(vec2{xpos, ypos}));
 	//MazeLocation mazeLoc = registry.get_maze_location(camera.adjust_to_player(vec2{ xpos, ypos }));
 	//std::cout << "x: " << mazeLoc.col << " y: " << mazeLoc.row << std::endl;
