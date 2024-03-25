@@ -194,24 +194,34 @@ void AISystem::step()
 		float yDiff = player_motion.position[1] - keeper_motion.position[1];
 		float distance = std::sqrt(pow(xDiff, 2) + pow(yDiff, 2));
 
+		vec2 adjusted_keeper_pos = keeper_motion.position;
+		adjusted_keeper_pos.y = adjusted_keeper_pos.y + (KEEPER_HEIGHT / 2) - (TILE_SIZE / 2);
+
+		vec2 adjusted_player_pos = player_motion.position;
+		adjusted_player_pos.y = adjusted_player_pos.y + (PLAYER_HEIGHT / 2);
+
+		// ------- Chase Player state -------
+
 		if (distance < chase_distance)
 		{
 			if (!registry.colors.has(keeper_entity))
 			{
 				registry.colors.insert(keeper_entity, vec3{ 1.0, 0.0, 0.0 });
 			}
-			Direction toGo = AStar(player_motion.position, keeper_motion.position);
-			keeper.last_direction = toGo;
-			keeper_motion.velocity = direction_to_velocity[toGo];
-			continue;
+			Direction toGo = AStar(adjusted_player_pos, adjusted_keeper_pos);
+			if (toGo != Direction::NONE)
+			{
+				keeper_motion.velocity = direction_to_velocity[toGo] + direction_to_velocity[toGo];
+				keeper.last_direction = toGo;
+				continue;
+			}
 		}
 		else
 		{
 			registry.colors.remove(keeper_entity);
 		}
 
-		vec2 adjusted_keeper_pos = keeper_motion.position;
-		adjusted_keeper_pos.y = adjusted_keeper_pos.y + (KEEPER_HEIGHT / 2) - (TILE_SIZE / 2);
+		// ------- Wander Randomly state -------
 
 		// get possible directions within overall maze
 		MazeLocation loc = get_maze_location(adjusted_keeper_pos);
@@ -228,13 +238,22 @@ void AISystem::step()
 		}
 		if (!dead_end)
 		{
+			keeper_motion.velocity = direction_to_velocity[keeper.last_direction];
 			continue;
 		}
 
 		// shuffle for randomness
 		std::shuffle(std::begin(directions), std::end(directions), rng);
 
-		Direction new_keeper_direction = directions[0];
+		
+		Direction new_keeper_direction;
+		// we could potentially have a scenario in which no direction is valid and then we crash? so adding check here...
+		if ((int)directions.size() == 0)
+		{
+			// hopefully we never end up here
+			new_keeper_direction = Direction::LEFT;
+		}
+		new_keeper_direction = directions[0];
 		keeper.last_direction = new_keeper_direction;
 		keeper_motion.velocity = direction_to_velocity[new_keeper_direction];
 	}
