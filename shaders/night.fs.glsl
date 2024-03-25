@@ -177,4 +177,7 @@ void main() {
     else {
         color = in_color;
     }
+
+    // don't do night stuff for easier debugging rn
+    color = in_color;
 }

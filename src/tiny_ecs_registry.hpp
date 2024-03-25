@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iostream>
 
 #include "tiny_ecs.hpp"
 #include "components.hpp"

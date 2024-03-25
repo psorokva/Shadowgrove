@@ -38,7 +38,23 @@ const int window_height_px = 800; // 1400;
 const int TILE_SIZE = 55;
 const int MAZE_SIZE = 26;
 static bool DEBUG_PRINT = true;
-enum Direction { UP, DOWN, LEFT, RIGHT };
+enum Direction { UP, DOWN, LEFT, RIGHT, NONE };
+
+// Location in overall maze. Not limited to within one chunk
+struct MazeLocation {
+	int x;
+	int y;
+
+	bool operator == (const MazeLocation& loc) const
+	{
+		return (x == loc.x && y == loc.y);
+	}
+
+	bool operator < (const MazeLocation& loc) const
+	{
+		return (x < loc.x) || ((x == loc.x) && (y < loc.y));
+	}
+};
 
 const float NIGHT_DURATION = 60000.0f; // 30 sec
 /// These Durations adjust when light changes in the night shader
