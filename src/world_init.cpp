@@ -536,8 +536,8 @@ Entity createSign2() {
     auto& day = registry.screenStates.emplace(entity);
 
     auto& fixed = registry.immobiles.emplace(entity);
-    fixed.position = { 0.4 * window_width_px, 0.23 * window_height_px };
-    fixed.scale = { 100, 100 };
+    fixed.position = { 0.35 * window_width_px, 0.20 * window_height_px };
+    fixed.scale = { 150, 150 };
 
     Daytime& sign = registry.daytimes.emplace(entity);
 
@@ -608,8 +608,8 @@ Entity createLogo() {
     auto& day = registry.screenStates.emplace(entity);
 
     auto& fixed = registry.immobiles.emplace(entity);
-    fixed.position = { 0.5 * window_width_px, 0.3 * window_height_px };
-    fixed.scale = { 1000, 500 };
+    fixed.position = { 0.5 * window_width_px, 0.4 * window_height_px };
+    fixed.scale = { 1000, 300 };
 
     Daytime& logo = registry.daytimes.emplace(entity);
 
