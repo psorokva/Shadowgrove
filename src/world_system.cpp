@@ -24,7 +24,8 @@ Direction playerDirection;
 const uint NUM_POTIONS = 8;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
-const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+float keeper_rate = 10.0;
+float KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
@@ -506,8 +507,15 @@ void WorldSystem::restart_game() {
         generator->createWorldMap();
 		if (level < 9) {
 			level++;
+			keeper_rate-= 0.8;
+			KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 		}
-        createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+		for (int k = 0; k < level +2; k++) {
+			vec2 spawn_point = registry.get_empty_spawn_location();
+			createKeeper(renderer, spawn_point);
+		}
+
+        
     }
     else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely

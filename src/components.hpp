@@ -398,7 +398,9 @@ enum class TEXTURE_ASSET_ID {
     LOGO_00 = HELPTORCH + 1,
     LOGO_01 = LOGO_00 + 1,
 	TORCH_00 = LOGO_01 + 1,
-	TEXTURE_COUNT = TORCH_00 + 1
+	WIN0 = TORCH_00 + 1,
+	WIN1 = WIN0 + 1,
+	TEXTURE_COUNT = WIN1 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
