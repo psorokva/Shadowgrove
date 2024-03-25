@@ -14,8 +14,8 @@
 #include <sstream>
 
 // setup fonts
-//std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
-std::string font_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
+std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+//std::string font_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
 unsigned int font_default_size = 48;
 // fonts
 std::map<char, Character> m_ftCharacters;	// map of all characters and their textures
