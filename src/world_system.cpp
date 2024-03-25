@@ -420,6 +420,12 @@ void WorldSystem::restart_game() {
 		registry.remove_all_components_of(registry.chunks.entities.back());
 	while (registry.players.entities.size() > 0)
 		registry.remove_all_components_of(registry.players.entities.back());
+    for (Entity entity : registry.textRenderRequests.entities)
+    {
+        if (!registry.pauses.has(entity)) {
+            registry.remove_all_components_of(entity);
+        }
+    }
 //    while (registry.screenStates.entities.size() > 0)
 //        registry.remove_all_components_of(registry.screenStates.entities.back());
 	//registry.clear_all_components();
@@ -461,6 +467,7 @@ void WorldSystem::restart_game() {
 	//night_counter.counter_ms = NIGHT_DURATION;
 
     if (screen.game_screen == game_screen_night) {
+        printf("in game night screen");
         // Playing background music indefinitely
 		createNight();
         Mix_PlayMusic(night_music, -1);
@@ -482,32 +489,47 @@ void WorldSystem::restart_game() {
         printf("day entity init %zu\n", day);
 
         if (screen.game_screen == game_screen_day) {
+            printf("in game day screen");
             createDog({ 0.85 * window_width_px, 0.75 * window_height_px });
 
             createSign();
             createSign2();
-        } else if (screen.game_screen == game_screen_main_menu) {
+        } else {
+            printf("in game start screen");
             createDog({ 0.3 * window_width_px, 0.8 * window_height_px });
 
             createLogo();
 
-//            auto entity = Entity();
-//            registry.textRenderRequests.insert(entity,
-//                                               {
-//                                                       "Press space key to start", vec2(0.2 * window_width_px, 0.75 * window_height_px) // might need to adjust position
-//                                               });
+            auto spaceKeyText = Entity();
+            registry.textRenderRequests.insert(spaceKeyText,
+                                               {
+                                                       "Press space key to start", vec2(0.3 * window_width_px, 0.4 * window_height_px) // might need to adjust position
+                                               });
+            TextRenderRequest& text = registry.textRenderRequests.get(spaceKeyText);
+            text.scale = 0.6;
         }
 
     } else if (screen.game_screen == game_screen_game_over) {
+        auto entity = Entity();
+        registry.textRenderRequests.insert(entity,
+                                           {"Game over", vec2(0.5 * window_width_px, 0.5 * window_height_px)});
+        auto spaceKeyText = Entity();
+        registry.textRenderRequests.insert(spaceKeyText,
+                                           {
+                                                   "Press space key to restart", vec2(0.3 * window_width_px, 0.4 * window_height_px) // might need to adjust position
+                                           });
+        TextRenderRequest& text = registry.textRenderRequests.get(spaceKeyText);
+        text.scale = 0.6;
+
+        printf("in game over screen");
+
         Entity end_keeper = createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
         Motion& keeper_motion = registry.motions.get(end_keeper);
         keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
         keeper_motion.scale *= 4;
         keeper_motion.velocity = {0,0};
 
-//        auto entity = Entity();
-//        registry.textRenderRequests.insert(entity,
-//                                           {"Game over", vec2(0.5 * window_width_px, 0.5 * window_height_px)});
+
     } else if (screen.game_screen == game_screen_win) {
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
@@ -573,7 +595,7 @@ void WorldSystem::pause_game() {
     registry.pauses.emplace(entity);
 	registry.textRenderRequests.insert(entity,
 		{
-			"PAUSED", vec2(window_width_px / 2, window_height_px / 2) // might need to adjust position
+			"PAUSED", vec2(0.4 * window_width_px, 0.5 * window_height_px) // might need to adjust position
 		});
 	for (Motion& motion : registry.motions.components) {
 		motion.velocity = { 0, 0 };
