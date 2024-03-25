@@ -366,6 +366,7 @@ FodyWeavers.xsd
 /ext/project_path.hpp
 
 # CMake generated files
+CMakeLists.txt
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
