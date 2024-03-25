@@ -216,6 +216,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		// switch to day after night timer expired
 		if (night_counter.counter_ms < 0) {
 			registry.nightTimer.clear();
+
 			screen.game_screen = game_screen_day;
 			screen.torch_mode = 0;
 
@@ -364,7 +365,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			screen.darken_screen_factor = 0;
             screen.game_screen = game_screen_game_over;
             player_component.alive = 0;
-//            restart_game();
+            restart_game();
 			return true;
 		}
 	}
@@ -403,7 +404,7 @@ void WorldSystem::restart_game() {
 
 	printf("Restarting\n");
 
-	game_paused = false;
+    game_paused = false;
 
 	// Reset the game speed
 	current_speed = 1.f;
@@ -441,7 +442,6 @@ void WorldSystem::restart_game() {
 
 	// vec2(start_x, start_y);
 	registry.inventory.emplace(player);
-    Player& player_component = registry.players.components[0];
 
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
@@ -461,14 +461,35 @@ void WorldSystem::restart_game() {
 
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
-
+    Player& player_component = registry.players.components[0];
     ScreenState &screen = registry.screenStates.components[0];
 
+    if (screen.game_screen == game_screen_game_over) {
+//        printf("in game over screen\n");
 
-	//night_counter.counter_ms = NIGHT_DURATION;
+        auto over = Entity();
+        registry.textRenderRequests.insert(over,
+                                           {"Game over", vec2(0.33 * window_width_px, 0.5 * window_height_px)});
+        TextRenderRequest& over_text = registry.textRenderRequests.get(over);
+        over_text.scale = 1.2;
+        auto spaceKey = Entity();
+        registry.textRenderRequests.insert(spaceKey,
+                                           {
+                                                   "Press space key to restart", vec2(0.27 * window_width_px, 0.4 * window_height_px) // might need to adjust position
+                                           });
+        TextRenderRequest& spaceKeyText = registry.textRenderRequests.get(spaceKey);
+        spaceKeyText.scale = 0.6;
 
-    if (screen.game_screen == game_screen_night) {
-        printf("in game night screen");
+        Entity end_keeper = createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+        Motion& keeper_motion = registry.motions.get(end_keeper);
+        keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
+        keeper_motion.scale *= 4;
+        keeper_motion.velocity = {0,0};
+
+        player_component.alive = 0;
+    }
+    else if (screen.game_screen == game_screen_night) {
+        printf("in game night screen\n");
         // Playing background music indefinitely
 		createNight();
         Mix_PlayMusic(night_music, -1);
@@ -479,28 +500,31 @@ void WorldSystem::restart_game() {
 			level++;
 		}
         createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
-    } else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
+    }
+    else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
+        printf("here\n");
 
         Motion& player_motion = registry.motions.get(player);
         player_motion.position = { 0.6 * window_width_px, 0.75 * window_height_px };
         // put player alive again
         player_component.alive = 1;
         player_motion.scale = { 2 * 60, 2 * 80 };
+        printf("created player\n");
 
         Entity day = createDay();
         printf("day entity init %zu\n", day);
 
         if (screen.game_screen == game_screen_day) {
-            printf("in game day screen");
+            printf("in game day screen\n");
             createDog({ 0.85 * window_width_px, 0.75 * window_height_px });
 
             createSign();
             createSign2();
         } else {
-            printf("in game start screen");
+            printf("in game start screen\n");
             createDog({ 0.3 * window_width_px, 0.8 * window_height_px });
 
             createLogo();
@@ -514,28 +538,8 @@ void WorldSystem::restart_game() {
             text.scale = 0.6;
         }
 
-    } else if (screen.game_screen == game_screen_game_over) {
-        auto entity = Entity();
-        registry.textRenderRequests.insert(entity,
-                                           {"Game over", vec2(0.5 * window_width_px, 0.5 * window_height_px)});
-        auto spaceKeyText = Entity();
-        registry.textRenderRequests.insert(spaceKeyText,
-                                           {
-                                                   "Press space key to restart", vec2(0.3 * window_width_px, 0.4 * window_height_px) // might need to adjust position
-                                           });
-        TextRenderRequest& text = registry.textRenderRequests.get(spaceKeyText);
-        text.scale = 0.6;
-
-        printf("in game over screen");
-
-        Entity end_keeper = createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
-        Motion& keeper_motion = registry.motions.get(end_keeper);
-        keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
-        keeper_motion.scale *= 4;
-        keeper_motion.velocity = {0,0};
-
-
-    } else if (screen.game_screen == game_screen_win) {
+    }
+    else if (screen.game_screen == game_screen_win) {
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
