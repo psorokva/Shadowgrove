@@ -808,10 +808,10 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
 	// Reset collision flags
-	blockedNorth = false;
+	/*blockedNorth = false;
 	blockedSouth = false;
 	blockedWest = false;
-	blockedEast = false;
+	blockedEast = false;*/
 
     // handle boundaries during daytime
     ScreenState& screen = registry.screenStates.components[0];
@@ -1052,14 +1052,14 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 playerDirection = RIGHT;
                 RenderRequest& r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-                if (!blockedEast) {
-                    motion.velocity = vec2(CHARACTER_SPEED, 0.f);
-                    if (screen.game_screen == game_screen_day) {
-                        motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                    } else {
-                        motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
-                    }
+                //motion.velocity = vec2(CHARACTER_SPEED, 0.f);
+				motion.velocity.x += CHARACTER_SPEED;
+                if (screen.game_screen == game_screen_day) {
+                    motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
+                } else {
+                    motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
+               
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
@@ -1068,14 +1068,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 playerDirection = LEFT;
                 RenderRequest &r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID) (animation_cycle + 1);
-                if (!blockedWest) {
-                    motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
-                    if (screen.game_screen == game_screen_day) {
-                        motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                    } else {
-                        motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
-                    }
-                }
+               
+                //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
+				motion.velocity.x -= CHARACTER_SPEED;
+                if (screen.game_screen == game_screen_day) {
+                    motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
+                } else {
+                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
+                 }
+                
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
