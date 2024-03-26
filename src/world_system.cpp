@@ -238,7 +238,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//f//loat keeper_spawn_time = 0.0f;
 	if (keeper_spawn_time > KEEPER_SPAWN_FREQ && screen.game_screen == game_screen_night) {
 		keeper_spawn_time = 0.0;
-		vec2 spawn_pos = registry.get_empty_spawn_location();
+		vec2 spawn_pos = registry.get_empty_spawn_keeper_location();
 		createKeeper(renderer, spawn_pos);
 	}
 	
@@ -264,12 +264,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// debugging maze tiles
 	draw_chunk_borders();
-
-	//std::cout << "BEFORE" << std::endl;
-	//std::cout << "line x: " << line_motion.position.x << " line y: " << line_motion.position.y << " line camera x: " << line_motion.camera_position.x << "line camera y: " << line_motion.position.y << std::endl;
-
-
 
     camera.step();
 
@@ -514,7 +510,7 @@ void WorldSystem::restart_game() {
 		if (level < 9) {
 			level++;
 		}
-        createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+        //createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
     }
     else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
@@ -826,12 +822,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
-	// ai stepping
-	if (action == GLFW_RELEASE && key == GLFW_KEY_B)
-	{
-		ai.step();
-	}
-
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_L) {
 		chunk_border = !chunk_border;
@@ -1060,8 +1050,8 @@ void WorldSystem::on_mouse_move(vec2 mouse_position) {
 void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
-	const Motion& player_motion = registry.motions.get(player);
-	vec2 mouse_pos = camera.adjust_to_player({ xpos, ypos });
+	//vec2 mouse_pos = camera.adjust_to_player({ xpos, ypos });
+
 	//std::cout << "x: " << mouse_pos.x << ", y: " << mouse_pos.y << std::endl;
 	//int chunk_value = registry.get_chunk_value(camera.adjust_to_player(vec2{xpos, ypos}));
 	//MazeLocation mazeLoc = registry.get_maze_location(camera.adjust_to_player(vec2{ xpos, ypos }));
