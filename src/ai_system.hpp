@@ -20,7 +20,7 @@ public:
 	AISystem();
 	void step();
 private:
-	Direction AISystem::AStar(vec2 player_location, vec2 keeper_location);
+	Direction AStar(vec2 player_location, vec2 keeper_location);
 	const int enemy_velocity_multipler = 80;
 	const int step_size = PLAYER_HEIGHT / 2;
 	const int frames_till_update = 30;

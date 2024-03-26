@@ -270,58 +270,80 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     camera.step();
 
     ai.step();
+//    Entity p = registry.players.entities[0];
+    Motion& p_motion = registry.motions.get(player);
 
-    Entity p = registry.players.entities[0];
-    Motion& p_motion = registry.motions.get(p);
+   createHelp();
 
-    // Displaying health bar
-	auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
-	registry.colors.insert(healthBG, { 0, 0, 0 });
+    if (screen.game_screen == game_screen_night) {
+        // Displaying health bar
+        auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
+        registry.colors.insert(healthBG, { 0, 0, 0 });
 
-	auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
-	registry.colors.insert(healthBar, { 1, 0, 0 });
+        auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
+        registry.colors.insert(healthBar, { 1, 0, 0 });
 
-    // inventory bar position on screen
-    vec2 pos = {720, 60};
-    createInventory(pos);
-//    createHelp();
+        // inventory bar position on screen
+        vec2 pos = {720, 60};
+        createInventory(pos);
 
-    for (int i = 0; i < 5; i++) {
-        Inventory& player_inv = registry.inventory.get(p);
-        auto& item = player_inv.holding[i];
 
-        Entity localItem = createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
-		if (player_inv.select_state == i) {
-			registry.motions.get(localItem).scale = { 100, 100 };
-		}
-		else {
-			registry.motions.get(localItem).scale = { 50, 50 };
-		}
+        for (int i = 0; i < 5; i++) {
+            Inventory& player_inv = registry.inventory.get(player);
+            auto& item = player_inv.holding[i];
+
+            Entity localItem = createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
+            if (player_inv.select_state == i) {
+                registry.motions.get(localItem).scale = { 100, 100 };
+            }
+            else {
+                registry.motions.get(localItem).scale = { 50, 50 };
+            }
+        }
     }
 
-	if (registry.inventory.get(p).is_open == true) {
-		createCraftingUI({ pos.x - 300, pos.y + 400});
-		for (int i = 0; i < registry.inventory.get(p).inUI.size(); i++) {
-			Item item = registry.inventory.get(p).inUI[i];
-			createInventoryPotion(item, { pos.x - 500 + (200 * i), pos.y + 190});
-		}
-		checkCrafted();
-		std::vector<unsigned int> allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
-		auto rec1 = std::find(allCrafted.begin(), allCrafted.end(), 1);
-		auto rec2 = std::find(allCrafted.begin(), allCrafted.end(), 2);
-		auto rec3 = std::find(allCrafted.begin(), allCrafted.end(), 3);
-		if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
-			// call for end game - sucess
-		}
-		
-	}
+
+    if (screen.game_screen == game_screen_day) {
+        vec2 pos = {820, 60};
+        createInventory(pos);
+
+        for (int i = 0; i < 5; i++) {
+            Inventory& player_inv = registry.inventory.get(player);
+            auto& item = player_inv.holding[i];
+
+            Entity localItem = createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
+            if (player_inv.select_state == i) {
+                registry.immobiles.get(localItem).scale = { 100, 100 };
+            }
+            else {
+                registry.immobiles.get(localItem).scale = { 50, 50 };
+            }
+        }
+
+        if (registry.inventory.get(player).is_open == true) {
+            createCraftingUI({0.5 * window_width_px, 0.5 * window_height_px});
+            for (int i = 0; i < registry.inventory.get(player).inUI.size(); i++) {
+                Item item = registry.inventory.get(player).inUI[i];
+                Entity e = createInventoryPotion(item, { pos.x - 472 + (197 * i), pos.y + 115});
+                registry.immobiles.get(e).scale = { 90, 90 };
+            }
+            checkCrafted();
+            std::vector<unsigned int> allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
+            auto rec1 = std::find(allCrafted.begin(), allCrafted.end(), 1);
+            auto rec2 = std::find(allCrafted.begin(), allCrafted.end(), 2);
+            auto rec3 = std::find(allCrafted.begin(), allCrafted.end(), 3);
+            if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
+                // call for end game - sucess
+            }
+        }
+    }
 
 	//createShadowOverlay(renderer);
 
 	if (num_of_item_on_screen < NUM_POTIONS) {
 		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10,11 };
 		for (int i = 0; i < 5; i++) {
-			Item& item = registry.inventory.get(p).holding[i];
+			Item& item = registry.inventory.get(player).holding[i];
 			switch (item) {
 				case (magical_mushroom):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 0), randomizer.end());
@@ -462,10 +484,9 @@ void WorldSystem::restart_game() {
 	printf("Restarting\n");
 
     game_paused = false;
-
 	// Reset the game speed
 	current_speed = 1.f;
-    inventory = 0;
+//    inventory = 0;
 	num_of_item_on_screen = 0;
 	// Remove all entities that we created
 	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
@@ -510,10 +531,11 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
-	registry.inventory.get(player).holding.push_back(nullval);
-	save_state.loadInventory();
+//	registry.inventory.get(player).holding.push_back(nullval);
+    registry.inventory.get(player).holding.push_back(magical_grapes);
 
-    createHelp();
+    save_state.loadInventory();
+
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -618,6 +640,29 @@ void WorldSystem::restart_game() {
 		//screen.night_counter_ms = 0;
 
         createDog({ window_width_px / 2, window_height_px - 200 });
+
+        auto win = Entity();
+        registry.textRenderRequests.insert(win,
+                                           {"You win!", vec2(0.35 * window_width_px, 0.64 * window_height_px)});
+        TextRenderRequest& over_text = registry.textRenderRequests.get(win);
+        over_text.scale = 1.4;
+
+        auto savedDog = Entity();
+        registry.textRenderRequests.insert(savedDog,
+                                           {
+                                                   "Congratulations! You saved your beloved dog!", vec2(0.12 * window_width_px, 0.56 * window_height_px) // might need to adjust position
+                                           });
+        TextRenderRequest& savedDogText = registry.textRenderRequests.get(savedDog);
+        savedDogText.scale = 0.6;
+
+        auto spaceKey = Entity();
+        registry.textRenderRequests.insert(spaceKey,
+                                           {
+                                                   "Press space key to play again", vec2(0.23 * window_width_px, 0.5 * window_height_px) // might need to adjust position
+                                           });
+        TextRenderRequest& spaceKeyText = registry.textRenderRequests.get(spaceKey);
+        spaceKeyText.scale = 0.6;
+
 
     }
 
@@ -1110,6 +1155,26 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             registry.nightTimer.clear();
             restart_game();
         }
+    }
+
+    // space to restart
+    if (screen.game_screen == game_screen_win) {
+        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+            printf("in game win screen on key \n");
+            screen.game_screen = game_screen_main_menu;
+//            screen.torch_mode = 0;
+            screen.night_counter_ms = 0;
+            registry.nightTimer.clear();
+            restart_game();
+        }
+    }
+
+    // v to victory screen
+   if (action == GLFW_RELEASE && key == GLFW_KEY_V) {
+       if (screen.game_screen != game_screen_night) {
+           screen.game_screen = game_screen_win;
+           restart_game();
+       }
     }
 
 	// Control the current speed with `<` `>`

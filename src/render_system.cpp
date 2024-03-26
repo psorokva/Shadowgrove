@@ -474,6 +474,26 @@ void RenderSystem::draw() {
         Entity sign = registry.daytimes.entities[2];
         drawTexturedStaticMesh(sign, projection_2D);
 
+        // render inventory lines
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.motions.has(entity)) {
+                if (!registry.immobiles.has(entity)) {
+                    if (registry.debugComponents.has(entity)) {
+                        drawTexturedMesh(entity, projection_2D);
+                    }
+                }
+            }
+        }
+        // render UI screen
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.immobiles.has(entity)) {
+                if (registry.debugComponents.has(entity)) {
+                    drawTexturedStaticMesh(entity, projection_2D);
+                }
+            }
+        }
+
+
         HelpScreen& help = registry.helpScreen.components[0];
         if (help.help == 1) {
             Entity helpScreen = registry.helpScreen.entities[0];
@@ -494,15 +514,6 @@ void RenderSystem::draw() {
     else if (screen.game_screen == game_screen_win) {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
-
-        // render dog
-        Entity dog = registry.daytimes.entities[1];
-        drawTexturedStaticMesh(dog, projection_2D);
-
-        // render player
-        Motion& player_motion = registry.motions.get(player);
-        player_motion.scale = { 2 * 60, 2 * 80 };
-        drawTexturedMesh(player, projection_2D);
 
     }
 
