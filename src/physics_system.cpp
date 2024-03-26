@@ -68,22 +68,26 @@ void PhysicsSystem::setCompass(Entity* entity, Immobile* immobile) {
 
 void PhysicsSystem::step(float elapsed_ms) {
 	
-	ComponentContainer<Motion>& motion_container = registry.motions;
+	auto& motion_registry = registry.motions;
+	//ComponentContainer<Motion>& motion_container = registry.motions;
 	// Check for collisions between player and walls
 	ComponentContainer<Immobile>& immobiles_container = registry.immobiles;
 	Entity player = registry.players.entities[0];
-	Motion& player_motion = motion_container.components[0];
+	Motion& player_motion = motion_registry.components[0];
+	//Motion& player_motion = motion_container.get(player);
 	Motion prev_player_motion = player_motion;
 	float step_seconds = elapsed_ms / 1000.f;
 
-	// Move bug based on how much time has passed, this is to (partially) avoid
+	// Move entities based on how much time has passed, this is to (partially) avoid
 	// having entities move at different speed based on the machine.
-	auto& motion_registry = registry.motions;
+	
 	for (uint i = 0; i < motion_registry.size(); i++) {
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
 
 		motion.position = motion.position + step_seconds * motion.velocity;
+		/*printf("motion.velocity x %f/n", motion.velocity.x);
+		printf("motion.velocity y %f/n", motion.velocity.y);*/
 	}
 
 	for (uint i = 0; i < immobiles_container.components.size(); i++) {
@@ -97,23 +101,21 @@ void PhysicsSystem::step(float elapsed_ms) {
 		}
 	}
 
-	// Check for collisions between all moving entities
-	for(uint i = 0; i<motion_container.components.size(); i++) {
-		Motion& motion_i = motion_container.components[i];
-		Entity entity_i = motion_container.entities[i];
-		
+	// Check for collisions between player and other moving entities
+	//Motion& motion_i = motion_container.get(player);
+	//Entity entity_i = player;
 	// note starting j at i+1 to compare all (i,j) pairs only once (and to not compare with itself)
-	for(uint j = 0; j < motion_container.components.size(); j++) {
-		Entity entity_j = motion_container.entities[j];
-		Motion& motion_j = motion_container.components[j];
-		if (collides(motion_i, motion_j) && entity_i != entity_j) {
+	for(uint j = 1; j < motion_registry.components.size(); j++) {
+		Entity entity_j = motion_registry.entities[j];
+		Motion& motion_j = motion_registry.components[j];
+		if (collides(player_motion, motion_j) && player != entity_j) {
 			// Create a collisions event
 			// We are abusing the ECS system a bit in that we potentially insert multiple collisions for the same entity
-			registry.collisions.emplace_with_duplicates(entity_i, entity_j);
-			registry.collisions.emplace_with_duplicates(entity_j, entity_i);
+			registry.collisions.emplace_with_duplicates(player, entity_j);
+			registry.collisions.emplace_with_duplicates(entity_j, player);
 		}
 	}
-	//}
+	
 
 
 }
