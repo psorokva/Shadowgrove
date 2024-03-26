@@ -15,10 +15,10 @@
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
 
-bool blockedNorth = false;
-bool blockedSouth = false;
-bool blockedEast = false;
-bool blockedWest = false;
+//bool blockedNorth = false;
+//bool blockedSouth = false;
+//bool blockedEast = false;
+//bool blockedWest = false;
 
 Direction playerDirection;
 const uint NUM_POTIONS = 100;
@@ -578,8 +578,7 @@ void WorldSystem::restart_game() {
     else if (screen.game_screen == game_screen_night) {
         printf("in game night screen\n");
         // Playing background music indefinitely
-		// !! TODO uncomment
-		//createNight();
+		createNight();
 
         Mix_PlayMusic(night_music, -1);
         fprintf(stderr, "Loaded music\n");
@@ -730,49 +729,6 @@ void WorldSystem::pause_game() {
 	}
 }
 
-// !! TEMP, move to physics_system when done
-// Returns the local bounding coordinates scaled by the current size of the entity
-vec2 get_bounding_box2(const Motion& motion) {
-	// abs is to avoid negative scale due to the facing direction.
-	return { abs(motion.scale.x), abs(motion.scale.y) };
-}
-
-// Duplicate for collision with walls, might need to change
-vec2 get_bounding_box2(const Immobile& immobile) {
-	// abs is to avoid negative scale due to the facing direction.
-	return { abs(immobile.scale.x), abs(immobile.scale.y) };
-}
-
-
-//vec2 get_new_position(const Motion& motionA, const Immobile& motionB) {
-//
-//	vec2 result;
-//	
-//	if (motionA.position.x < motionB.position.x) { // coming from left
-//		result.x = motionB.position.x - ((motionB.scale.x / 2) + (motionA.scale.x / 2));
-//	}
-//	else if (motionA.position.x >= motionB.position.x) { // coming from right
-//		result.x = motionB.position.x + ((motionB.scale.x / 2) + (motionA.scale.x / 2));
-//	}
-//
-//	if (motionA.position.y < motionB.position.y) { // coming from top
-//		result.y = motionB.position.y - ((motionB.scale.y / 2) + (motionA.scale.y / 2));
-//	}
-//	else if (motionA.position.y >= motionB.position.y) { // coming from bottom
-//		result.y = motionB.position.y + ((motionB.scale.y / 2) + (motionA.scale.y / 2));
-//	}
-//
-//	// if both x & y intersecting, chose the one with least displacement
-//	if (abs(motionA.position.x - result.x) < abs(motionA.position.y - result.y)) {
-//		result.y = motionA.position.y;
-//	}
-//	else {
-//		result.x = motionA.position.x;
-//	}
-//
-//	return result;
-//}
-
 void WorldSystem::resume_game() {
 	
 	game_paused = false;
@@ -803,31 +759,6 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				// Can adjust this
 				//float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
-				
-				//!! TEMP, move back to physics_system after
-				// Change this to AABB
-				
-				//motion_p.position = get_new_position(motion_p, motion_w);
-				//motion_p.position = motion_p.position - diff * 0.5f;
-				
-				
-
-				//printf("within the box\n");
-				
-				//vec2 dp = motion_p.position - motion_w.position;
-				//float dist_squared = dot(dp, dp);
-				//const vec2 other_bonding_box = get_bounding_box2(motion_p) / 2.f;
-				//const float other_r_squared = dot(other_bonding_box, other_bonding_box);
-				//const vec2 my_bonding_box = get_bounding_box2(motion_w) / 2.f;
-				//const float my_r_squared = dot(my_bonding_box, my_bonding_box);
-				//const float r_squared = max(other_r_squared, my_r_squared);
-				//
-				//float multiplier = r_squared / dist_squared;
-				//
-				////if (dist_squared < r_squared) {
-				
-				//motion_p.position = motion_w.position + dp * (float)pow(multiplier,0.5);
-				//motion_p.velocity = vec2(0.0f, 0.0f);
 			
 				//if (playerDirection == UP) {
 				//	//printf("Collided with North wall");
@@ -875,7 +806,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 
 						// Move enemy slightly back after collision (so that player doesn't die instantly)
 						enemy_motion.position = enemy_motion.position + (enemy_motion.velocity * vec2(-0.5, -0.5));
-						Mix_PlayChannel(-1, player_hit_sound, 0); // TODO: replace with "hit" sound
+						Mix_PlayChannel(-1, player_hit_sound, 0);
 					}
 					else {
 						p.health = 0;
@@ -1147,11 +1078,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 playerDirection = UP;
                 RenderRequest& r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-                if (!blockedNorth) {
-                    //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
-					motion.velocity.y -= CHARACTER_SPEED;
-                }
-               // printf("pos: %f %f \n", motion.position.x, motion.position.y);
+                //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
+				motion.velocity.y -= CHARACTER_SPEED;
             }
 
             // Move Down
@@ -1159,11 +1087,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 playerDirection = DOWN;
                 RenderRequest& r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-                if (!blockedSouth) {
-                    //motion.velocity = vec2(0.f, CHARACTER_SPEED);
-					motion.velocity.y += CHARACTER_SPEED;
-                }
-                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
+                //motion.velocity = vec2(0.f, CHARACTER_SPEED);
+				motion.velocity.y += CHARACTER_SPEED;
             }
 
             // Move Right
