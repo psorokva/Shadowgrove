@@ -552,8 +552,8 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
 				//printf("colliding with a wall\n");
-				Motion& motion_p = registry.motions.get(entity);
-				Immobile& motion_w = registry.immobiles.get(entity_other);
+				//Motion& motion_p = registry.motions.get(entity);
+				//Immobile& motion_w = registry.immobiles.get(entity_other);
 				// Can adjust this
 				//float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
@@ -581,7 +581,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				////if (dist_squared < r_squared) {
 				
 				//motion_p.position = motion_w.position + dp * (float)pow(multiplier,0.5);
-				motion_p.velocity = vec2(0.0f, 0.0f);
+				//motion_p.velocity = vec2(0.0f, 0.0f);
 			
 				//if (playerDirection == UP) {
 				//	//printf("Collided with North wall");
