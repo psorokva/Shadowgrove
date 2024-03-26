@@ -8,7 +8,7 @@
 
 // iostream
 #include <iostream>
-
+#include <vector>
 #include "physics_system.hpp"
 
 // Game configuration
@@ -21,7 +21,7 @@ bool blockedEast = false;
 bool blockedWest = false;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 8;
+const uint NUM_POTIONS = 100;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
@@ -298,6 +298,24 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.motions.get(localItem).scale = { 50, 50 };
 		}
     }
+
+	if (registry.inventory.get(p).is_open == true) {
+		createCraftingUI({ pos.x - 300, pos.y + 400});
+		for (int i = 0; i < registry.inventory.get(p).inUI.size(); i++) {
+			Item item = registry.inventory.get(p).inUI[i];
+			createInventoryPotion(item, { pos.x - 500 + (200 * i), pos.y + 190});
+		}
+		checkCrafted();
+		std::vector<unsigned int> allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
+		auto rec1 = std::find(allCrafted.begin(), allCrafted.end(), 1);
+		auto rec2 = std::find(allCrafted.begin(), allCrafted.end(), 2);
+		auto rec3 = std::find(allCrafted.begin(), allCrafted.end(), 3);
+		if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
+			// call for end game - sucess
+		}
+		
+	}
+
 	//createShadowOverlay(renderer);
 
 	if (num_of_item_on_screen < NUM_POTIONS) {
@@ -372,6 +390,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
+
+	for (Entity entity : registry.torches.entities) {
+		// progress timer
+		Torches& counter = registry.torches.get(entity);
+		counter.t_timer -= elapsed_ms_since_last_update;
+		if (counter.t_timer > 0) {
+			screen.torch_mode = 1;
+		}
+		else {
+			screen.torch_mode = 0;
+			registry.torches.remove(entity);
+		}
+	}
+
 	// reduce window brightness if any of the present is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
@@ -398,6 +430,28 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     }
 
 	return true;
+}
+
+void WorldSystem::checkCrafted() {
+	std::vector<Item> UIItem = registry.inventory.get(registry.players.entities[0]).inUI;
+	auto rec1 = std::find(UIItem.begin(), UIItem.end(), magical_mushroom);
+	auto rec2 = std::find(UIItem.begin(), UIItem.end(), green_potion);
+	auto rec3 = std::find(UIItem.begin(), UIItem.end(), orange_potion);
+	auto rec4 = std::find(UIItem.begin(), UIItem.end(), magical_strawberry);
+	auto rec5 = std::find(UIItem.begin(), UIItem.end(), red_potion);
+	auto rec6 = std::find(UIItem.begin(), UIItem.end(), magical_carrot);
+	auto rec7 = std::find(UIItem.begin(), UIItem.end(), magical_grapes);
+	auto rec8 = std::find(UIItem.begin(), UIItem.end(), purple_potion);
+	auto rec9 = std::find(UIItem.begin(), UIItem.end(), magical_apple);
+	if (rec1 != UIItem.end() && rec2 != UIItem.end() && rec3 != UIItem.end()) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back(1);
+	}
+	if (rec4 != UIItem.end() && rec5 != UIItem.end() && rec6 != UIItem.end()) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back(2);
+	}
+	if (rec7 != UIItem.end() && rec8 != UIItem.end() && rec9 != UIItem.end()) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back(3);
+	}
 }
 
 // Reset the world state to its initial state
@@ -854,6 +908,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		registry.inventory.get(registry.players.entities[0]).select_state = 4;
 	}
 
+	if (action == GLFW_RELEASE && key == GLFW_KEY_Z) {
+		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
+		registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+	}
+
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
 		//std::cout << "in here!" << std::endl;
 		while (registry.enemies.entities.size() > 0)
@@ -902,6 +961,31 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
          restart_game();
     }
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_X) {
+		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
+		if (registry.inventory.get(registry.players.entities[0]).is_open == false) {
+			if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == food) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 20;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			}
+			else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
+				registry.torches.emplace(Entity());
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			}
+		}
+		else {
+			if (registry.inventory.get(registry.players.entities[0]).inUI.size() < 3) {
+				registry.inventory.get(registry.players.entities[0]).inUI.push_back(registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state]);
+			}
+		}
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_U) {
+		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
+	}
 
     // Opening help screen
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
