@@ -995,7 +995,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// Exiting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		std::cout << "EXIT GAME" << std::endl;
-		save_state.saveInventory();
+		if (registry.screenStates.components[0].game_screen == game_screen_day) {
+			save_state.saveInventory();
+		}
 		glfwSetWindowShouldClose(window, true);
 	}
 
