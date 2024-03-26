@@ -501,7 +501,12 @@ void WorldSystem::restart_game() {
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
 	//player = createPlayer(renderer, { start_x, start_y });
-	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	
+	//vec2 player_starting_location = registry.get_empty_spawn_location();
+	//player = createPlayer(renderer, player_starting_location);
+
+	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 }); // TODO: update this after
+	
 
 	// vec2(start_x, start_y);
 	registry.inventory.emplace(player);
@@ -707,8 +712,8 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 		if (!game_paused && registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
 		
-			// Checking Player - Wall collisions
-			if (registry.impenetrables.has(entity_other)) {
+			// Checking Player - Wall collisions <- this is handled by physics system now
+			//if (registry.impenetrables.has(entity_other)) {
 				//printf("colliding with a wall\n");
 				//Motion& motion_p = registry.motions.get(entity);
 				//Immobile& motion_w = registry.immobiles.get(entity_other);
@@ -737,7 +742,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				//	blockedEast = true;
 				//	motion.position = motion.position - vec2(offset, 0);
 				//}
-			}
+			//}
 
 			// Checking Player - Enemy collisions
 			if (registry.enemies.has(entity_other)) {
