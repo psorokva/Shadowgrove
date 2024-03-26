@@ -24,12 +24,15 @@ Direction playerDirection;
 const uint NUM_POTIONS = 100;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
-const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
+float keeper_rate = 10.0;
+float KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
+const float TORCH_LENGTH = 25 * 1000.0;
+float torch_timer_ms = TORCH_LENGTH;
 
 bool game_paused = false;
 
@@ -190,6 +193,8 @@ void WorldSystem::createInventory(vec2 pos) {
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
+
+
 	// tabbing out of the game or minimizing the window will pause the game
 	int focused = glfwGetWindowAttrib(window, GLFW_FOCUSED);
 	if (!focused) pause_game();
@@ -242,6 +247,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createKeeper(renderer, spawn_pos);
 	}
 	
+
+
+
 	// Updating window title with points
 	std::stringstream title_ss;
 	//title_ss << "Points: " << points;
@@ -269,12 +277,28 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
     camera.step();
 
+	///  put help back
+	Motion& help_motion = registry.motions.get(help);
+	Immobile& help_immobile = registry.immobiles.get(help);
+	vec2 help_pos = vec2(window_width_px*0.5, window_height_px*0.5);
+	help_motion.position = help_pos;
+	help_motion.camera_position = help_pos;
+	help_immobile.position = help_pos;
+	help_immobile.camera_position = help_pos;
+
+	if ( screen.game_screen == game_screen_win) {
+		Motion& mot = registry.motions.get(win_dance);
+		mot.position = { 400.0, 400.0 + 1.0*(animation_cycle % 2) };
+		RenderRequest& render_request = registry.renderRequests.get(win_dance);
+		TEXTURE_ASSET_ID animation_frame = (TEXTURE_ASSET_ID) (  (int)TEXTURE_ASSET_ID::WIN0 + (animation_cycle % 2) );
+		render_request.used_texture = animation_frame;
+	}
+
     ai.step();
 //    Entity p = registry.players.entities[0];
     Motion& p_motion = registry.motions.get(player);
 
-   createHelp();
-
+//   createHelp();
     if (screen.game_screen == game_screen_night) {
         // Displaying health bar
         auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
@@ -287,6 +311,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         vec2 pos = {720, 60};
         createInventory(pos);
 
+    createHelp();
+//    Entity help = registry.helpScreen.entities[0];
+//    vec2 help_pos = registry.motions.get(help).camera_position;
+//    help_pos = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
 
         for (int i = 0; i < 5; i++) {
             Inventory& player_inv = registry.inventory.get(player);
@@ -496,6 +524,9 @@ void WorldSystem::restart_game() {
 //            registry.remove_all_components_of(entity);
 //        }
 //    }
+	//Entity tempPLayer = player;
+	//Inventory& tempInventory = registry.inventory.get(player);
+
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
 	while (registry.immobiles.entities.size() > 0)
@@ -521,21 +552,32 @@ void WorldSystem::restart_game() {
 	// Create a new player
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
-	player = createPlayer(renderer, { start_x, start_y });
+	//registry.get_empty_spawn_location();
+
+
+	player = createPlayer(renderer, registry.get_empty_spawn_location());
 	//player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 
 	// vec2(start_x, start_y);
+	//if (level > 1) {
+	//	registry.inventory.insert(player,tempInventory);
+	//} else {
 	registry.inventory.emplace(player);
 
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
 	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
+	save_state.loadInventory();
+	//}
 //	registry.inventory.get(player).holding.push_back(nullval);
     registry.inventory.get(player).holding.push_back(magical_grapes);
 
     save_state.loadInventory();
 
+
+    help = createHelp();
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -550,6 +592,7 @@ void WorldSystem::restart_game() {
 
     Player& player_component = registry.players.components[0];
     ScreenState &screen = registry.screenStates.components[0];
+
 
     if (screen.game_screen == game_screen_game_over) {
 //        printf("in game over screen\n");
@@ -583,10 +626,19 @@ void WorldSystem::restart_game() {
         fprintf(stderr, "Loaded music\n");
 		generator->makeNoise(level);
         generator->createWorldMap();
+		Motion& p_motion = registry.motions.get(player);
+		p_motion.position = registry.get_empty_spawn_keeper_location();
 		if (level < 9) {
 			level++;
+			keeper_rate-= 0.8;
+			KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 		}
-        //createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+		for (int k = 0; k < level +2; k++) {
+			vec2 spawn_point = registry.get_empty_spawn_keeper_location();
+			createKeeper(renderer, spawn_point);
+		}
+
+
     }
     else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
@@ -627,6 +679,8 @@ void WorldSystem::restart_game() {
 
     }
     else if (screen.game_screen == game_screen_win) {
+
+
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
@@ -639,7 +693,10 @@ void WorldSystem::restart_game() {
 		//screen.torch_mode = 0;
 		//screen.night_counter_ms = 0;
 
-        createDog({ window_width_px / 2, window_height_px - 200 });
+		win_dance = createWinDance(renderer, { 0.6 * window_width_px, 0.75 * window_height_px });
+		renderer->setDance(win_dance);
+		// get win animation
+
 
         auto win = Entity();
         registry.textRenderRequests.insert(win,
@@ -662,6 +719,9 @@ void WorldSystem::restart_game() {
                                            });
         TextRenderRequest& spaceKeyText = registry.textRenderRequests.get(spaceKey);
         spaceKeyText.scale = 0.6;
+
+
+       // createDog({ window_width_px / 2, window_height_px - 200 });
 
 
     }
@@ -1052,7 +1112,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
 	if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night) {
 		screen.torch_mode = (screen.torch_mode + 1) %2;
-	
+		if (torch_timer_ms == 0.0 && screen.torch_mode == 1) {
+			torch_timer_ms = TORCH_LENGTH;
+		}
+
 	}
 
 	// Debugging
