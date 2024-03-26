@@ -326,7 +326,7 @@ Entity createLine(vec2 position, vec2 scale) {
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-//	motion.position = position;
+	motion.position = position;
 	motion.scale = scale;
 	motion.camera_position = position;
 
@@ -418,6 +418,17 @@ Entity createCompass(vec2 position) {
 	fixed.position.y = position.y;
 	fixed.camera_position.x = position.x;
 	fixed.camera_position.y = position.y;
+	return entity;
+}
+
+Entity createCraftingUI(vec2 position) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ 800, 600 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CRAFTING, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
 

@@ -8,7 +8,7 @@
 
 // iostream
 #include <iostream>
-
+#include <vector>
 #include "physics_system.hpp"
 
 // Game configuration
@@ -21,7 +21,7 @@ bool blockedEast = false;
 bool blockedWest = false;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 8;
+const uint NUM_POTIONS = 100;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
@@ -34,7 +34,7 @@ int level = 0;
 bool game_paused = false;
 
 // Create the bug world
-WorldSystem::WorldSystem() : points(0) {
+WorldSystem::WorldSystem() : points(0), chunk_border(false) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
@@ -238,8 +238,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	//f//loat keeper_spawn_time = 0.0f;
 	if (keeper_spawn_time > KEEPER_SPAWN_FREQ && screen.game_screen == game_screen_night) {
 		keeper_spawn_time = 0.0;
-		vec2 spawn_pos = registry.get_empty_spawn_location();
-		createKeeper(renderer, camera.adjust_to_player(spawn_pos));
+		vec2 spawn_pos = registry.get_empty_spawn_keeper_location();
+		createKeeper(renderer, spawn_pos);
 	}
 	
 	// Updating window title with points
@@ -263,6 +263,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
 		}
 	}
+
+	// debugging maze tiles
+	draw_chunk_borders();
 
     camera.step();
 
@@ -298,6 +301,24 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.motions.get(localItem).scale = { 50, 50 };
 		}
     }
+
+	if (registry.inventory.get(p).is_open == true) {
+		createCraftingUI({ pos.x - 300, pos.y + 400});
+		for (int i = 0; i < registry.inventory.get(p).inUI.size(); i++) {
+			Item item = registry.inventory.get(p).inUI[i];
+			createInventoryPotion(item, { pos.x - 500 + (200 * i), pos.y + 190});
+		}
+		checkCrafted();
+		std::vector<unsigned int> allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
+		auto rec1 = std::find(allCrafted.begin(), allCrafted.end(), 1);
+		auto rec2 = std::find(allCrafted.begin(), allCrafted.end(), 2);
+		auto rec3 = std::find(allCrafted.begin(), allCrafted.end(), 3);
+		if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
+			// call for end game - sucess
+		}
+		
+	}
+
 	//createShadowOverlay(renderer);
 
 	if (num_of_item_on_screen < NUM_POTIONS) {
@@ -344,7 +365,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 
 		vec2 spawn_pos = registry.get_empty_spawn_location();
-		createPotion(renderer, camera.adjust_to_player(spawn_pos), randomizer);
+		createPotion(renderer, spawn_pos, randomizer);
 		//for (size_t i = 0; i < randomizer.size(); ++i) {
 		//	printf("%d ", randomizer[i]);
 		//}
@@ -372,6 +393,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
+
+	for (Entity entity : registry.torches.entities) {
+		// progress timer
+		Torches& counter = registry.torches.get(entity);
+		counter.t_timer -= elapsed_ms_since_last_update;
+		if (counter.t_timer > 0) {
+			screen.torch_mode = 1;
+		}
+		else {
+			screen.torch_mode = 0;
+			registry.torches.remove(entity);
+		}
+	}
+
 	// reduce window brightness if any of the present is dying
 	screen.darken_screen_factor = 1 - min_counter_ms / 3000;
 
@@ -398,6 +433,28 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     }
 
 	return true;
+}
+
+void WorldSystem::checkCrafted() {
+	std::vector<Item> UIItem = registry.inventory.get(registry.players.entities[0]).inUI;
+	auto rec1 = std::find(UIItem.begin(), UIItem.end(), magical_mushroom);
+	auto rec2 = std::find(UIItem.begin(), UIItem.end(), green_potion);
+	auto rec3 = std::find(UIItem.begin(), UIItem.end(), orange_potion);
+	auto rec4 = std::find(UIItem.begin(), UIItem.end(), magical_strawberry);
+	auto rec5 = std::find(UIItem.begin(), UIItem.end(), red_potion);
+	auto rec6 = std::find(UIItem.begin(), UIItem.end(), magical_carrot);
+	auto rec7 = std::find(UIItem.begin(), UIItem.end(), magical_grapes);
+	auto rec8 = std::find(UIItem.begin(), UIItem.end(), purple_potion);
+	auto rec9 = std::find(UIItem.begin(), UIItem.end(), magical_apple);
+	if (rec1 != UIItem.end() && rec2 != UIItem.end() && rec3 != UIItem.end()) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back(1);
+	}
+	if (rec4 != UIItem.end() && rec5 != UIItem.end() && rec6 != UIItem.end()) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back(2);
+	}
+	if (rec7 != UIItem.end() && rec8 != UIItem.end() && rec9 != UIItem.end()) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back(3);
+	}
 }
 
 // Reset the world state to its initial state
@@ -509,7 +566,7 @@ void WorldSystem::restart_game() {
 		if (level < 9) {
 			level++;
 		}
-        createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+        //createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
     }
     else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
@@ -605,8 +662,9 @@ void WorldSystem::restart_game() {
 				if ( c.grid[row][col] > 0) {
 					int major_row = c.y * MAZE_SIZE + row;
 					int major_col = c.x * MAZE_SIZE + col;
-					int plant_x = c.offset_x + col * TILE_SIZE;
-					int plant_y = c.offset_y + row * TILE_SIZE;
+					// add the TILE_SIZE / 2 so that plants are aligned with their respective cell
+					int plant_x = c.offset_x + col * TILE_SIZE + TILE_SIZE / 2;
+					int plant_y = c.offset_y + row * TILE_SIZE + TILE_SIZE / 2;
 					// TODO store plant type in // c.grid[row][col]
 					createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); //
 					//printf("tile: %d %d ", c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col);
@@ -843,6 +901,17 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_L) {
+		chunk_border = !chunk_border;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_O) {
+		for (const auto& chunk : registry.chunks.components) {
+			std::cout << "x: " << chunk.x << " y: " << chunk.y << " offset_x: " << chunk.offset_x << " offset_y: " << chunk.offset_y << std::endl;
+		}
+	}
+
 	// remove items from slot on num key press
 	if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
 		registry.inventory.get(registry.players.entities[0]).select_state = 0;
@@ -862,6 +931,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_5) {
 		registry.inventory.get(registry.players.entities[0]).select_state = 4;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_Z) {
+		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
+		registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
@@ -912,6 +986,31 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
          restart_game();
     }
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_X) {
+		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
+		if (registry.inventory.get(registry.players.entities[0]).is_open == false) {
+			if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == food) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 20;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			}
+			else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
+				registry.torches.emplace(Entity());
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			}
+		}
+		else {
+			if (registry.inventory.get(registry.players.entities[0]).inUI.size() < 3) {
+				registry.inventory.get(registry.players.entities[0]).inUI.push_back(registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state]);
+			}
+		}
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_U) {
+		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
+	}
 
     // Opening help screen
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
@@ -1078,15 +1177,22 @@ void WorldSystem::on_mouse_move(vec2 mouse_position) {
 }
 
 void WorldSystem::on_mouse_click(int button, int action, int mods) {
-	//std::cout << "x: " << mouse_position[0] << ", y: " << mouse_position[1] << std::endl;
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
+	//vec2 mouse_pos = camera.adjust_to_player({ xpos, ypos });
+
+	//std::cout << "x: " << mouse_pos.x << ", y: " << mouse_pos.y << std::endl;
+	//int chunk_value = registry.get_chunk_value(camera.adjust_to_player(vec2{xpos, ypos}));
+	//MazeLocation mazeLoc = registry.get_maze_location(camera.adjust_to_player(vec2{ xpos, ypos }));
+	//std::cout << "x: " << mazeLoc.col << " y: " << mazeLoc.row << std::endl;
+	//int chunk_value = registry.get_chunk_value(mazeLoc);
+	//std::cout << "CHUNK VALUE: " << chunk_value << std::endl;
 
 	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
 //		vec2 spawn_pos = registry.get_empty_spawn_location();
 //		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
 //		createPotion(renderer, camera.adjust_to_player(spawn_pos));
-//		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//if (points <= 5) {
 		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//}
@@ -1094,4 +1200,32 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	}
 	
 	
+}
+
+void WorldSystem::draw_chunk_borders() {
+	if (!chunk_border) {
+		return;
+	}
+	int maze_pixel_size = MAZE_SIZE * TILE_SIZE;
+	int line_width = 10;
+	//std::cout << position_vec.x << ", " << position_vec.y << std::endl;
+	//vec2 scale_vec = 
+	vec3 blue = { 0, 0, 1.0 };
+	for (const auto& chunk : registry.chunks.components) {
+
+		// for grid lines
+		// 
+		for (int i = 0; i < MAZE_SIZE; i++) {
+			Entity vertical_line = createLine(vec2{ chunk.offset_x + i * TILE_SIZE, chunk.offset_y + maze_pixel_size / 2 }, vec2{line_width, maze_pixel_size});
+			Entity horizontal_line = createLine(vec2{ chunk.offset_x + maze_pixel_size / 2, chunk.offset_y + i * TILE_SIZE }, vec2{ maze_pixel_size, line_width });
+			registry.colors.insert(vertical_line, blue);
+			registry.colors.insert(horizontal_line, blue);
+		}
+
+		Entity left_line = createLine(vec2{ chunk.offset_x, chunk.offset_y + maze_pixel_size / 2 }, vec2{ line_width, maze_pixel_size });
+		Entity right_line = createLine(vec2{ chunk.offset_x + maze_pixel_size, chunk.offset_y + maze_pixel_size / 2 }, vec2{ line_width, maze_pixel_size });
+		Entity top_line = createLine(vec2{ chunk.offset_x + maze_pixel_size / 2, chunk.offset_y }, vec2{ maze_pixel_size, line_width });
+		Entity bottom_line = createLine(vec2{ chunk.offset_x + maze_pixel_size / 2, chunk.offset_y + maze_pixel_size }, vec2{ maze_pixel_size, line_width });
+
+	}
 }

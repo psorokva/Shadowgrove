@@ -1,8 +1,11 @@
 #pragma once
 #include <vector>
+#include <iostream>
 
 #include "tiny_ecs.hpp"
 #include "components.hpp"
+
+inline int get_chunk_value(MazeLocation location);
 
 class ECSRegistry {
 	// Callbacks to remove a particular or all entities in the system
@@ -36,6 +39,7 @@ public:
     ComponentContainer<Invincible> invincibles;
 	ComponentContainer<TextRenderRequest> textRenderRequests;
     ComponentContainer<Daytime> daytimes;
+	ComponentContainer<Torches> torches;
     ComponentContainer<Pause> pauses;
 
 	// constructor that adds all containers for looping over them
@@ -66,6 +70,7 @@ public:
         registry_list.push_back(&invincibles);
 		registry_list.push_back(&textRenderRequests);
         registry_list.push_back(&daytimes);
+		registry_list.push_back(&torches);
         registry_list.push_back(&pauses);
 	}
 
@@ -123,7 +128,44 @@ public:
 		//printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
 		//printf("Zero cam pos x %f y %f \n", zero.camera_position.x, zero.camera_position.y);
 		//printf("Zero pos x %f y %f \n", zero.position.x, zero.position.y);
-		location = vec2(chunk.campos_x + c * TILE_SIZE, chunk.campos_y + r * TILE_SIZE) ;
+		location = vec2(chunk.x * MAZE_SIZE * TILE_SIZE + c * TILE_SIZE + TILE_SIZE / 2, chunk.y * MAZE_SIZE * TILE_SIZE + r * TILE_SIZE + TILE_SIZE / 2);
+		return location;
+	}
+
+	vec2 get_empty_spawn_keeper_location() {
+		vec2 location;
+		int num_chunks = chunks.size();
+		if (num_chunks < 1) {
+			return vec2(0.0, 0.0);
+		}
+		Entity& ent = chunks.entities[rand() % num_chunks];
+		// if (num_chunks == 1) { ent = chunks.entities[0]; } // no need for [0] because %1 == 0
+		int count = 0;
+		Chunk& chunk = chunks.get(ent);
+		int r = rand() % MAZE_SIZE;
+		int c = rand() % MAZE_SIZE;
+		bool location_found = false;
+		while (!location_found) {
+			r = rand() % MAZE_SIZE;
+			c = rand() % MAZE_SIZE;
+			count++;
+			int maze_val_below = get_chunk_value(MazeLocation{ chunk.x * MAZE_SIZE + c, chunk.y * MAZE_SIZE + r });
+			int maze_val_above = get_chunk_value(MazeLocation{ chunk.x * MAZE_SIZE + c, chunk.y * MAZE_SIZE + r - 1 });
+
+			if (maze_val_below == 0 && maze_val_above == 0)
+			{
+				location_found = true;
+				break;
+			}
+			//if (chunk.grid[])
+			// just in case a bad full chunk
+			if (count > 16) {
+				count = 0;
+				ent = chunks.entities[rand() % num_chunks];
+				chunk = chunks.get(ent);
+			}
+		}
+		location = vec2(chunk.x * MAZE_SIZE * TILE_SIZE + c * TILE_SIZE + TILE_SIZE / 2, chunk.y * MAZE_SIZE * TILE_SIZE + r * TILE_SIZE + TILE_SIZE / 2);
 		return location;
 	}
 
