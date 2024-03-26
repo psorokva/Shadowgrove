@@ -104,7 +104,7 @@ public:
 		int num_chunks = chunks.size();
 		if (num_chunks < 1) {
 			return vec2(0.0, 0.0);
-		} 
+		}
 		Entity& ent = chunks.entities[rand() % num_chunks];
 		// if (num_chunks == 1) { ent = chunks.entities[0]; } // no need for [0] because %1 == 0
 		int count = 0;
@@ -128,8 +128,7 @@ public:
 		//printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
 		//printf("Zero cam pos x %f y %f \n", zero.camera_position.x, zero.camera_position.y);
 		//printf("Zero pos x %f y %f \n", zero.position.x, zero.position.y);
-		//location = vec2(chunk.x * MAZE_SIZE * TILE_SIZE + c * TILE_SIZE + TILE_SIZE / 2, chunk.y * MAZE_SIZE * TILE_SIZE + r * TILE_SIZE + TILE_SIZE / 2);
-		location = vec2(chunk.campos_x + c * TILE_SIZE + TILE_SIZE / 2, chunk.campos_y + r * TILE_SIZE + TILE_SIZE / 2);
+		location = vec2(chunk.x * MAZE_SIZE * TILE_SIZE + c * TILE_SIZE + TILE_SIZE / 2, chunk.y * MAZE_SIZE * TILE_SIZE + r * TILE_SIZE + TILE_SIZE / 2);
 		return location;
 	}
 

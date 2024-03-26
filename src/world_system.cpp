@@ -521,12 +521,12 @@ void WorldSystem::restart_game() {
 	// Create a new player
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
-	//player = createPlayer(renderer, { start_x, start_y });
+	//player = createPlayer(renderer, { start_x, start_y 
 	
 	//vec2 player_starting_location = registry.get_empty_spawn_location();
 	//player = createPlayer(renderer, player_starting_location);
 
-	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 }); // TODO: update this after
+	player = createPlayer(renderer, vec2{0,0}); // TODO: update this after
 	
 
 	// vec2(start_x, start_y);
@@ -706,6 +706,15 @@ void WorldSystem::restart_game() {
 	// wait();
 	// Debugging for memory/component leaks
 	//torchEntity = createShadowOverlay(renderer);
+
+	if (screen.game_screen == game_screen_night)
+	{
+		vec2 player_spawn = registry.get_empty_spawn_keeper_location();
+
+		registry.motions.get(player).position = player_spawn;
+	}
+
+
 
 	registry.list_all_components();
 
