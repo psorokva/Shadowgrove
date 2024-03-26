@@ -467,12 +467,18 @@ void WorldSystem::checkCrafted() {
 	auto rec9 = std::find(UIItem.begin(), UIItem.end(), magical_apple);
 	if (rec1 != UIItem.end() && rec2 != UIItem.end() && rec3 != UIItem.end()) {
 		registry.inventory.get(registry.players.entities[0]).crafted.push_back(1);
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
+		registry.inventory.get(registry.players.entities[0]).index = {};
 	}
 	if (rec4 != UIItem.end() && rec5 != UIItem.end() && rec6 != UIItem.end()) {
 		registry.inventory.get(registry.players.entities[0]).crafted.push_back(2);
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
+		registry.inventory.get(registry.players.entities[0]).index = {};
 	}
 	if (rec7 != UIItem.end() && rec8 != UIItem.end() && rec9 != UIItem.end()) {
 		registry.inventory.get(registry.players.entities[0]).crafted.push_back(3);
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
+		registry.inventory.get(registry.players.entities[0]).index = {};
 	}
 }
 
