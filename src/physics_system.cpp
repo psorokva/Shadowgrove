@@ -99,7 +99,7 @@ void PhysicsSystem::step(float elapsed_ms) {
 		if (!registry.screenStates.has(entity_i)) {
 			if (collides(player_motion, fixed_i)) {
 				player_motion = prev_player_motion;
-				printf("Colliding with wall\n");
+				//printf("Colliding with wall\n");
 				//Mix_PlayChannel(-1, tree_collision_sound, 0);
 				//// Create a collisions event
 				//registry.collisions.emplace_with_duplicates(player, entity_i);
