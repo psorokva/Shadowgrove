@@ -1122,17 +1122,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                
                 //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
 				motion.velocity.x -= CHARACTER_SPEED;
-                if (screen.game_screen == game_screen_day) {
+                if (screen.game_screen == game_screen_day) 
+				{
                     motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                } else {
-                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
-                 }
-                
-                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
-                    //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
-					motion.velocity.x -= CHARACTER_SPEED;
+                } else 
+				{
                     motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
+                
+                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
 			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
