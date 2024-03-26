@@ -104,7 +104,7 @@ public:
 		int num_chunks = chunks.size();
 		if (num_chunks < 1) {
 			return vec2(0.0, 0.0);
-		} 
+		}
 		Entity& ent = chunks.entities[rand() % num_chunks];
 		// if (num_chunks == 1) { ent = chunks.entities[0]; } // no need for [0] because %1 == 0
 		int count = 0;

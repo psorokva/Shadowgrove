@@ -15,10 +15,10 @@
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
 
-bool blockedNorth = false;
-bool blockedSouth = false;
-bool blockedEast = false;
-bool blockedWest = false;
+//bool blockedNorth = false;
+//bool blockedSouth = false;
+//bool blockedEast = false;
+//bool blockedWest = false;
 
 Direction playerDirection;
 const uint NUM_POTIONS = 100;
@@ -521,8 +521,13 @@ void WorldSystem::restart_game() {
 	// Create a new player
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
-	player = createPlayer(renderer, { start_x, start_y });
-	//player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	//player = createPlayer(renderer, { start_x, start_y 
+	
+	//vec2 player_starting_location = registry.get_empty_spawn_location();
+	//player = createPlayer(renderer, player_starting_location);
+
+	player = createPlayer(renderer, vec2{0,0}); // TODO: update this after
+	
 
 	// vec2(start_x, start_y);
 	registry.inventory.emplace(player);
@@ -579,6 +584,7 @@ void WorldSystem::restart_game() {
         printf("in game night screen\n");
         // Playing background music indefinitely
 		createNight();
+
         Mix_PlayMusic(night_music, -1);
         fprintf(stderr, "Loaded music\n");
 		generator->makeNoise(level);
@@ -701,6 +707,15 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	//torchEntity = createShadowOverlay(renderer);
 
+	if (screen.game_screen == game_screen_night)
+	{
+		vec2 player_spawn = registry.get_empty_spawn_keeper_location();
+
+		registry.motions.get(player).position = player_spawn;
+	}
+
+
+
 	registry.list_all_components();
 
 
@@ -738,7 +753,7 @@ void WorldSystem::resume_game() {
 }
 
 // Compute collisions between entities
-void WorldSystem::handle_collisions() {
+void WorldSystem::handle_collisions(float elapsed_ms) {
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -751,36 +766,37 @@ void WorldSystem::handle_collisions() {
 		if (!game_paused && registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
 		
-			// Checking Player - Wall collisions
-			if (registry.impenetrables.has(entity_other)) {
-
-				Motion& motion = registry.motions.get(entity);
+			// Checking Player - Wall collisions <- this is handled by physics system now
+			//if (registry.impenetrables.has(entity_other)) {
+				//printf("colliding with a wall\n");
+				//Motion& motion_p = registry.motions.get(entity);
+				//Immobile& motion_w = registry.immobiles.get(entity_other);
 				// Can adjust this
-				float offset = 10.0f;
+				//float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
-
-				if (playerDirection == UP) {
-					//printf("Collided with North wall");
-					blockedNorth = true;
-					// Offset player position to stop from going through
-					motion.position = motion.position - vec2(0, -offset);
-				}
-				if (playerDirection == DOWN) {
-					//printf("Collided with South wall");
-					blockedSouth = true;
-					motion.position = motion.position - vec2(0, offset);
-				}
-				if (playerDirection == LEFT) {
-					//printf("Collided with West wall");
-					blockedWest = true;
-					motion.position = motion.position - vec2(-offset, 0);
-				}
-				if (playerDirection == RIGHT) {
-					//printf("Collided with East wall");
-					blockedEast = true;
-					motion.position = motion.position - vec2(offset, 0);
-				}
-			}
+			
+				//if (playerDirection == UP) {
+				//	//printf("Collided with North wall");
+				//	blockedNorth = true;
+				//	// Offset player position to stop from going through
+				//	motion.position = motion.position - vec2(0, -offset);
+				//}
+				//if (playerDirection == DOWN) {
+				//	//printf("Collided with South wall");
+				//	blockedSouth = true;
+				//	motion.position = motion.position - vec2(0, offset);
+				//}
+				//if (playerDirection == LEFT) {
+				//	//printf("Collided with West wall");
+				//	blockedWest = true;
+				//	motion.position = motion.position - vec2(-offset, 0);
+				//}
+				//if (playerDirection == RIGHT) {
+				//	//printf("Collided with East wall");
+				//	blockedEast = true;
+				//	motion.position = motion.position - vec2(offset, 0);
+				//}
+			//}
 
 			// Checking Player - Enemy collisions
 			if (registry.enemies.has(entity_other)) {
@@ -805,7 +821,7 @@ void WorldSystem::handle_collisions() {
 
 						// Move enemy slightly back after collision (so that player doesn't die instantly)
 						enemy_motion.position = enemy_motion.position + (enemy_motion.velocity * vec2(-0.5, -0.5));
-						Mix_PlayChannel(-1, player_hit_sound, 0); // TODO: replace with "hit" sound
+						Mix_PlayChannel(-1, player_hit_sound, 0);
 					}
 					else {
 						p.health = 0;
@@ -851,10 +867,10 @@ void WorldSystem::handle_collisions() {
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
 	// Reset collision flags
-	blockedNorth = false;
+	/*blockedNorth = false;
 	blockedSouth = false;
 	blockedWest = false;
-	blockedEast = false;
+	blockedEast = false;*/
 
     // handle boundaries during daytime
     ScreenState& screen = registry.screenStates.components[0];
@@ -978,7 +994,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
-
+		resume_game(); // this removed paused text
         restart_game();
 	}
 
@@ -1077,10 +1093,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 playerDirection = UP;
                 RenderRequest& r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-                if (!blockedNorth) {
-                    motion.velocity = vec2(0.f, -CHARACTER_SPEED);
-                }
-               // printf("pos: %f %f \n", motion.position.x, motion.position.y);
+                //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
+				motion.velocity.y -= CHARACTER_SPEED;
+				//printf("motion.velocity.y %f/n", motion.velocity.y);
             }
 
             // Move Down
@@ -1088,10 +1103,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 playerDirection = DOWN;
                 RenderRequest& r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-                if (!blockedSouth) {
-                    motion.velocity = vec2(0.f, CHARACTER_SPEED);
-                }
-                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
+                //motion.velocity = vec2(0.f, CHARACTER_SPEED);
+				motion.velocity.y += CHARACTER_SPEED;
             }
 
             // Move Right
@@ -1099,14 +1112,14 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 playerDirection = RIGHT;
                 RenderRequest& r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
-                if (!blockedEast) {
-                    motion.velocity = vec2(CHARACTER_SPEED, 0.f);
-                    if (screen.game_screen == game_screen_day) {
-                        motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                    } else {
-                        motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
-                    }
+                //motion.velocity = vec2(CHARACTER_SPEED, 0.f);
+				motion.velocity.x += CHARACTER_SPEED;
+                if (screen.game_screen == game_screen_day) {
+                    motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
+                } else {
+                    motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
+               
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
@@ -1115,16 +1128,21 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 playerDirection = LEFT;
                 RenderRequest &r = registry.renderRequests.get(player);
                 r.used_texture = (TEXTURE_ASSET_ID) (animation_cycle + 1);
-                if (!blockedWest) {
-                    motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
-                    if (screen.game_screen == game_screen_day) {
-                        motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                    } else {
-                        motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
-                    }
+               
+                //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
+				motion.velocity.x -= CHARACTER_SPEED;
+                if (screen.game_screen == game_screen_day) 
+				{
+                    motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
+                } else 
+				{
+                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
+                
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
+			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
+			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
         }
 
 		// Stop moving when key is released

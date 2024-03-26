@@ -68,7 +68,9 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 	fixed.position = position;
 	fixed.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
 	
-	registry.impenetrables.emplace(entity);
+	auto& wall = registry.impenetrables.emplace(entity);
+	wall.position = position;
+	wall.scale = fixed.scale;
 
 	//add to animation // choppable // etc registry.emplace(entity);
 	if (biome_type == 1) {
