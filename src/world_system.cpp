@@ -330,8 +330,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             checkCrafted();
             std::vector<unsigned int> allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
             auto rec1 = std::find(allCrafted.begin(), allCrafted.end(), 1);
+			if (rec1 != allCrafted.end()) {
+				Entity check = createCheck({ pos.x + 35, pos.y + 320 });
+				registry.immobiles.get(check).scale = { 110, 90 };
+			}
             auto rec2 = std::find(allCrafted.begin(), allCrafted.end(), 2);
+			if (rec2 != allCrafted.end()) {
+				Entity check = createCheck({ pos.x + 35, pos.y + 430 });
+				registry.immobiles.get(check).scale = { 110, 90 };
+			}
             auto rec3 = std::find(allCrafted.begin(), allCrafted.end(), 3);
+			if (rec3 != allCrafted.end()) {
+				Entity check = createCheck({ pos.x + 35, pos.y + 550 });
+				registry.immobiles.get(check).scale = { 110, 90 };
+			}
             if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
                 // call for end game - sucess
             }

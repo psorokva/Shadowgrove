@@ -435,6 +435,26 @@ Entity createCraftingUI(vec2 position) {
 	return entity;
 }
 
+
+Entity createCheck(vec2 position) {
+	auto entity = Entity();
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE + 100, MUSHROOM_SIZE + 50});
+
+	Immobile& fixed = registry.immobiles.emplace(entity);
+	fixed.position = position;
+	fixed.scale = vec2({ 3 * MUSHROOM_SIZE, 3 * MUSHROOM_SIZE });
+
+	registry.debugComponents.emplace(entity);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CHECK, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
+
+
 Entity createInventoryPotion(Item& item, vec2 position) {
     auto entity = Entity();
 
