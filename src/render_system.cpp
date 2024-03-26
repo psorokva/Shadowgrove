@@ -278,6 +278,7 @@ void RenderSystem::drawToScreen() {
 	//NightTimer& nighttime = registry.nightTimer.components[0];
 	GLuint night_timer = glGetUniformLocation(night_program, "night_timer");
 	glUniform1f(night_timer, screen.night_counter_ms);
+
 	GLuint night_length_full = glGetUniformLocation(night_program, "night_length_full");
 	glUniform1f(night_length_full, NIGHT_DURATION);
 	
@@ -294,6 +295,16 @@ void RenderSystem::drawToScreen() {
 	GLuint night_length_5 = glGetUniformLocation(night_program, "night_length_5");
 	glUniform1f(night_length_5, NIGHT_DURATION_5);
 
+    GLuint alive = glGetUniformLocation(night_program, "alive");
+    Player& player = registry.players.components[0];
+    glUniform1i(alive, player.alive);
+
+    GLuint hit = glGetUniformLocation(night_program, "hit");
+    glUniform1i(hit, player.hit);
+
+    GLuint help = glGetUniformLocation(night_program, "help");
+    HelpScreen& help_screen = registry.helpScreen.components[0];
+    glUniform1i(help, help_screen.help);
 
 	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
 	glUniform1i(torch_mode, screen.torch_mode);
@@ -338,6 +349,17 @@ void RenderSystem::drawToScreen() {
 	glUniform1i(light_02, 7);
 	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_02]);
 	gl_has_errors();
+
+	glActiveTexture(GL_TEXTURE8);
+	GLuint helpnight = glGetUniformLocation(night_program, "helpnight");
+	glUniform1i(helpnight, 8);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::HELPNIGHT]);
+
+	glActiveTexture(GL_TEXTURE9);
+	GLuint helptorch = glGetUniformLocation(night_program, "helptorch");
+	glUniform1i(helptorch, 9);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::HELPTORCH]);
+	gl_has_errors();
 	//glUniform1i(shad_00, 0);
 
 	// Draw
@@ -375,52 +397,101 @@ void RenderSystem::draw() {
 
     ScreenState &screen = registry.screenStates.components[0];
 
-    if (screen.game_screen == game_screen_night) {
+    Entity player = registry.players.entities[0];
+    if (screen.game_screen == game_screen_main_menu) {
+        Entity background = registry.daytimes.entities[0];
+        drawTexturedStaticMesh(background, projection_2D);
 
-        // Draw all textured meshes that have a position and size component
-        for (Entity entity: registry.renderRequests.entities) {
-            if (registry.motions.has(entity)) {
-                if (!registry.debugComponents.has(entity)) {
-                    if (!registry.helpScreen.has(entity)) {
-                        drawTexturedMesh(entity, projection_2D);
+        // render dog
+        Entity dog = registry.daytimes.entities[1];
+        drawTexturedStaticMesh(dog, projection_2D);
+
+        // render sign last
+        Entity logo = registry.daytimes.entities[2];
+        drawTexturedStaticMesh(logo, projection_2D);
+
+        // render player
+        Motion& player_motion = registry.motions.get(player);
+        player_motion.scale = { 2 * 60, 2 * 80 };
+        drawTexturedMesh(player, projection_2D);
+
+    }
+    else if (screen.game_screen == game_screen_night) {
+        // if (!registry.deathTimers.has(player)) {
+            // Draw all textured meshes that have a position and size component
+            for (Entity entity: registry.renderRequests.entities) {
+                if (registry.motions.has(entity)) {
+                    if (!registry.debugComponents.has(entity)) {
+                        if (!registry.helpScreen.has(entity)) {
+                            drawTexturedMesh(entity, projection_2D);
+                        }
                     }
                 }
+                    // for non-moving entities (plants and potions)
+                else if (registry.immobiles.has(entity)) {
+                    if (!registry.helpScreen.has(entity)) {
+                        drawTexturedStaticMesh(entity, projection_2D);
+                    }
+                }
+
+                // Note, its not very efficient to access elements indirectly via the entity
+                // albeit iterating through all Sprites in sequence. A good point to optimize
             }
-                // for non-moving entities (plants and potions)
-            else if (registry.immobiles.has(entity)) {
-                if (!registry.helpScreen.has(entity)) {
-                    drawTexturedStaticMesh(entity, projection_2D);
+            // render inventory lines last?
+            for (Entity entity: registry.renderRequests.entities) {
+                if (registry.debugComponents.has(entity)) {
+                    drawTexturedMesh(entity, projection_2D);
                 }
             }
 
-            // Note, its not very efficient to access elements indirectly via the entity
-            // albeit iterating through all Sprites in sequence. A good point to optimize
-        }
-        // render inventory lines last?
-        for (Entity entity: registry.renderRequests.entities) {
-            if (registry.debugComponents.has(entity)) {
-                drawTexturedMesh(entity, projection_2D);
+        // render help screen
+        HelpScreen& help = registry.helpScreen.components[0];
+        if (help.help == 1) {
+            for (Entity entity: registry.renderRequests.entities) {
+                if (registry.helpScreen.has(entity)) {
+                    drawTexturedMesh(entity, projection_2D);
+                }
             }
         }
 
-		// add overlay of shadow
-		//drawTexturedStaticMesh(torchEntity, projection_2D);
+    }
+    else if (screen.game_screen == game_screen_day) {
+        Entity background = registry.daytimes.entities[0];
+        drawTexturedStaticMesh(background, projection_2D);
 
+        // render dog 2nd
+        Entity dog = registry.daytimes.entities[1];
+        drawTexturedStaticMesh(dog, projection_2D);
 
-        // add help screen to night screen
-//        HelpScreen& help = registry.helpScreen.components[0];
-//        if (help.help == 1) {
-//            Entity helpScreen = registry.helpScreen.entities[0];
-//
-//            if (!registry.motions.has(helpScreen)) {
-//                auto &motion = registry.motions.emplace(helpScreen);
-//                motion.position = {window_width_px / 2, 0.75 * window_height_px};
-//                motion.scale = {0.5 * window_width_px, 0.5 * window_height_px};
-//            }
-//            drawTexturedMesh(helpScreen, projection_2D);
-//        }
+        // render danger sign 3rd
+        Entity sign2 = registry.daytimes.entities[3];
+        drawTexturedStaticMesh(sign2, projection_2D);
 
-    } else if (screen.game_screen == game_screen_day) {
+        // render player 2nd last
+        drawTexturedMesh(player, projection_2D);
+
+        // render instruction sign last
+        Entity sign = registry.daytimes.entities[2];
+        drawTexturedStaticMesh(sign, projection_2D);
+
+        HelpScreen& help = registry.helpScreen.components[0];
+        if (help.help == 1) {
+            Entity helpScreen = registry.helpScreen.entities[0];
+            drawTexturedStaticMesh(helpScreen, projection_2D);
+        }
+    }
+    else if (screen.game_screen == game_screen_game_over) {
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.enemies.has(entity)) {
+                Motion& keeper_motion = registry.motions.get(entity);
+                keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
+                keeper_motion.scale = {200, 400};
+                keeper_motion.velocity = {0,0};
+                 drawTexturedMesh(entity, projection_2D);
+            }
+        }
+    }
+    else if (screen.game_screen == game_screen_win) {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
 
@@ -429,27 +500,10 @@ void RenderSystem::draw() {
         drawTexturedStaticMesh(dog, projection_2D);
 
         // render player
-        Entity player = registry.players.entities[0];
         Motion& player_motion = registry.motions.get(player);
         player_motion.scale = { 2 * 60, 2 * 80 };
         drawTexturedMesh(player, projection_2D);
 
-        // render sign last
-        Entity sign = registry.daytimes.entities[2];
-        drawTexturedStaticMesh(sign, projection_2D);
-
-
-        HelpScreen& help = registry.helpScreen.components[0];
-        if (help.help == 1) {
-            Entity helpScreen = registry.helpScreen.entities[0];
-
-            if (!registry.immobiles.has(helpScreen)) {
-                auto &fixed = registry.immobiles.emplace(helpScreen);
-                fixed.position = {window_width_px / 2, 0.75 * window_height_px};
-                fixed.scale = {0.5 * window_width_px, 0.5 * window_height_px};
-            }
-            drawTexturedStaticMesh(helpScreen, projection_2D);
-        }
     }
 
 	glm::mat4 trans = glm::mat4(1.0f);
@@ -463,8 +517,8 @@ void RenderSystem::draw() {
 	// Render all text in the registry
 	for (Entity entity : registry.textRenderRequests.entities)
 	{
-		// TextRenderRequest request = registry.textRenderRequests.get(entity);
-		// renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+		TextRenderRequest request = registry.textRenderRequests.get(entity);
+		renderText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
 	}
 
 	// Truely render to the screen

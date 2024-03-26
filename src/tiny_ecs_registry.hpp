@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iostream>
 
 #include "tiny_ecs.hpp"
 #include "components.hpp"
@@ -37,6 +38,7 @@ public:
 	ComponentContainer<TextRenderRequest> textRenderRequests;
     ComponentContainer<Daytime> daytimes;
 	ComponentContainer<Torches> torches;
+    ComponentContainer<Pause> pauses;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -67,6 +69,7 @@ public:
 		registry_list.push_back(&textRenderRequests);
         registry_list.push_back(&daytimes);
 		registry_list.push_back(&torches);
+        registry_list.push_back(&pauses);
 	}
 
 	void clear_all_components() {
@@ -123,7 +126,7 @@ public:
 		//printf("Desired Chunk x %x y %x \n", chunk.x, chunk.y);
 		//printf("Zero cam pos x %f y %f \n", zero.camera_position.x, zero.camera_position.y);
 		//printf("Zero pos x %f y %f \n", zero.position.x, zero.position.y);
-		location = vec2(chunk.campos_x + c * TILE_SIZE, chunk.campos_y + r * TILE_SIZE) ;
+		location = vec2(chunk.x * MAZE_SIZE + c * TILE_SIZE, chunk.y * MAZE_SIZE + r * TILE_SIZE);
 		return location;
 	}
 

@@ -15,6 +15,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
 	motion.scale = vec2({ PLAYER_WIDTH, PLAYER_HEIGHT });
+
 	motion.camera_position = { window_width_px / 2, window_height_px / 2 };
 	
 
@@ -160,7 +161,7 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 		} else {
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_17, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 		}
-	} else {
+	} else if (biome_type == 5) {
 		if (plant_type == 1) {
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 		} else if (plant_type == 2) {
@@ -181,6 +182,116 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_08, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 		} else {
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_09, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+	} else if (biome_type == 6) {
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_26, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_27, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_28, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_29, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_30, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_31, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_32, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_33, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_34, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_35, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+	} else if (biome_type == 7) {
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_12, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_13, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_14, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_15, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_16, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_17, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_18, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_19, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_20, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::MUSH_21, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+	} else if (biome_type == 8) {
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_27, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_28, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_29, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_30, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_31, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_22, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_21, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_20, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_19, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_18, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+	} else if (biome_type == 9) {
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_23, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_24, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_25, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PLANT_26, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_35, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_36, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_37, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_38, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_39, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_40, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		}
+	} else {
+		if (plant_type == 1) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 2) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 3) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 4) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 5) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 6) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_05, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 7) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_18, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 8) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_19, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else if (plant_type == 9) {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_20, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+		} else {
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUSH_21, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 		}
 	}
 
@@ -215,7 +326,7 @@ Entity createLine(vec2 position, vec2 scale) {
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0, 0 };
-//	motion.position = position;
+	motion.position = position;
 	motion.scale = scale;
 	motion.camera_position = position;
 
@@ -425,7 +536,24 @@ Entity createSign() {
     Daytime& sign = registry.daytimes.emplace(entity);
 
     // TEXTURE_COUNT indicates that no txture is needed
-    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::SIGN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::SIGN_01, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}
+
+Entity createSign2() {
+    auto entity = Entity();
+
+    auto& day = registry.screenStates.emplace(entity);
+
+    auto& fixed = registry.immobiles.emplace(entity);
+    fixed.position = { 0.35 * window_width_px, 0.20 * window_height_px };
+    fixed.scale = { 150, 150 };
+
+    Daytime& sign = registry.daytimes.emplace(entity);
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::SIGN_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
 }
@@ -441,8 +569,16 @@ Entity createNight() {
 Entity createHelp() {
     auto entity = Entity();
 
-    auto& help = registry.helpScreen.emplace(entity);
+    HelpScreen& help = registry.helpScreen.emplace(entity);
 
+    Motion& help_motion = registry.motions.emplace(entity);
+//    help_motion.position = {2000, 2000};
+    help_motion.scale = {0.5 * window_width_px, 0.5 * window_height_px};
+    help_motion.camera_position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+
+    auto &fixed = registry.immobiles.emplace(entity);
+    fixed.position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+    fixed.scale = {0.5 * window_width_px +2.0, 0.5 * window_height_px};
     // TEXTURE_COUNT indicates that no txture is needed
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::HELP_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
@@ -468,11 +604,28 @@ Entity createDog(vec2 position) {
 
     Immobile& immobile = registry.immobiles.emplace(entity);
     immobile.position = position;
-    immobile.scale = vec2({ 1.5 * 135, 1.5 * 60 });
+    immobile.scale = vec2({ 1.6 * 135, 1.6 * 60 });
     immobile.camera_position = { window_width_px / 4, window_height_px / 4 };
 
     Daytime& dog = registry.daytimes.emplace(entity);
 
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DOG, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
+}
+
+Entity createLogo() {
+    auto entity = Entity();
+
+    auto& day = registry.screenStates.emplace(entity);
+
+    auto& fixed = registry.immobiles.emplace(entity);
+    fixed.position = { 0.5 * window_width_px, 0.4 * window_height_px };
+    fixed.scale = { 1000, 300 };
+
+    Daytime& logo = registry.daytimes.emplace(entity);
+
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::LOGO_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
 }

@@ -13,22 +13,32 @@ struct Chunk {
 	float campos_x = 0;
 	float campos_y = 0;
 	int grid[MAZE_SIZE][MAZE_SIZE] = {
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1},
-		{0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0},
-		{0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1},
-		{1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1},
-		{1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1},
-		{1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1},
-		{1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1},
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	};
 };
 
@@ -64,9 +74,15 @@ struct Impenetrable {
 // Player component
 struct Player {
 	unsigned int health;
+    int alive = 1;
+    int hit = 0;
 };
 
 struct Daytime {
+
+};
+
+struct Pause {
 
 };
 
@@ -74,8 +90,8 @@ struct Daytime {
 struct Enemy {
 	unsigned int attack;
 	int frame_count = 0;
-	std::set<Direction> last_possible_directions;
-	Direction last_direction;
+	//std::set<Direction> last_possible_directions;
+	Direction last_direction = Direction::NONE;
 	Entity e_id;
 };
 
@@ -179,12 +195,13 @@ enum Game_screens {
     game_screen_night,
     game_screen_day,
     game_screen_game_over,
+    game_screen_win,
 };
 
 // Sets the brightness of the screen
 struct ScreenState {
 	float darken_screen_factor = -1;
-    Game_screens game_screen = game_screen_day;
+    Game_screens game_screen = game_screen_main_menu;
 	int torch_mode = 0;
 	int torch_anim = 0;
 	float night_counter_ms = 0;
@@ -301,7 +318,23 @@ enum class TEXTURE_ASSET_ID {
 	BUSH_22 = BUSH_21 + 1,
 	BUSH_23 = BUSH_22 + 1,
 	BUSH_24 = BUSH_23 + 1,
-	MUSH_00 = BUSH_24 + 1,
+	BUSH_25 = BUSH_24 + 1,
+	BUSH_26 = BUSH_25 + 1,
+	BUSH_27 = BUSH_26 + 1,
+	BUSH_28 = BUSH_27 + 1,
+	BUSH_29 = BUSH_28 + 1,
+	BUSH_30 = BUSH_29 + 1,
+	BUSH_31 = BUSH_30 + 1,
+	BUSH_32 = BUSH_31 + 1,
+	BUSH_33 = BUSH_32 + 1,
+	BUSH_34 = BUSH_33 + 1,
+	BUSH_35 = BUSH_34 + 1,
+	BUSH_36 = BUSH_35 + 1,
+	BUSH_37 = BUSH_36 + 1,
+	BUSH_38 = BUSH_37 + 1,
+	BUSH_39 = BUSH_38 + 1,
+	BUSH_40 = BUSH_39 + 1,
+	MUSH_00 = BUSH_40 + 1,
 	MUSH_01 = MUSH_00 + 1,
 	MUSH_02 = MUSH_01 + 1,
 	MUSH_03 = MUSH_02 + 1,
@@ -314,7 +347,16 @@ enum class TEXTURE_ASSET_ID {
 	MUSH_10 = MUSH_09 + 1,
 	MUSH_11 = MUSH_10 + 1,
 	MUSH_12 = MUSH_11 + 1,
-	PLANT_00 = MUSH_12 + 1,
+	MUSH_13 = MUSH_12 + 1,
+	MUSH_14 = MUSH_13 + 1,
+	MUSH_15 = MUSH_14 + 1,
+	MUSH_16 = MUSH_15 + 1,
+	MUSH_17 = MUSH_16 + 1,
+	MUSH_18 = MUSH_17 + 1,
+	MUSH_19 = MUSH_18 + 1,
+	MUSH_20 = MUSH_19 + 1,
+	MUSH_21 = MUSH_20 + 1,
+	PLANT_00 = MUSH_21 + 1,
 	PLANT_01 = PLANT_00 + 1,
 	PLANT_02 = PLANT_01 + 1,
 	PLANT_03 = PLANT_02 + 1,
@@ -332,10 +374,25 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_15 = PLANT_14 + 1,
 	PLANT_16 = PLANT_15 + 1,
 	PLANT_17 = PLANT_16 + 1,
-	DAY_SCREEN = PLANT_17 + 1,
+	PLANT_18 = PLANT_17 + 1,
+	PLANT_19 = PLANT_18 + 1,
+	PLANT_20 = PLANT_19 + 1,
+	PLANT_21 = PLANT_20 + 1,
+	PLANT_22 = PLANT_21 + 1,
+	PLANT_23 = PLANT_22 + 1,
+	PLANT_24 = PLANT_23 + 1,
+	PLANT_25 = PLANT_24 + 1,
+	PLANT_26 = PLANT_25 + 1,
+	PLANT_27 = PLANT_26 + 1,
+	PLANT_28 = PLANT_27 + 1,
+	PLANT_29 = PLANT_28 + 1,
+	PLANT_30 = PLANT_29 + 1,
+	PLANT_31 = PLANT_30 + 1,
+	DAY_SCREEN = PLANT_31 + 1,
     HELP_SCREEN = DAY_SCREEN +1,
-    SIGN = HELP_SCREEN + 1,
-	TORCHLIGHT_00 = SIGN + 1,
+    SIGN_01 = HELP_SCREEN + 1,
+    SIGN_02 = SIGN_01 +1,
+	TORCHLIGHT_00 = SIGN_02 + 1,
 	TORCHLIGHT_01 = TORCHLIGHT_00 + 1,
 	TORCHLIGHT_02 = TORCHLIGHT_01 + 1,
 	SHADOW_00 = TORCHLIGHT_02 + 1,
@@ -344,7 +401,11 @@ enum class TEXTURE_ASSET_ID {
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
 	TORCH_00 = MIDNIGHT_01 + 1,
 	CRAFTING = TORCH_00 + 1,
-	TEXTURE_COUNT = CRAFTING + 1
+	HELPNIGHT = CRAFTING + 1,
+	HELPTORCH = HELPNIGHT + 1,
+    LOGO_00 = HELPTORCH + 1,
+    LOGO_01 = LOGO_00 + 1,
+	TEXTURE_COUNT = LOGO_01 + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -376,5 +437,13 @@ struct TextRenderRequest {
 	vec2 position = vec2(1.0f, 1.0f);
 	float scale = 1.0f;
 	vec3 color = vec3(1.0f, 1.0f, 1.0f); // default white
+};
+
+struct ChunkStitch {
+	int ch1x = 0;
+	int ch2x = 0;
+	int ch1y = 0;
+	int ch2y = 0;
+	int location = 0;
 };
 
