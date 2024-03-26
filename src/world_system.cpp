@@ -672,6 +672,12 @@ void WorldSystem::pause_game() {
 		{
 			"PAUSED", vec2(0.4 * window_width_px, 0.5 * window_height_px) // might need to adjust position
 		});
+	auto entity2 = Entity();
+	registry.pauses.emplace(entity2);
+	registry.textRenderRequests.insert(entity2,
+		{
+			"Press P to unpause", vec2(0.38 * window_width_px, 0.5 * window_height_px - 30.f), 0.5f
+		});
 	for (Motion& motion : registry.motions.components) {
 		motion.velocity = { 0, 0 };
 	}
@@ -681,7 +687,7 @@ void WorldSystem::resume_game() {
 	
 	game_paused = false;
 	// Remove "Paused" text 
-	if (registry.pauses.size() > 0) {
+	while (registry.pauses.size() > 0) {
 		registry.remove_all_components_of(registry.pauses.entities[0]);
 	}
 }
