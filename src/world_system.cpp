@@ -709,8 +709,9 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 		
 			// Checking Player - Wall collisions
 			if (registry.impenetrables.has(entity_other)) {
-			
-				Motion& motion = registry.motions.get(entity);
+				//printf("colliding with a wall\n");
+				//Motion& motion_p = registry.motions.get(entity);
+				//Immobile& motion_w = registry.immobiles.get(entity_other);
 				// Can adjust this
 				//float offset = 10.0f;
                 // Mix_PlayChannel(-1, tree_collision_sound, 0);
