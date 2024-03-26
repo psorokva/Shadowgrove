@@ -13,7 +13,7 @@ public:
 	void loadInventory();
 
 private:
-//	std::string filePath = "../../../data/saveState/saveState.txt";
-    std::string filePath = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/saveState/saveState.txt";
+	std::string filePath = "../../../data/saveState/saveState.txt";
+//    std::string filePath = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/saveState/saveState.txt";
 	int loaded;
 };
