@@ -168,6 +168,11 @@ struct Immobile {
 	vec2 camera_position = { 0, 0 };
 };
 
+struct UIComp {
+	vec2 position = { 0, 0 };
+	vec2 scale = { 10, 10 };
+};
+
 // Stucture to store collision information
 struct Collision {
 	// Note, the first object is stored in the ECS container.entities
