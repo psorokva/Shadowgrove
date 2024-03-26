@@ -190,10 +190,6 @@ void WorldSystem::createInventory(vec2 pos) {
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
-	// tabbing out of the game or minimizing the window will pause the game
-	int focused = glfwGetWindowAttrib(window, GLFW_FOCUSED);
-	if (!focused) pause_game();
-
 	// Don't do anything if game is paused
 	if (game_paused) return true;
 
@@ -201,7 +197,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	ScreenState& screen = registry.screenStates.components[0];
     Player& player_component = registry.players.components[0];
 
-    // dont do anything if player is dead
+	// tabbing out of the game or minimizing the window will pause the game
+	int focused = glfwGetWindowAttrib(window, GLFW_FOCUSED);
+	if (!focused && screen.game_screen == game_screen_night) pause_game();
+
+    // don't do anything if player is dead
     if (player_component.alive == 0) return true;
 
     if (registry.nightTimer.size() > 0) {
@@ -672,6 +672,12 @@ void WorldSystem::pause_game() {
 		{
 			"PAUSED", vec2(0.4 * window_width_px, 0.5 * window_height_px) // might need to adjust position
 		});
+	auto entity2 = Entity();
+	registry.pauses.emplace(entity2);
+	registry.textRenderRequests.insert(entity2,
+		{
+			"Press P to unpause", vec2(0.38 * window_width_px, 0.5 * window_height_px - 30.f), 0.5f
+		});
 	for (Motion& motion : registry.motions.components) {
 		motion.velocity = { 0, 0 };
 	}
@@ -680,14 +686,10 @@ void WorldSystem::pause_game() {
 void WorldSystem::resume_game() {
 	
 	game_paused = false;
-	// Remove "Paused" text (does it remove too much?)
-//	while (registry.textRenderRequests.entities.size() > 0) {
-//		registry.remove_all_components_of(registry.textRenderRequests.entities.back());
-//	}
-
-    registry.remove_all_components_of(registry.pauses.entities[0]);
-	
-	//printf("Game unpaused \n");
+	// Remove "Paused" text 
+	while (registry.pauses.size() > 0) {
+		registry.remove_all_components_of(registry.pauses.entities[0]);
+	}
 }
 
 // Compute collisions between entities
@@ -812,6 +814,7 @@ void WorldSystem::handle_collisions() {
     // handle boundaries during daytime
     ScreenState& screen = registry.screenStates.components[0];
     if (screen.game_screen == game_screen_day) {
+		resume_game();
         Motion& player_motion = registry.motions.get(player);
         float x_pos = player_motion.position.x;
         float y_pos = player_motion.position.y;
