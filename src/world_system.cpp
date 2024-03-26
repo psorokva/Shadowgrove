@@ -307,7 +307,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     // inventory bar position on screen
     vec2 pos = {720, 60};
     createInventory(pos);
-//    createHelp();
+    createHelp();
+//    Entity help = registry.helpScreen.entities[0];
+//    vec2 help_pos = registry.motions.get(help).camera_position;
+//    help_pos = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
 
     for (int i = 0; i < 5; i++) {
         Inventory& player_inv = registry.inventory.get(p);
@@ -664,6 +667,29 @@ void WorldSystem::restart_game() {
 		//screen.night_counter_ms = 0;
 
         createDog({ window_width_px / 2, window_height_px - 200 });
+
+        auto win = Entity();
+        registry.textRenderRequests.insert(win,
+                                           {"You win!", vec2(0.35 * window_width_px, 0.64 * window_height_px)});
+        TextRenderRequest& over_text = registry.textRenderRequests.get(win);
+        over_text.scale = 1.4;
+
+        auto savedDog = Entity();
+        registry.textRenderRequests.insert(savedDog,
+                                           {
+                                                   "Congratulations! You saved your beloved dog!", vec2(0.12 * window_width_px, 0.56 * window_height_px) // might need to adjust position
+                                           });
+        TextRenderRequest& savedDogText = registry.textRenderRequests.get(savedDog);
+        savedDogText.scale = 0.6;
+
+        auto spaceKey = Entity();
+        registry.textRenderRequests.insert(spaceKey,
+                                           {
+                                                   "Press space key to play again", vec2(0.23 * window_width_px, 0.5 * window_height_px) // might need to adjust position
+                                           });
+        TextRenderRequest& spaceKeyText = registry.textRenderRequests.get(spaceKey);
+        spaceKeyText.scale = 0.6;
+
 
     }
 
@@ -1156,6 +1182,26 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             registry.nightTimer.clear();
             restart_game();
         }
+    }
+
+    // space to restart
+    if (screen.game_screen == game_screen_win) {
+        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+            printf("in game win screen on key \n");
+            screen.game_screen = game_screen_main_menu;
+//            screen.torch_mode = 0;
+            screen.night_counter_ms = 0;
+            registry.nightTimer.clear();
+            restart_game();
+        }
+    }
+
+    // v to victory screen
+   if (action == GLFW_RELEASE && key == GLFW_KEY_V) {
+       if (screen.game_screen != game_screen_night) {
+           screen.game_screen = game_screen_win;
+           restart_game();
+       }
     }
 
 	// Control the current speed with `<` `>`

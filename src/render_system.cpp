@@ -501,15 +501,6 @@ void RenderSystem::draw() {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
 
-        // render dog
-        Entity dog = registry.daytimes.entities[1];
-        drawTexturedStaticMesh(dog, projection_2D);
-
-        // render player
-        Motion& player_motion = registry.motions.get(player);
-        player_motion.scale = { 2 * 60, 2 * 80 };
-        drawTexturedMesh(player, projection_2D);
-
     }
 
 	glm::mat4 trans = glm::mat4(1.0f);
