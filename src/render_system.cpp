@@ -515,7 +515,13 @@ void RenderSystem::draw() {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
 
-		drawTexturedMesh(&win_dance, projection_2D);
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.daytimes.has(entity) && registry.motions.has(entity)) {
+                drawTexturedMesh(entity, projection_2D);
+            }
+        }
+
+//		drawTexturedMesh(&win_dance, projection_2D);
     }
 
 	glm::mat4 trans = glm::mat4(1.0f);

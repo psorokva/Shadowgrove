@@ -29,14 +29,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
-Entity createWinDance(RenderSystem* renderer, vec2 pos) {
-	auto entity = Entity();
-	Motion& motion = registry.motions.emplace(entity);
-	motion.position = pos;
-	motion.scale = vec2({ PLAYER_WIDTH*4.0, PLAYER_HEIGHT *2.0 });
-	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::WIN1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-	return entity;
-}
+
 
 
 Entity createKeeper(RenderSystem* renderer, vec2 pos) {
@@ -613,7 +606,18 @@ Entity createShadowOverlay(RenderSystem* renderer) {
 	return entity;
 }
 
+Entity createWinDance(RenderSystem* renderer, vec2 pos) {
+    auto entity = Entity();
+    Motion& immobile = registry.motions.emplace(entity);
+    immobile.position = pos;
+    immobile.scale = vec2({ 1.5 * PLAYER_WIDTH*4.0, 1.5 * PLAYER_HEIGHT *2.0 });
+    immobile.camera_position = { 0.3 * window_width_px, 0.3 * window_height_px };
 
+    registry.daytimes.emplace(entity);
+
+    registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::WIN1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+    return entity;
+}
 Entity createDog(vec2 position) {
     auto entity = Entity();
 

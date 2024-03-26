@@ -288,7 +288,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	if ( screen.game_screen == game_screen_win) {
 		Motion& mot = registry.motions.get(win_dance);
-		mot.position = { 400.0, 400.0 + 1.0*(animation_cycle % 2) };
+		mot.position = { 550.0, 550.0 + 1.0*(animation_cycle % 2) };
 		RenderRequest& render_request = registry.renderRequests.get(win_dance);
 		TEXTURE_ASSET_ID animation_frame = (TEXTURE_ASSET_ID) (  (int)TEXTURE_ASSET_ID::WIN0 + (animation_cycle % 2) );
 		render_request.used_texture = animation_frame;
@@ -311,7 +311,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         vec2 pos = {720, 60};
         createInventory(pos);
 
-    createHelp();
+//    createHelp();
 //    Entity help = registry.helpScreen.entities[0];
 //    vec2 help_pos = registry.motions.get(help).camera_position;
 //    help_pos = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
@@ -685,16 +685,16 @@ void WorldSystem::restart_game() {
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
 
-        Motion& player_motion = registry.motions.get(player);
-        player_motion.position = { window_width_px / 2, window_height_px - 200 };
+//        Motion& player_motion = registry.motions.get(player);
+//        player_motion.position = { window_width_px / 2, window_height_px - 200 };
 
         Entity day = createDay();
         printf("day entity init %zu\n", day);
 		//screen.torch_mode = 0;
 		//screen.night_counter_ms = 0;
 
-		win_dance = createWinDance(renderer, { 0.6 * window_width_px, 0.75 * window_height_px });
-		renderer->setDance(win_dance);
+		win_dance = createWinDance(renderer, { 0.5 * window_width_px, 0.75 * window_height_px });
+//		renderer->setDance(win_dance);
 		// get win animation
 
 
