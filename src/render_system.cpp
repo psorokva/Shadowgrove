@@ -474,6 +474,26 @@ void RenderSystem::draw() {
         Entity sign = registry.daytimes.entities[2];
         drawTexturedStaticMesh(sign, projection_2D);
 
+        // render inventory lines
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.motions.has(entity)) {
+                if (!registry.immobiles.has(entity)) {
+                    if (registry.debugComponents.has(entity)) {
+                        drawTexturedMesh(entity, projection_2D);
+                    }
+                }
+            }
+        }
+        // render UI screen
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.immobiles.has(entity)) {
+                if (registry.debugComponents.has(entity)) {
+                    drawTexturedStaticMesh(entity, projection_2D);
+                }
+            }
+        }
+
+
         HelpScreen& help = registry.helpScreen.components[0];
         if (help.help == 1) {
             Entity helpScreen = registry.helpScreen.entities[0];

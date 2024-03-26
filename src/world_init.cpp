@@ -311,7 +311,6 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 //	return entity;
 //}
 
-
 Entity createLine(vec2 position, vec2 scale) {
 	Entity entity = Entity();
 
@@ -334,7 +333,6 @@ Entity createLine(vec2 position, vec2 scale) {
 	
 	return entity;
 }
-
 
 Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> randomizer) {
 	auto entity = Entity();
@@ -423,11 +421,14 @@ Entity createCompass(vec2 position) {
 
 Entity createCraftingUI(vec2 position) {
 	auto entity = Entity();
-	Motion& motion = registry.motions.emplace(entity);
-	motion.camera_position = position;
-	motion.angle = 0.f;
-	motion.velocity = { 0.f, 0.f };
-	motion.scale = vec2({ 800, 600 });
+
+    registry.daytimes.emplace(entity);
+    registry.debugComponents.emplace(entity);
+	Immobile& motion = registry.immobiles.emplace(entity);
+    motion.position = position;
+//    immobiles.angle = 0.f;
+//	motion.velocity = { 0.f, 0.f };
+    motion.scale = vec2({ 800, 600 });
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CRAFTING, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
@@ -445,6 +446,10 @@ Entity createInventoryPotion(Item& item, vec2 position) {
     motion.angle = 0.f;
     motion.velocity = { 0.f, 0.f };
     motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
+
+    Immobile& fixed = registry.immobiles.emplace(entity);
+    fixed.position = position;
+    fixed.scale = vec2({ 3 * MUSHROOM_SIZE, 3 * MUSHROOM_SIZE });
 
     registry.debugComponents.emplace(entity);
 
