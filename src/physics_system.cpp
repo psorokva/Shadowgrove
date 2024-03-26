@@ -135,28 +135,10 @@ void PhysicsSystem::step(float elapsed_ms) {
 	ComponentContainer<Immobile>& immobiles_container = registry.immobiles;
 	Entity player = registry.players.entities[0];
 	Motion& player_motion = motion_container.components[0];
+	Motion prev_player_motion = player_motion;
 	float step_seconds = elapsed_ms / 1000.f;
 
-	for (uint i = 0; i < immobiles_container.components.size(); i++) {
-		Immobile& fixed_i = immobiles_container.components[i];
-		Entity entity_i = immobiles_container.entities[i];
-		if (collides(player_motion, fixed_i)) {
-			// Create a collisions event
-			registry.collisions.emplace_with_duplicates(player, entity_i);
-			
-			//player_motion.position = get_new_position(player_motion, fixed_i) - player_motion.velocity * step_seconds;
-			printf("colliding");
-			printf("position before. x: %f", player_motion.position.x);
-			printf("y: %f\n", player_motion.position.y);
-			//player_motion.camera_position = get_new_position(player_motion, fixed_i) + step_seconds * player_motion.velocity;
-			player_motion.position = get_new_position(player_motion, fixed_i);
-			player_motion.velocity = vec2(0.f, 0.f);
-			printf("position after. x: %f", player_motion.position.x);
-			printf("y: %f\n", player_motion.position.y);
-			//player_motion.velocity *= -1.0f;
-			//player_motion.position -= elapsed_ms / 1000.0f * player_motion.velocity *1.1f;
-		}
-	}
+
 
 
 	// Move bug based on how much time has passed, this is to (partially) avoid
@@ -221,6 +203,28 @@ void PhysicsSystem::step(float elapsed_ms) {
 		//	motion.position[1] = std::min(motion.position[1], window_height_px - PLAYER_HEIGHT / 2);
 		//}
 
+	}
+
+	for (uint i = 0; i < immobiles_container.components.size(); i++) {
+		Immobile& fixed_i = immobiles_container.components[i];
+		Entity entity_i = immobiles_container.entities[i];
+		if (collides(player_motion, fixed_i)) {
+			player_motion = prev_player_motion;
+			//// Create a collisions event
+			//registry.collisions.emplace_with_duplicates(player, entity_i);
+
+			////player_motion.position = get_new_position(player_motion, fixed_i) - player_motion.velocity * step_seconds;
+			//printf("colliding");
+			//printf("position before. x: %f", player_motion.position.x);
+			//printf("y: %f\n", player_motion.position.y);
+			////player_motion.camera_position = get_new_position(player_motion, fixed_i) + step_seconds * player_motion.velocity;
+			//player_motion.position = get_new_position(player_motion, fixed_i);
+			//player_motion.velocity = vec2(0.f, 0.f);
+			//printf("position after. x: %f", player_motion.position.x);
+			//printf("y: %f\n", player_motion.position.y);
+			////player_motion.velocity *= -1.0f;
+			////player_motion.position -= elapsed_ms / 1000.0f * player_motion.velocity *1.1f;
+		}
 	}
 
 	//for (uint i = 0; i < immobiles_container.components.size(); i++) {
