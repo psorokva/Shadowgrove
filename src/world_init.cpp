@@ -421,6 +421,17 @@ Entity createCompass(vec2 position) {
 	return entity;
 }
 
+Entity createCraftingUI(vec2 position) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ 800, 600 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CRAFTING, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
+
 Entity createInventoryPotion(Item& item, vec2 position) {
     auto entity = Entity();
 
@@ -536,8 +547,8 @@ Entity createSign2() {
     auto& day = registry.screenStates.emplace(entity);
 
     auto& fixed = registry.immobiles.emplace(entity);
-    fixed.position = { 0.4 * window_width_px, 0.23 * window_height_px };
-    fixed.scale = { 100, 100 };
+    fixed.position = { 0.35 * window_width_px, 0.20 * window_height_px };
+    fixed.scale = { 150, 150 };
 
     Daytime& sign = registry.daytimes.emplace(entity);
 
@@ -608,8 +619,8 @@ Entity createLogo() {
     auto& day = registry.screenStates.emplace(entity);
 
     auto& fixed = registry.immobiles.emplace(entity);
-    fixed.position = { 0.5 * window_width_px, 0.3 * window_height_px };
-    fixed.scale = { 1000, 500 };
+    fixed.position = { 0.5 * window_width_px, 0.4 * window_height_px };
+    fixed.scale = { 1000, 300 };
 
     Daytime& logo = registry.daytimes.emplace(entity);
 
