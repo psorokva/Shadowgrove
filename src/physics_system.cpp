@@ -33,7 +33,7 @@ bool collides(const Motion& motion1, const Motion& motion2) {
 }
 
 // Collision with walls (AABB)
-bool collides(const Motion& motionA, const Immobile& motionB) {
+bool collides(const Motion& motionA, const Impenetrable& motionB) {
 	return motionA.position.x < motionB.position.x + abs(motionB.scale.x) / 2//might need to divide scales by 2
 		&& motionA.position.x + abs(motionA.scale.x) / 2 > motionB.position.x
 		&& motionA.position.y < motionB.position.y + abs(motionB.scale.y) / 2
@@ -90,15 +90,22 @@ void PhysicsSystem::step(float elapsed_ms) {
 		printf("motion.velocity y %f/n", motion.velocity.y);*/
 	}
 
-	for (uint i = 0; i < immobiles_container.components.size(); i++) {
-		Immobile& fixed_i = immobiles_container.components[i];
-		Entity entity_i = immobiles_container.entities[i];
-		if (collides(player_motion, fixed_i)) {
-			player_motion = prev_player_motion;
-			//Mix_PlayChannel(-1, tree_collision_sound, 0);
-			//// Create a collisions event
-			//registry.collisions.emplace_with_duplicates(player, entity_i);
+	// Check for collision with walls
+	auto& walls_container = registry.impenetrables;
+	for (uint i = 0; i < walls_container.components.size(); i++) {
+		Impenetrable& fixed_i = walls_container.components[i];
+		Entity entity_i = walls_container.entities[i];
+		// If not a screen
+		if (!registry.screenStates.has(entity_i)) {
+			if (collides(player_motion, fixed_i)) {
+				player_motion = prev_player_motion;
+				printf("Colliding with wall\n");
+				//Mix_PlayChannel(-1, tree_collision_sound, 0);
+				//// Create a collisions event
+				//registry.collisions.emplace_with_duplicates(player, entity_i);
+			}
 		}
+		
 	}
 
 	// Check for collisions between player and other moving entities

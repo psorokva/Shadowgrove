@@ -68,7 +68,8 @@ struct Tile {
 
 // Bushes/Trees/Forest are impenetrable by player
 struct Impenetrable {
-
+	vec2 position = { 0, 0 };
+	vec2 scale = { 10, 10 };
 };
 
 // Player component
