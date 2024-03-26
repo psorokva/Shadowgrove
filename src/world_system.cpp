@@ -496,6 +496,14 @@ void WorldSystem::restart_game() {
 //            registry.remove_all_components_of(entity);
 //        }
 //    }
+	Inventory i = Inventory();
+	if (registry.inventory.components.size() > 0) {
+		i = registry.inventory.components[0];
+	}
+	else {
+		i.holding = { nullval, nullval, nullval, nullval, nullval };
+	}
+
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
 	while (registry.immobiles.entities.size() > 0)
@@ -532,12 +540,7 @@ void WorldSystem::restart_game() {
 	// vec2(start_x, start_y);
 	registry.inventory.emplace(player);
 
-	registry.inventory.get(player).holding.push_back(nullval);
-	registry.inventory.get(player).holding.push_back(nullval);
-	registry.inventory.get(player).holding.push_back(nullval);
-	registry.inventory.get(player).holding.push_back(nullval);
-//	registry.inventory.get(player).holding.push_back(nullval);
-    registry.inventory.get(player).holding.push_back(magical_grapes);
+	registry.inventory.get(player) = i;
 
     save_state.loadInventory();
 
