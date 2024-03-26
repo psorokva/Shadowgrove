@@ -1016,7 +1016,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_N) {
         printf("N key pressed, switching screen");
-        
+		for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
+			registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
+		}
+		registry.inventory.get(registry.players.entities[0]).index = {};
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
         if (screen.game_screen == game_screen_night) {
             screen.game_screen = game_screen_day;
 			screen.torch_mode = 0;
@@ -1043,14 +1047,20 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			}
 		}
 		else {
-			if (registry.inventory.get(registry.players.entities[0]).inUI.size() < 3) {
+			if (registry.inventory.get(registry.players.entities[0]).inUI.size() < 3 && registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] != nullval) {
 				registry.inventory.get(registry.players.entities[0]).inUI.push_back(registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state]);
+				registry.inventory.get(registry.players.entities[0]).index.push_back(selected_inv_state);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			}
 		}
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_U) {
 		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
+		for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
+			registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
+		}
+		registry.inventory.get(registry.players.entities[0]).index = {};
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 	}
 

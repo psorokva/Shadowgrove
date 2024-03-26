@@ -144,6 +144,7 @@ struct Inventory {
 	unsigned int select_state = 0;
 	bool is_open = false;
 	std::vector<Item> inUI;
+	std::vector<unsigned int> index;
 };
 
 struct Invincible {
