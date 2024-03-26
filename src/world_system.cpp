@@ -743,26 +743,35 @@ vec2 get_bounding_box2(const Immobile& immobile) {
 	return { abs(immobile.scale.x), abs(immobile.scale.y) };
 }
 
-// AABB collision
-// might need to reverse motionA & immobileB
-vec2 get_collision_overlap(const Motion& motionA, const Immobile& motionB) {
-	//return motionA.position.x < motionB.position.x + abs(motionB.scale.x)//might need to divide scales by 2
-	//	&& motionA.position.x + abs(motionA.scale.x) > motionB.position.x
-	//	&& motionA.position.y < motionB.position.y + abs(motionB.scale.y)
-	//	&& motionA.position.y + abs(motionA.scale.y) > motionB.position.y;
 
-	// return smaller value for x and y
-	float val_x = motionB.position.x + (abs(motionB.scale.x) / 2) - motionA.position.x;
-	printf("Valx: %f\n", val_x);
-	float val_y = motionB.position.y + (abs(motionB.scale.y) / 2) - motionA.position.y;
-	printf("Valy: %f\n", val_y);
-	/*if (abs(val_x) > abs(val_y)) {
-		return vec2(val_x, 0.f);
-	}
-	else {
-		return vec2(0.f, val_y);
-	}*/
-}
+//vec2 get_new_position(const Motion& motionA, const Immobile& motionB) {
+//
+//	vec2 result;
+//	
+//	if (motionA.position.x < motionB.position.x) { // coming from left
+//		result.x = motionB.position.x - ((motionB.scale.x / 2) + (motionA.scale.x / 2));
+//	}
+//	else if (motionA.position.x >= motionB.position.x) { // coming from right
+//		result.x = motionB.position.x + ((motionB.scale.x / 2) + (motionA.scale.x / 2));
+//	}
+//
+//	if (motionA.position.y < motionB.position.y) { // coming from top
+//		result.y = motionB.position.y - ((motionB.scale.y / 2) + (motionA.scale.y / 2));
+//	}
+//	else if (motionA.position.y >= motionB.position.y) { // coming from bottom
+//		result.y = motionB.position.y + ((motionB.scale.y / 2) + (motionA.scale.y / 2));
+//	}
+//
+//	// if both x & y intersecting, chose the one with least displacement
+//	if (abs(motionA.position.x - result.x) < abs(motionA.position.y - result.y)) {
+//		result.y = motionA.position.y;
+//	}
+//	else {
+//		result.x = motionA.position.x;
+//	}
+//
+//	return result;
+//}
 
 void WorldSystem::resume_game() {
 	
@@ -798,8 +807,10 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				//!! TEMP, move back to physics_system after
 				// Change this to AABB
 				
-				vec2 diff = get_collision_overlap(motion_p, motion_w);
-				motion_p.position = motion_p.position - diff * 0.5f;
+				//motion_p.position = get_new_position(motion_p, motion_w);
+				//motion_p.position = motion_p.position - diff * 0.5f;
+				
+				
 
 				//printf("within the box\n");
 				
