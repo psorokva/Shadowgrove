@@ -67,6 +67,67 @@ void PhysicsSystem::setCompass(Entity* entity, Immobile* immobile) {
 	compass_immobile = immobile;
 }
 
+vec2 get_new_position(const Motion& motionA, const Immobile& motionB) {
+
+	vec2 result;
+	vec2 abs_scaleA = abs(motionA.scale);
+	vec2 abs_scaleB = abs(motionB.scale);
+	float randomNumber = 30.f;
+
+	if (motionA.position.x < motionB.position.x) { // coming from left
+		//float valX1 = 42.5f;//((abs_scaleB.x / 2));
+		//printf("Change position to lefter by %f\n", valX1);
+		//result.x = motionB.position.x - valX1;
+		result.x = motionB.position.x - ((abs_scaleB.x / 2) + (abs_scaleA.x / 2));
+		//result.x = motionB.position.x - (abs_scaleB.x / 2);
+		//result.x = motionB.position.x - abs_scaleB.x;
+		//result.x = motionB.position.x - randomNumber;
+	}
+	else if (motionA.position.x >= motionB.position.x) { // coming from right
+		//float valX2 = 44.f;//((abs_scaleB.x / 2));
+		//printf("Change position to righter by %f\n", valX2);
+		//result.x = motionB.position.x + valX2;
+		result.x = motionB.position.x + ((abs_scaleB.x / 2) + (abs_scaleA.x / 2)) + 25.f;
+		//result.x = motionB.position.x + (abs_scaleB.x / 2);
+		//result.x = motionB.position.x + abs_scaleB.x;
+		//result.x = motionB.position.x + randomNumber + 6.f;
+	}
+
+	if (motionA.position.y < motionB.position.y) { // coming from top
+		//float valY1 = 42.f;//((abs_scaleB.y / 2)); //(abs_scaleA.y / 25)
+		//printf("Change position to higher by %f\n", valY1);
+		//result.y = motionB.position.y - valY1;
+		result.y = motionB.position.y - ((abs_scaleB.y / 2) + (abs_scaleA.y / 2));
+		//result.y = motionB.position.y - (abs_scaleB.y / 2);
+		//result.y = motionB.position.y - abs_scaleB.y;
+		//result.y = motionB.position.y - randomNumber;
+	}
+	else if (motionA.position.y >= motionB.position.y) { // coming from bottom
+		//float valY2 = 43.f;//((abs_scaleB.y / 2));
+		//printf("Change position to lower by %f\n", valY2);
+		//result.y = motionB.position.y + valY2;
+		result.y = motionB.position.y + ((abs_scaleB.y / 2) + (abs_scaleA.y / 2));
+		//result.y = motionB.position.y + (abs_scaleB.y / 2);
+		//result.y = motionB.position.y + abs_scaleB.y;
+		//result.y = motionB.position.y + randomNumber;
+	}
+
+	// if both x & y intersecting, chose the one with least displacement
+	float diff = abs(motionA.position.x - result.x) - abs(motionA.position.y - result.y);
+
+	//if (abs(diff) <= 5.0f) { // if intersecting in corner
+	//	return result;
+	//}
+	if (diff < 0.f) { // if negative
+		result.y = motionA.position.y;
+	}
+	else {
+		result.x = motionA.position.x;
+	}
+
+	return result;
+}
+
 void PhysicsSystem::step(float elapsed_ms) {
 	
 	ComponentContainer<Motion>& motion_container = registry.motions;
@@ -74,6 +135,7 @@ void PhysicsSystem::step(float elapsed_ms) {
 	ComponentContainer<Immobile>& immobiles_container = registry.immobiles;
 	Entity player = registry.players.entities[0];
 	Motion& player_motion = motion_container.components[0];
+	float step_seconds = elapsed_ms / 1000.f;
 
 	for (uint i = 0; i < immobiles_container.components.size(); i++) {
 		Immobile& fixed_i = immobiles_container.components[i];
@@ -81,6 +143,16 @@ void PhysicsSystem::step(float elapsed_ms) {
 		if (collides(player_motion, fixed_i)) {
 			// Create a collisions event
 			registry.collisions.emplace_with_duplicates(player, entity_i);
+			
+			//player_motion.position = get_new_position(player_motion, fixed_i) - player_motion.velocity * step_seconds;
+			printf("colliding");
+			printf("position before. x: %f", player_motion.position.x);
+			printf("y: %f\n", player_motion.position.y);
+			//player_motion.camera_position = get_new_position(player_motion, fixed_i) + step_seconds * player_motion.velocity;
+			player_motion.position = get_new_position(player_motion, fixed_i);
+			player_motion.velocity = vec2(0.f, 0.f);
+			printf("position after. x: %f", player_motion.position.x);
+			printf("y: %f\n", player_motion.position.y);
 			//player_motion.velocity *= -1.0f;
 			//player_motion.position -= elapsed_ms / 1000.0f * player_motion.velocity *1.1f;
 		}
@@ -93,20 +165,82 @@ void PhysicsSystem::step(float elapsed_ms) {
 	for (uint i = 0; i < motion_registry.size(); i++) {
 		Motion& motion = motion_registry.components[i];
 		Entity entity = motion_registry.entities[i];
+		//float step_seconds = elapsed_ms / 1000.f;
 
+
+		////// TODO: check if collide with map
+		//Motion future = Motion();
+		//Motion future_w = Motion();
+		////registry.chunks
+		//ChunkLocation* current_pos = getPlayerTiles(motion,compass_immobile);
+		//future.position = motion.position + step_seconds * motion.velocity + vec2(0.0, -PLAYER_WIDTH*0.25);;
+		////future_w.position = motion.position + step_seconds * motion.velocity + vec2(PLAYER_WIDTH, 0.0);
+		//ChunkLocation* future_pos = getPlayerTiles(future, compass_immobile);
+		//ChunkLocation* future_w_pos = getPlayerTiles(future_w, compass_immobile);
+
+		//for (Chunk& chunk : registry.chunks.components) {
+		//	//printf(".");
+		//	//if (DEBUG_PRINT) {
+		//	//	printf("mp %f , %f \n", motion.position[0], motion.position[1]);
+		//	//	printf("vec4 offset: x %d ,y %d , index: x %d ,y %d \n", current_pos->offset_x, current_pos->offset_y, current_pos->index_x, current_pos->index_y);
+		//	//	printf("fp %f , %f \n", future.position[0], future.position[1]);
+		//	//	printf("vec4 offset: x %d ,y %d , index: x %d ,y %d \n", future_pos->offset_x, future_pos->offset_y, future_pos->index_x, future_pos->index_y);
+		//	//}
+		//	// if relevant chunk is there
+		//	if (chunk.x == future_pos->index_x && chunk.y == future_pos->index_y ) { // && chunk.x == future_w_pos->index_x && chunk.y == future_w_pos->index_y) {
+		//		// check if future position is legal
+		//		if (chunk.grid[future_pos->offset_y][future_pos->offset_x] == 0 ){ // && chunk.grid[future_w_pos->offset_y][future_w_pos->offset_x] == 0) {
+		//			//motion.position = motion.position + step_seconds * motion.velocity;
+		//			//printf("vec4 offset: x %u ,y %u , index: x %u ,y %u \n", future_pos->offset_x, future_pos->offset_y, future_pos->index_x, future_pos->index_y);
+		//		} // else don't update also add checks for previous location after
+		//		else {
+		//			motion.velocity = vec2(0.0, 0.0);
+		//			// TODO: keep motion going closer if we could get a little closer
+		//			//printf("Bounds collision in  chunk %f , %f\n", future_pos[2], future_pos[3]);
+		//		}
+		//	} else {
+		//		// We're not in a chunk?!
+		//		//printf("Not at chunk %f , %f\n", future_pos[2], future_pos[3]);
+		//	}
+		//}
+		////DEBUG_PRINT = false;
+		//delete current_pos;
+		//delete future_pos;
+
+		// TODO: can still move a bit towards the non passable tile ?? 
+		//
 		motion.position = motion.position + step_seconds * motion.velocity;
+		/*printf("regular position. x: %f", player_motion.position.x);
+		printf("y: %f\n", player_motion.position.y);*/
+
+		//Bounds checking for player
+		//if (registry.players.has(entity)) {
+		//	motion.position[0] = std::max(motion.position[0], PLAYER_WIDTH / 2);
+		//	motion.position[0] = std::min(motion.position[0], window_width_px - PLAYER_WIDTH / 2);
+		//	motion.position[1] = std::max(motion.position[1], PLAYER_HEIGHT / 2);
+		//	motion.position[1] = std::min(motion.position[1], window_height_px - PLAYER_HEIGHT / 2);
+		//}
+
 	}
 
-	for (uint i = 0; i < immobiles_container.components.size(); i++) {
-		Immobile& fixed_i = immobiles_container.components[i];
-		Entity entity_i = immobiles_container.entities[i];
-		if (collides(player_motion, fixed_i)) {
-			player_motion = prev_player_motion;
-			//Mix_PlayChannel(-1, tree_collision_sound, 0);
-			//// Create a collisions event
-			//registry.collisions.emplace_with_duplicates(player, entity_i);
-		}
-	}
+	//for (uint i = 0; i < immobiles_container.components.size(); i++) {
+	//	Immobile& fixed_i = immobiles_container.components[i];
+	//	Entity entity_i = immobiles_container.entities[i];
+	//	if (collides(player_motion, fixed_i)) {
+	//		// Create a collisions event
+	//		//registry.collisions.emplace_with_duplicates(player, entity_i);
+
+	//		//player_motion.position = get_new_position(player_motion, fixed_i) - player_motion.velocity * step_seconds;
+	//		printf("colliding");
+	//		printf("position before. x: %f", player_motion.position.x);
+	//		printf("y: %f\n", player_motion.position.y);
+	//		player_motion.position = get_new_position(player_motion, fixed_i);
+	//		player_motion.velocity = vec2(0.f, 0.f);
+	//		printf("position after. x: %f", player_motion.position.x);
+	//		printf("y: %f\n", player_motion.position.y);
+
+	//	}
+	//}
 
 	// Check for collisions between all moving entities
 	for(uint i = 0; i<motion_container.components.size(); i++) {
