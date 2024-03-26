@@ -16,7 +16,7 @@ void MapGen::clearMap() {
 }
 
 void MapGen::makeNoise(int level) {
-	const int BIOMES = 4;
+	const int BIOMES = 3;
 	const int RARITY = 14;
 	const int NOISE_LEVELS = 10;
 	const int BIG_WIDTH = cols * MAZE_SIZE;

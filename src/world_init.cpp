@@ -29,6 +29,16 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createWinDance(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_WIDTH*2.0, PLAYER_HEIGHT });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::WIN0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
+
+
 Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 

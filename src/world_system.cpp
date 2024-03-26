@@ -31,6 +31,8 @@ int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
+const float TORCH_LENGTH = 25 * 1000.0;
+float torch_timer_ms = TORCH_LENGTH;
 
 bool game_paused = false;
 
@@ -191,6 +193,8 @@ void WorldSystem::createInventory(vec2 pos) {
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
+
+
 	// tabbing out of the game or minimizing the window will pause the game
 	int focused = glfwGetWindowAttrib(window, GLFW_FOCUSED);
 	if (!focused) pause_game();
@@ -204,6 +208,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
     // dont do anything if player is dead
     if (player_component.alive == 0) return true;
+
+	if (screen.torch_mode == 1) {
+		torch_timer_ms -= elapsed_ms_since_last_update;
+		if (torch_timer_ms < 0) {
+			torch_timer_ms = 0.0;
+			screen.torch_mode = 0;
+		}
+	}
 
     if (registry.nightTimer.size() > 0) {
         float min_night_counter_ms = 60000.f;
@@ -266,6 +278,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
     camera.step();
+
+	///  put help back
+	Motion& help_motion = registry.motions.get(help);
+	Immobile& help_immobile = registry.immobiles.get(help);
+	vec2 help_pos = vec2(window_width_px*0.5, window_height_px*0.5);
+	help_motion.position = help_pos;
+	help_motion.camera_position = help_pos;
+	help_immobile.position = help_pos;
+	help_immobile.camera_position = help_pos;
+
 
     ai.step();
 
@@ -446,7 +468,7 @@ void WorldSystem::restart_game() {
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
 	player = createPlayer(renderer, { start_x, start_y });
 	//player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
-
+	win_dance = createWinDance(renderer, { start_x, start_y });
 	// vec2(start_x, start_y);
 	registry.inventory.emplace(player);
 
@@ -457,7 +479,7 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player).holding.push_back(nullval);
 	save_state.loadInventory();
 
-    createHelp();
+    help = createHelp();
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -556,6 +578,12 @@ void WorldSystem::restart_game() {
 
     }
     else if (screen.game_screen == game_screen_win) {
+
+		// get win animation 
+		RenderRequest& render_request = registry.renderRequests.get(win_dance);
+		TEXTURE_ASSET_ID animation_frame = (TEXTURE_ASSET_ID)((int)TEXTURE_ASSET_ID::WIN0 + (animation_cycle % 2));
+		render_request.used_texture = animation_frame;
+
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
@@ -916,6 +944,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
 	if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night) {
 		screen.torch_mode = (screen.torch_mode + 1) %2;
+		if (torch_timer_ms == 0.0 && screen.torch_mode == 1) {
+			torch_timer_ms = TORCH_LENGTH;
+		}
 	
 	}
 

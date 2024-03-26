@@ -69,6 +69,8 @@ private:
 	PhysicsSystem* physics;
 	float current_speed;
 	Entity player;
+	Entity help;
+	Entity win_dance;
 	Immobile* compass_immobile;
     int inventory;
     Entity inventory1;
