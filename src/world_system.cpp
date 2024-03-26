@@ -500,8 +500,8 @@ void WorldSystem::restart_game() {
 	// Create a new player
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
-	player = createPlayer(renderer, { start_x, start_y });
-	//player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
+	//player = createPlayer(renderer, { start_x, start_y });
+	player = createPlayer(renderer, { window_width_px / 2, window_height_px - 200 });
 
 	// vec2(start_x, start_y);
 	registry.inventory.emplace(player);
@@ -1036,6 +1036,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
 				motion.velocity.y -= CHARACTER_SPEED;
+				//printf("motion.velocity.y %f/n", motion.velocity.y);
             }
 
             // Move Down
