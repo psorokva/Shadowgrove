@@ -498,15 +498,15 @@ void WorldSystem::restart_game() {
 //            registry.remove_all_components_of(entity);
 //        }
 //    }
-	Entity tempPLayer = player;
-	Inventory& tempInventory = registry.inventory.get(player);
+	//Entity tempPLayer = player;
+	//Inventory& tempInventory = registry.inventory.get(player);
 
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
 	while (registry.immobiles.entities.size() > 0)
 		registry.remove_all_components_of(registry.immobiles.entities.back());
-	//while (registry.inventory.entities.size() > 0)
-	//	registry.remove_all_components_of(registry.inventory.entities.back());
+	while (registry.inventory.entities.size() > 0)
+		registry.remove_all_components_of(registry.inventory.entities.back());
 	while (registry.chunks.entities.size() > 0)
 		registry.remove_all_components_of(registry.chunks.entities.back());
 	while (registry.players.entities.size() > 0)
@@ -535,14 +535,14 @@ void WorldSystem::restart_game() {
 	//if (level > 1) {
 	//	registry.inventory.insert(player,tempInventory);
 	//} else {
-		registry.inventory.emplace(player);
+	registry.inventory.emplace(player);
 
-		registry.inventory.get(player).holding.push_back(nullval);
-		registry.inventory.get(player).holding.push_back(nullval);
-		registry.inventory.get(player).holding.push_back(nullval);
-		registry.inventory.get(player).holding.push_back(nullval);
-		registry.inventory.get(player).holding.push_back(nullval);
-		save_state.loadInventory();
+	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
+	registry.inventory.get(player).holding.push_back(nullval);
+	save_state.loadInventory();
 	//}
 
 
