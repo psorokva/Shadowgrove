@@ -782,7 +782,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				////if (dist_squared < r_squared) {
 				
 				//motion_p.position = motion_w.position + dp * (float)pow(multiplier,0.5);
-				motion_p.velocity = vec2(0.0f, 0.0f);
+				//motion_p.velocity = vec2(0.0f, 0.0f);
 			
 				//if (playerDirection == UP) {
 				//	//printf("Collided with North wall");
