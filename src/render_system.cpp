@@ -448,20 +448,22 @@ void RenderSystem::draw() {
                 }
             }
 
-        // render help screen
-			if (registry.helpScreen.size() > 0) {
-				HelpScreen& help = registry.helpScreen.components[0];
-				if (help.help == 1) {
-					printf("got here");
-					for (Entity entity : registry.renderRequests.entities) {
-						if (registry.helpScreen.has(entity)) {
-							drawTexturedMesh(entity, projection_2D);
-						}
-					}
-				}
-		}
+ 
 		Motion& player_motion = registry.motions.get(player);
 		drawTexturedMesh(player, projection_2D);
+
+		// render help screen
+		if (registry.helpScreen.size() > 0) {
+			HelpScreen& help = registry.helpScreen.components[0];
+			if (help.help == 1) {
+				//printf("got here");
+				for (Entity entity : registry.renderRequests.entities) {
+					if (registry.helpScreen.has(entity)) {
+						drawTexturedMesh(entity, projection_2D);
+					}
+				}
+			}
+		}
 
     }
     else if (screen.game_screen == game_screen_day) {

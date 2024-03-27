@@ -15,8 +15,7 @@
 
 // setup fonts
 std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
-//std::string font_filenameMAC = "/data/fonts/Kenney_Pixel_Square.ttf";
- std::string font_filenameMAC = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
+//std::string font_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
 unsigned int font_default_size = 48;
 // fonts
 std::map<char, Character> m_ftCharacters;	// map of all characters and their textures
@@ -391,11 +390,19 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 	FT_Face face;
 	if (FT_New_Face(ft, font_filename.c_str(), 0, &face)) {
 		std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filename << std::endl;
-		if (FT_New_Face(ft, font_filenameMAC.c_str(), 0, &face)) {
-			std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filenameMAC << std::endl;
-			return false;
-		}
+		//if (FT_New_Face(ft, font_filenameMAC.c_str(), 0, &face)) {
+		//	std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filenameMAC << std::endl;
+		//	return false;
+		//}
+		return false;
 	}
+
+//    FT_Face face;
+//	if (FT_New_Face(ft, font_filename.c_str(), 0, &face))
+//	{
+//		std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filename << std::endl;
+//		return false;
+//	}
 
 	// extract a default size
 	FT_Set_Pixel_Sizes(face, 0, font_default_size);

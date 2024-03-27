@@ -164,9 +164,9 @@ class RenderSystem {
 			textures_path("NightHelpTorchlight.png"),
             textures_path("logo_00.png"),
             textures_path("logo_01.png"),
-			textures_path("f1CHECKO.png"),
 			textures_path("win0.png"),
 			textures_path("win1.png"),
+			textures_path("f1CHECKO.png"),
 
 	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
 
