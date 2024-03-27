@@ -382,18 +382,26 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 
 	// init FreeType fonts
 	FT_Library ft;
-	if (FT_Init_FreeType(&ft))
-	{
+	if (FT_Init_FreeType(&ft)) {
 		std::cerr << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
 		return false;
 	}
 
 	FT_Face face;
-	if (FT_New_Face(ft, font_filename.c_str(), 0, &face))
-	{
+	if (FT_New_Face(ft, font_filename.c_str(), 0, &face)) {
 		std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filename << std::endl;
-		return false;
+		if (FT_New_Face(ft, font_filenameMAC.c_str(), 0, &face)) {
+			std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filenameMAC << std::endl;
+			return false;
+		}
 	}
+
+//    FT_Face face;
+//	if (FT_New_Face(ft, font_filename.c_str(), 0, &face))
+//	{
+//		std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filename << std::endl;
+//		return false;
+//	}
 
 	// extract a default size
 	FT_Set_Pixel_Sizes(face, 0, font_default_size);
@@ -402,11 +410,9 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// load each of the chars - note only first 128 ASCII chars
-	for (unsigned char c = 0; c < 128; c++)
-	{
+	for (unsigned char c = 0; c < 128; c++) {
 		// load character glyph 
-		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
-		{
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
 			std::cerr << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
 			continue;
 		}
