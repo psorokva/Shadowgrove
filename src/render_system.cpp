@@ -460,7 +460,8 @@ void RenderSystem::draw() {
 					}
 				}
 		}
-      
+		Motion& player_motion = registry.motions.get(player);
+		drawTexturedMesh(player, projection_2D);
 
     }
     else if (screen.game_screen == game_screen_day) {
