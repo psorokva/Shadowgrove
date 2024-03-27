@@ -17,20 +17,20 @@ Shadowgrove Game:
 (Reloadability) Player restarts with inventory items.  
 
 New game screens: 
-	Title Screen 
-	Day Screen 
-	Night Screen ends after night timer  
-	Winning Screen – with extra animated cuteness 
-	Game Over Screen  
+- 	Title Screen 
+- 	Day Screen 
+- 	Night Screen ends after night timer  
+- 	Winning Screen – with extra animated cuteness 
+- 	Game Over Screen  
 
 Level Progression (Playability):  
-	increasing hardness with enemy spawn rates and numbers 
-	with changing graphics for forest 
+- increasing hardness with enemy spawn rates and numbers 
+- with changing graphics for forest 
 
 Major Bug fixes: 
-	Collision 
-	Clipping through plants 
-	Rendering player on top now instead of having bushes over player head 
-	AI 
-	Map generation  
+-  Collision 
+- Clipping through plants 
+- Rendering player on top now instead of having bushes over player head 
+- AI 
+- Map generation  
 
