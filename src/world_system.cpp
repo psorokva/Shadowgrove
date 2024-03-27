@@ -21,7 +21,7 @@ const int MAZE_HEIGHT = MAZE_SIZE;
 //bool blockedWest = false;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 100;
+const uint NUM_POTIONS = 25;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
@@ -613,7 +613,10 @@ void WorldSystem::restart_game() {
 		if (level < 9) {
 			level++;
 		}
-        //createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
+		for (int num_keepers = 0; num_keepers < level; num_keepers++) {
+			createKeeper(renderer, registry.get_empty_spawn_location());
+		}
+
     }
     else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely

@@ -124,7 +124,7 @@ struct Escaper {
 };
 
 struct Torches {
-	float t_timer = 5000;
+	float t_timer = 20000.0;
 };
 
 struct Deadly {
