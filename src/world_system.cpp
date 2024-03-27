@@ -377,7 +377,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				registry.immobiles.get(check).scale = { 110, 90 };
 			}
             if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
-                // call for end game - sucess
+				screen.game_screen = game_screen_win;
+				restart_game();
             }
         }
     }
