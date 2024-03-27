@@ -397,13 +397,6 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 		}
 	}
 
-//    FT_Face face;
-//	if (FT_New_Face(ft, font_filename.c_str(), 0, &face))
-//	{
-//		std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filename << std::endl;
-//		return false;
-//	}
-
 	// extract a default size
 	FT_Set_Pixel_Sizes(face, 0, font_default_size);
 

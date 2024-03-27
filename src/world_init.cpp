@@ -71,7 +71,9 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 	fixed.position = position;
 	fixed.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
 	
-	registry.impenetrables.emplace(entity);
+	auto& wall = registry.impenetrables.emplace(entity);
+	wall.position = position;
+	wall.scale = fixed.scale;
 
 	//add to animation // choppable // etc registry.emplace(entity);
 	if (biome_type == 1) {
@@ -435,6 +437,26 @@ Entity createCraftingUI(vec2 position) {
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CRAFTING, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
+
+
+Entity createCheck(vec2 position) {
+	auto entity = Entity();
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE + 100, MUSHROOM_SIZE + 50});
+
+	Immobile& fixed = registry.immobiles.emplace(entity);
+	fixed.position = position;
+	fixed.scale = vec2({ 3 * MUSHROOM_SIZE, 3 * MUSHROOM_SIZE });
+
+	registry.debugComponents.emplace(entity);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CHECK, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
+
 
 Entity createInventoryPotion(Item& item, vec2 position) {
     auto entity = Entity();

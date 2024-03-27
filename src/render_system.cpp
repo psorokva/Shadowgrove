@@ -302,9 +302,13 @@ void RenderSystem::drawToScreen() {
     GLuint hit = glGetUniformLocation(night_program, "hit");
     glUniform1i(hit, player.hit);
 
-    GLuint help = glGetUniformLocation(night_program, "help");
-    HelpScreen& help_screen = registry.helpScreen.components[0];
-    glUniform1i(help, help_screen.help);
+    
+	if (registry.helpScreen.size() > 0) {
+		GLuint help = glGetUniformLocation(night_program, "help");
+		HelpScreen& help_screen = registry.helpScreen.components[0];
+		glUniform1i(help, help_screen.help);
+	}
+   
 
 	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
 	glUniform1i(torch_mode, screen.torch_mode);
@@ -445,14 +449,19 @@ void RenderSystem::draw() {
             }
 
         // render help screen
-        HelpScreen& help = registry.helpScreen.components[0];
-        if (help.help == 1) {
-            for (Entity entity: registry.renderRequests.entities) {
-                if (registry.helpScreen.has(entity)) {
-                    drawTexturedMesh(entity, projection_2D);
-                }
-            }
-        }
+			if (registry.helpScreen.size() > 0) {
+				HelpScreen& help = registry.helpScreen.components[0];
+				if (help.help == 1) {
+					printf("got here");
+					for (Entity entity : registry.renderRequests.entities) {
+						if (registry.helpScreen.has(entity)) {
+							drawTexturedMesh(entity, projection_2D);
+						}
+					}
+				}
+		}
+		Motion& player_motion = registry.motions.get(player);
+		drawTexturedMesh(player, projection_2D);
 
     }
     else if (screen.game_screen == game_screen_day) {
@@ -493,12 +502,14 @@ void RenderSystem::draw() {
             }
         }
 
-
-        HelpScreen& help = registry.helpScreen.components[0];
-        if (help.help == 1) {
-            Entity helpScreen = registry.helpScreen.entities[0];
-            drawTexturedStaticMesh(helpScreen, projection_2D);
-        }
+		if (registry.helpScreen.size() > 0) {
+			HelpScreen& help = registry.helpScreen.components[0];
+			if (help.help == 1) {
+				Entity helpScreen = registry.helpScreen.entities[0];
+				drawTexturedStaticMesh(helpScreen, projection_2D);
+			}
+		}
+       
     }
     else if (screen.game_screen == game_screen_game_over) {
         for (Entity entity: registry.renderRequests.entities) {

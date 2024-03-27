@@ -68,7 +68,8 @@ struct Tile {
 
 // Bushes/Trees/Forest are impenetrable by player
 struct Impenetrable {
-
+	vec2 position = { 0, 0 };
+	vec2 scale = { 10, 10 };
 };
 
 // Player component
@@ -123,7 +124,7 @@ struct Escaper {
 };
 
 struct Torches {
-	float t_timer = 5000;
+	float t_timer = 20000.0;
 };
 
 struct Deadly {
@@ -143,6 +144,7 @@ struct Inventory {
 	unsigned int select_state = 0;
 	bool is_open = false;
 	std::vector<Item> inUI;
+	std::vector<unsigned int> index;
 };
 
 struct Invincible {
@@ -410,7 +412,8 @@ enum class TEXTURE_ASSET_ID {
 	HELPTORCH = HELPNIGHT + 1,
     LOGO_00 = HELPTORCH + 1,
     LOGO_01 = LOGO_00 + 1,
-	WIN0 = LOGO_01 + 1,
+	CHECK = LOGO_01 + 1,
+	WIN0 = CHECK + 1,
 	WIN1 = WIN0 + 1,
 	TEXTURE_COUNT = WIN1 + 1,
 };

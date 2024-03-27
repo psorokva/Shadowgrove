@@ -23,6 +23,7 @@ Entity createLine(vec2 position, vec2 size);
 //Entity createMapChunk(vec2 position);
 Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 });
 Entity createInventoryPotion(Item& item, vec2 position);
+Entity createCheck(vec2 position);
 Entity createCraftingUI(vec2 position);
 Entity createShadowOverlay(RenderSystem* renderer);
 Entity createLine(vec2 position, vec2 size);
