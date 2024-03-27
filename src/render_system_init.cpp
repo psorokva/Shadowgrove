@@ -390,10 +390,11 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 	FT_Face face;
 	if (FT_New_Face(ft, font_filename.c_str(), 0, &face)) {
 		std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filename << std::endl;
-		if (FT_New_Face(ft, font_filenameMAC.c_str(), 0, &face)) {
-			std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filenameMAC << std::endl;
-			return false;
-		}
+		//if (FT_New_Face(ft, font_filenameMAC.c_str(), 0, &face)) {
+		//	std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filenameMAC << std::endl;
+		//	return false;
+		//}
+		return false;
 	}
 
 //    FT_Face face;
