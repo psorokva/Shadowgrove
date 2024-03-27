@@ -24,15 +24,12 @@ Direction playerDirection;
 const uint NUM_POTIONS = 25;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
-float keeper_rate = 10.0;
-float KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
+const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
-const float TORCH_LENGTH = 25 * 1000.0;
-float torch_timer_ms = TORCH_LENGTH;
 
 bool game_paused = false;
 
@@ -196,6 +193,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Don't do anything if game is paused
 	if (game_paused) return true;
 
+	if (registry.players.get(player).moving)
+	{
+		RenderRequest& r = registry.renderRequests.get(player);
+		r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
+	}
+
 	//	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
     Player& player_component = registry.players.components[0];
@@ -294,6 +297,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     Motion& p_motion = registry.motions.get(player);
 
 //   createHelp();
+
     if (screen.game_screen == game_screen_night) {
         // Displaying health bar
         auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
@@ -306,10 +310,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         vec2 pos = {720, 60};
         createInventory(pos);
 
-//    createHelp();
-//    Entity help = registry.helpScreen.entities[0];
-//    vec2 help_pos = registry.motions.get(help).camera_position;
-//    help_pos = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
 
         for (int i = 0; i < 5; i++) {
             Inventory& player_inv = registry.inventory.get(player);
@@ -1158,9 +1158,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             // Character movement
             // Move Up
             if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+				if (action == GLFW_RELEASE)
+				{
+					registry.players.get(player).moving = false;
+				}
+				else
+				{
+					registry.players.get(player).moving = true;
+				}
                 playerDirection = UP;
-                RenderRequest& r = registry.renderRequests.get(player);
-                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
 				motion.velocity.y -= CHARACTER_SPEED;
 				//printf("motion.velocity.y %f/n", motion.velocity.y);
@@ -1168,18 +1174,30 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
             // Move Down
             if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
+				if (action == GLFW_RELEASE)
+				{
+					registry.players.get(player).moving = false;
+				}
+				else
+				{
+					registry.players.get(player).moving = true;
+				}
                 playerDirection = DOWN;
-                RenderRequest& r = registry.renderRequests.get(player);
-                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 //motion.velocity = vec2(0.f, CHARACTER_SPEED);
 				motion.velocity.y += CHARACTER_SPEED;
             }
 
             // Move Right
             if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+				if (action == GLFW_RELEASE)
+				{
+					registry.players.get(player).moving = false;
+				}
+				else
+				{
+					registry.players.get(player).moving = true;
+				}
                 playerDirection = RIGHT;
-                RenderRequest& r = registry.renderRequests.get(player);
-                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 //motion.velocity = vec2(CHARACTER_SPEED, 0.f);
 				motion.velocity.x += CHARACTER_SPEED;
                 if (screen.game_screen == game_screen_day) {
@@ -1187,15 +1205,21 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 } else {
                     motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
-
+               
                 //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
             // Move Left
             if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
+				if (action == GLFW_RELEASE)
+				{
+					registry.players.get(player).moving = false;
+				}
+				else
+				{
+					registry.players.get(player).moving = true;
+				}
                 playerDirection = LEFT;
-                RenderRequest &r = registry.renderRequests.get(player);
-                r.used_texture = (TEXTURE_ASSET_ID) (animation_cycle + 1);
 
                 //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
 				motion.velocity.x -= CHARACTER_SPEED;
