@@ -193,6 +193,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Don't do anything if game is paused
 	if (game_paused) return true;
 
+	if (registry.players.get(player).moving)
+	{
+		RenderRequest& r = registry.renderRequests.get(player);
+		r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
+	}
+
 	//	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
     Player& player_component = registry.players.components[0];
@@ -1126,9 +1132,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             // Character movement
             // Move Up
             if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+				if (action == GLFW_RELEASE)
+				{
+					registry.players.get(player).moving = false;
+				}
+				else
+				{
+					registry.players.get(player).moving = true;
+				}
                 playerDirection = UP;
-                RenderRequest& r = registry.renderRequests.get(player);
-                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
 				motion.velocity.y -= CHARACTER_SPEED;
 				//printf("motion.velocity.y %f/n", motion.velocity.y);
@@ -1136,18 +1148,30 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
             // Move Down
             if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
+				if (action == GLFW_RELEASE)
+				{
+					registry.players.get(player).moving = false;
+				}
+				else
+				{
+					registry.players.get(player).moving = true;
+				}
                 playerDirection = DOWN;
-                RenderRequest& r = registry.renderRequests.get(player);
-                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 //motion.velocity = vec2(0.f, CHARACTER_SPEED);
 				motion.velocity.y += CHARACTER_SPEED;
             }
 
             // Move Right
             if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+				if (action == GLFW_RELEASE)
+				{
+					registry.players.get(player).moving = false;
+				}
+				else
+				{
+					registry.players.get(player).moving = true;
+				}
                 playerDirection = RIGHT;
-                RenderRequest& r = registry.renderRequests.get(player);
-                r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
                 //motion.velocity = vec2(CHARACTER_SPEED, 0.f);
 				motion.velocity.x += CHARACTER_SPEED;
                 if (screen.game_screen == game_screen_day) {
@@ -1161,9 +1185,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
             // Move Left
             if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
+				if (action == GLFW_RELEASE)
+				{
+					registry.players.get(player).moving = false;
+				}
+				else
+				{
+					registry.players.get(player).moving = true;
+				}
                 playerDirection = LEFT;
-                RenderRequest &r = registry.renderRequests.get(player);
-                r.used_texture = (TEXTURE_ASSET_ID) (animation_cycle + 1);
                
                 //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
 				motion.velocity.x -= CHARACTER_SPEED;

@@ -77,6 +77,7 @@ struct Player {
 	unsigned int health;
     int alive = 1;
     int hit = 0;
+	bool moving = false;
 };
 
 struct Daytime {
