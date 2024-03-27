@@ -35,6 +35,7 @@ const float TORCH_LENGTH = 25 * 1000.0;
 float torch_timer_ms = TORCH_LENGTH;
 
 bool game_paused = false;
+bool is_in_debug = false;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
@@ -1020,15 +1021,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_L) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_L && is_in_debug) {
 		chunk_border = !chunk_border;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_O) {
-		for (const auto& chunk : registry.chunks.components) {
-			std::cout << "x: " << chunk.x << " y: " << chunk.y << " offset_x: " << chunk.offset_x << " offset_y: " << chunk.offset_y << std::endl;
-		}
-	}
 
 	// remove items from slot on num key press
 	if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
@@ -1056,7 +1052,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_M) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_M && is_in_debug) {
 		//std::cout << "in here!" << std::endl;
 		while (registry.enemies.entities.size() > 0)
 			registry.remove_all_components_of(registry.enemies.entities.back());
@@ -1072,7 +1068,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	}
 
 	// Resetting game
-	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_R && is_in_debug) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
 		resume_game(); // this removed paused text
@@ -1092,7 +1088,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
-    if (action == GLFW_RELEASE && key == GLFW_KEY_N) {
+    if (action == GLFW_RELEASE && key == GLFW_KEY_N && is_in_debug) {
         printf("N key pressed, switching screen");
 		for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
 			registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
@@ -1160,12 +1156,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     }
 
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
-	if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night) {
+	if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night && is_in_debug) {
 		screen.torch_mode = (screen.torch_mode + 1) %2;
 		if (torch_timer_ms == 0.0 && screen.torch_mode == 1) {
 			torch_timer_ms = TORCH_LENGTH;
 		}
 
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_B) {
+		is_in_debug = !is_in_debug;
 	}
 
 	// Debugging
@@ -1306,7 +1306,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     }
 
     // v to victory screen
-   if (action == GLFW_RELEASE && key == GLFW_KEY_V) {
+   if (action == GLFW_RELEASE && key == GLFW_KEY_V && is_in_debug) {
        if (screen.game_screen != game_screen_night) {
            screen.game_screen = game_screen_win;
            restart_game();
@@ -1314,16 +1314,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     }
 
 	// Control the current speed with `<` `>`
-	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
-		current_speed -= 0.1f;
+	//if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
+	//	current_speed -= 0.1f;
 		//printf("Current speed = %f\n", current_speed);
-	}
-	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
-		current_speed += 0.1f;
+	//}
+	//if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
+	//	current_speed += 0.1f;
 		//printf("Current speed = %f\n", current_speed);
-	}
+	//}
 
-	current_speed = fmax(0.f, current_speed);
+	//current_speed = fmax(0.f, current_speed);
 }
 
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
@@ -1347,7 +1347,7 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 	//int chunk_value = registry.get_chunk_value(mazeLoc);
 	//std::cout << "CHUNK VALUE: " << chunk_value << std::endl;
 
-	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
+	if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE && is_in_debug) {
 //		vec2 spawn_pos = registry.get_empty_spawn_location();
 //		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
 //		createPotion(renderer, camera.adjust_to_player(spawn_pos));
