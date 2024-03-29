@@ -379,6 +379,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
             if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
 				screen.game_screen = game_screen_win;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
 				restart_game();
             }
         }
@@ -453,6 +454,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.deathTimers.remove(entity);
 			screen.darken_screen_factor = 0;
             screen.game_screen = game_screen_game_over;
+			// player loses inventory on death
+			registry.inventory.components[0].crafted = {};
+			registry.inventory.components[0].inUI = {};
+			registry.inventory.components[0].index = {};
+			registry.inventory.components[0].holding = {};
             player_component.alive = 0;
             restart_game();
 			return true;
