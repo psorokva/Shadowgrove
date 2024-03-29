@@ -999,6 +999,11 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
         }
         else if (y_pos < half_height) {
             screen.game_screen = game_screen_night;
+			for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
+				registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
+			}
+			registry.inventory.get(registry.players.entities[0]).index = {};
+			registry.inventory.get(registry.players.entities[0]).inUI = {};
             restart_game();
         }
         // check bottom
@@ -1060,11 +1065,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Exiting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
-		std::cout << "EXIT GAME" << std::endl;
-		if (registry.screenStates.components[0].game_screen == game_screen_day) {
-			save_state.saveInventory();
+		if (registry.inventory.components[0].is_open) {
+			registry.inventory.components[0].is_open = false;
 		}
-		glfwSetWindowShouldClose(window, true);
+		else {
+			std::cout << "EXIT GAME" << std::endl;
+			if (registry.screenStates.components[0].game_screen == game_screen_day) {
+				save_state.saveInventory();
+			}
+			glfwSetWindowShouldClose(window, true);
+		}
 	}
 
 	// Resetting game
@@ -1129,7 +1139,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_U) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_U && registry.screenStates.components[0].game_screen == game_screen_day) {
 		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
 		for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
 			registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
