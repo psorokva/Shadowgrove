@@ -8,11 +8,14 @@ uniform sampler2D dark01;
 uniform sampler2D light00;
 uniform sampler2D light01;
 uniform sampler2D light02;
+//uniform sampler2D light05;
+//uniform sampler2D light06;
 uniform sampler2D helpnight;
 uniform sampler2D helptorch;
 //uniform int helpscreen;
 uniform int torch_mode;
 uniform int torch_anim;
+//uniform float torch_timer;
 uniform float time;
 uniform float darken_screen_factor;
 uniform float night_timer;
@@ -85,6 +88,7 @@ void main() {
     vec4 dark_color = texture(dark00, texcoord); 
     vec4 dark1_color = texture(dark01, texcoord); 
     vec4 light_color = texture(light00, texcoord); 
+    //vec4 lowlight_color = texture(light05, texcoord); 
 
     if (alive == 1) {
         /// Help Screen
@@ -100,6 +104,11 @@ void main() {
         float day_portion = 1.0;
         float eve_portion = 0.0;
         float dark_portion = 0.0;
+        //float torchfade_portion = 1.0;
+
+        //if ( torch_timer < 3.0 ) {
+        //    torchfade_portion = torch_timer / 3.0;
+        //}
 
         if (night_timer <= night_length_0) {
             eve_portion = night_timer / night_length_0;
@@ -138,9 +147,14 @@ void main() {
             if (help == 0) {
                 if (torch_anim == 2) {
                     light_color = texture(light02, texcoord);
+                    //lowlight_color = texture(light06, texcoord); 
                 } else if (torch_anim == 1) {
                     light_color = texture(light01, texcoord);
+                    //if (torch_timer < 0.5) {
+                    //    lowlight_color = texture(light06, texcoord); 
+                    //}
                 }
+                //light_color = light_color * (1.0 - torchfade_portion) + torchfade_portion* lowlight_color;
             }
 
             /// DAYTIME WITH TORCH
