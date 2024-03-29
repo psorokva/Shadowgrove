@@ -31,8 +31,8 @@ int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
-const float TORCH_LENGTH = 25 * 1000.0;
-float torch_timer_ms = TORCH_LENGTH;
+//const float TORCH_LENGTH = 25 * 1000.0;
+//float torch_timer_ms = TORCH_LENGTH;
 
 bool game_paused = false;
 bool is_in_debug = false;
@@ -215,7 +215,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     if (player_component.alive == 0) return true;
 
     if (registry.nightTimer.size() > 0) {
-        float min_night_counter_ms = 60000.f;
+        float min_night_counter_ms = NIGHT_DURATION;
         NightTimer& night_counter = registry.nightTimer.components[0];
         // progress timer
         night_counter.counter_ms -= elapsed_ms_since_last_update;
@@ -463,6 +463,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		// progress timer
 		Torches& counter = registry.torches.get(entity);
 		counter.t_timer -= elapsed_ms_since_last_update;
+		if (counter.t_timer > 0.0) {
+			screen.torch_timer_ms = counter.t_timer;
+		} else {
+			screen.torch_timer_ms = 0.0;
+		}
 		if (counter.t_timer > 0) {
 			screen.torch_mode = 1;
 		}
@@ -470,6 +475,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			screen.torch_mode = 0;
 			registry.torches.remove(entity);
 		}
+
+		
 	}
 
 	// reduce window brightness if any of the present is dying
@@ -553,7 +560,7 @@ void WorldSystem::restart_game() {
 		i = registry.inventory.components[0];
 	}
 	else {
-		i.holding = { nullval, nullval, nullval, nullval, nullval };
+		i.holding = { torch, nullval, nullval, nullval, nullval };
 	}
 
 	while (registry.motions.entities.size() > 0)
@@ -597,7 +604,7 @@ void WorldSystem::restart_game() {
 
 	registry.inventory.get(player) = i;
 
-    save_state.loadInventory();
+    //save_state.loadInventory();
 
 
     help = createHelp();
@@ -1158,9 +1165,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
 	if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night && is_in_debug) {
 		screen.torch_mode = (screen.torch_mode + 1) %2;
-		if (torch_timer_ms == 0.0 && screen.torch_mode == 1) {
-			torch_timer_ms = TORCH_LENGTH;
-		}
+		//if (torch_timer_ms == 0.0 && screen.torch_mode == 1) {
+		//	//torch_timer_ms = TORCH_LENGTH;
+		//}
 
 	}
 

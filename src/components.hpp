@@ -125,7 +125,7 @@ struct Escaper {
 };
 
 struct Torches {
-	float t_timer = 20000.0;
+	float t_timer = TORCH_LENGTH;
 };
 
 struct Deadly {
@@ -213,6 +213,7 @@ struct ScreenState {
 	int torch_mode = 0;
 	int torch_anim = 0;
 	float night_counter_ms = 0;
+	float torch_timer_ms = 0.0;
 };
 
 struct HelpScreen {

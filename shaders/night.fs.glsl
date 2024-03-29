@@ -8,14 +8,14 @@ uniform sampler2D dark01;
 uniform sampler2D light00;
 uniform sampler2D light01;
 uniform sampler2D light02;
-//uniform sampler2D light05;
-//uniform sampler2D light06;
+uniform sampler2D light05;
+uniform sampler2D light06;
 uniform sampler2D helpnight;
 uniform sampler2D helptorch;
 //uniform int helpscreen;
 uniform int torch_mode;
 uniform int torch_anim;
-//uniform float torch_timer;
+uniform float torch_timer;
 uniform float time;
 uniform float darken_screen_factor;
 uniform float night_timer;
@@ -29,57 +29,12 @@ uniform float night_length_5;
 uniform int alive;
 uniform int help;
 uniform int hit;
+uniform int active_torches;
 
 in vec2 texcoord;
 in float dist_to_player;
 
 layout(location = 0) out vec4 color;
-
-vec4 color_shift(vec4 in_color) {
-    vec4 out_color = vec4(0.5, 0.5, 1.0, 1.0);
-    vec4 sunset = vec4(0.7, 0.4, 0.6, 0.0);
-    vec4 night = vec4(0.327, 0.185, 0.33, 0.0);
-    vec4 sunrise = vec4(0.5, 0.4, 0.5, 0.0);
-    //float dist_to_player = 300.0;
-    float duration = 150.0;
-    float sunsetDuration = 50.0;
-    float nightDuration = 100.0;
-
-    float time_adjusted = mod(time, duration);
-    float effect = 0.6; 
-    
-    float INNER_RAD = 4.00;
-    float OUTER_RAD = 8.50;
-
-    if (dist_to_player <= INNER_RAD) {
-       effect = 0.0;
-    } else if (dist_to_player <= OUTER_RAD) {
-       effect = 0.9 * (dist_to_player - INNER_RAD) / (OUTER_RAD - INNER_RAD);
-    }   
-    
-    if (time_adjusted <= sunsetDuration) {
-        // sunset to night transition
-        float t = time_adjusted / sunsetDuration;
-        out_color = in_color * (1.0 - effect) - effect * mix(sunset, night, t);
-    } else if (time_adjusted <= nightDuration) {
-        out_color = in_color * (1.0 - effect) - effect * night;
-    } else if (time_adjusted <= duration) {
-        // night to sunrise transition
-        float t = (time_adjusted - nightDuration) / (duration - nightDuration);
-        out_color = in_color * (1.0 - effect) - effect * mix(night, sunrise, t);
-    }
-
-    return out_color;
-}
-
-vec4 fade_color(vec4 in_color) {
-	if (darken_screen_factor > 0)
-		in_color -= darken_screen_factor * vec4(0.8, 0.8, 0.8, 0);
-
-    if (alive == 0)
-        in_color -= vec4(0.8, 0.8, 0.8, 0);
-	return in_color;
-}
 
 void main() {
     vec4 in_color = texture(screen_texture, texcoord);
@@ -88,7 +43,18 @@ void main() {
     vec4 dark_color = texture(dark00, texcoord); 
     vec4 dark1_color = texture(dark01, texcoord); 
     vec4 light_color = texture(light00, texcoord); 
-    //vec4 lowlight_color = texture(light05, texcoord); 
+    vec4 lowlight_color = texture(light05, texcoord); 
+    float day_portion = 1.0;
+    float eve_portion = 0.0;
+    float dark_portion = 0.0;
+    float lit_effect = 0.4;
+    float fade_effect = 0.3;
+    float torchfade_portion = 0.0;
+    float torchlit_portion = 1.0 *lit_effect;
+    float torch_exists = 0.0; 
+    if (torch_mode == 1){
+        torch_exists = 1.0;
+    }
 
     if (alive == 1) {
         /// Help Screen
@@ -100,15 +66,16 @@ void main() {
             dark1_color = texture(helpnight, texcoord);
         }
 
+        if ( torch_timer < 5000.0 && torch_timer >= 0.0 && active_torches > 0) { 
+            if ( torch_timer < 1000.0) { 
+                torch_exists = torch_timer /1000.0;
+            }
+            torchlit_portion = torch_timer / 5000.0;
+            torchfade_portion = 1.0 - torchlit_portion;
+            torchfade_portion *= fade_effect;
+            torchlit_portion *= lit_effect;
 
-        float day_portion = 1.0;
-        float eve_portion = 0.0;
-        float dark_portion = 0.0;
-        //float torchfade_portion = 1.0;
-
-        //if ( torch_timer < 3.0 ) {
-        //    torchfade_portion = torch_timer / 3.0;
-        //}
+        }
 
         if (night_timer <= night_length_0) {
             eve_portion = night_timer / night_length_0;
@@ -139,7 +106,7 @@ void main() {
         }
 
         /// DAYTIME and Home Screen
-        color = in_color;
+        //color = in_color;
 
         // If using a torch
         if (torch_mode == 1){
@@ -147,33 +114,35 @@ void main() {
             if (help == 0) {
                 if (torch_anim == 2) {
                     light_color = texture(light02, texcoord);
-                    //lowlight_color = texture(light06, texcoord); 
                 } else if (torch_anim == 1) {
                     light_color = texture(light01, texcoord);
-                    //if (torch_timer < 0.5) {
-                    //    lowlight_color = texture(light06, texcoord); 
-                    //}
+                } else {
+                    lowlight_color = texture(light06, texcoord); 
                 }
-                //light_color = light_color * (1.0 - torchfade_portion) + torchfade_portion* lowlight_color;
             }
 
             /// DAYTIME WITH TORCH
             vec4 day_color = in_color + 0.2 * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
-            // vec4 color = in_color * 1.05 * vec4(dark1_color.r*dark1_color.a, dark1_color.g*dark1_color.a, dark1_color.b*dark1_color.a, 1.0);
+            //vec4 color = in_color * 1.05 * vec4(dark1_color.r*dark1_color.a, dark1_color.g*dark1_color.a, dark1_color.b*dark1_color.a, 1.0);
 
             /// EVE TORCH
+            shad1_color = mix(shad_color, shad1_color ,torch_exists);
             vec4 eve_color = in_color * vec4(shad1_color.r*shad1_color.a, shad1_color.g*shad1_color.a, shad1_color.b*shad1_color.a, 1.0);
-            eve_color += 0.4 * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
+            eve_color += torchlit_portion * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
+            eve_color -= torchfade_portion * vec4(lowlight_color.r*lowlight_color.a, lowlight_color.g*lowlight_color.a, lowlight_color.b*lowlight_color.a, 1.0);
 
             // MIGNIGHT WITH TORCH
+            shad1_color = mix(dark_color, dark1_color ,torch_exists);
             vec4 night_color = in_color * vec4(dark1_color.r*dark1_color.a, dark1_color.g*dark1_color.a, dark1_color.b*dark1_color.a, 1.0);
-            night_color = night_color + 0.4 * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
+            night_color += torchlit_portion * vec4(light_color.r*light_color.a, light_color.g*light_color.a, light_color.b*light_color.a, 1.0);
+            night_color -= torchfade_portion * vec4(lowlight_color.r*lowlight_color.a, lowlight_color.g*lowlight_color.a, lowlight_color.b*lowlight_color.a, 1.0);
+            // (1.0 - torch_exists) *
 
             color = day_portion * day_color + eve_portion * eve_color + dark_portion * night_color;
         }
 
         /// Otherwise no torch
-        if (torch_mode == 0){
+        if (torch_mode == 0) {
             // Day
             vec4 day_color = in_color;
             // EVE NO TORCH
@@ -184,11 +153,58 @@ void main() {
         }
 
         // if player is hit and temporarily invincible
-        if (hit == 1) {
-            //
-        }
+        //if (hit == 1) {
+        //    // do this on other shader // unless entire screen reddish
+        //}
     }
     else {
         color = in_color;
     }
 }
+
+
+// vec4 color_shift(vec4 in_color) {
+//     vec4 out_color = vec4(0.5, 0.5, 1.0, 1.0);
+//     vec4 sunset = vec4(0.7, 0.4, 0.6, 0.0);
+//     vec4 night = vec4(0.327, 0.185, 0.33, 0.0);
+//     vec4 sunrise = vec4(0.5, 0.4, 0.5, 0.0);
+//     //float dist_to_player = 300.0;
+//     float duration = 150.0;
+//     float sunsetDuration = 50.0;
+//     float nightDuration = 100.0;
+
+//     float time_adjusted = mod(time, duration);
+//     float effect = 0.6; 
+    
+//     float INNER_RAD = 4.00;
+//     float OUTER_RAD = 8.50;
+
+//     if (dist_to_player <= INNER_RAD) {
+//        effect = 0.0;
+//     } else if (dist_to_player <= OUTER_RAD) {
+//        effect = 0.9 * (dist_to_player - INNER_RAD) / (OUTER_RAD - INNER_RAD);
+//     }   
+    
+//     if (time_adjusted <= sunsetDuration) {
+//         // sunset to night transition
+//         float t = time_adjusted / sunsetDuration;
+//         out_color = in_color * (1.0 - effect) - effect * mix(sunset, night, t);
+//     } else if (time_adjusted <= nightDuration) {
+//         out_color = in_color * (1.0 - effect) - effect * night;
+//     } else if (time_adjusted <= duration) {
+//         // night to sunrise transition
+//         float t = (time_adjusted - nightDuration) / (duration - nightDuration);
+//         out_color = in_color * (1.0 - effect) - effect * mix(night, sunrise, t);
+//     }
+
+//     return out_color;
+// }
+
+// vec4 fade_color(vec4 in_color) {
+// 	if (darken_screen_factor > 0)
+// 		in_color -= darken_screen_factor * vec4(0.8, 0.8, 0.8, 0);
+
+//     if (alive == 0)
+//         in_color -= vec4(0.8, 0.8, 0.8, 0);
+// 	return in_color;
+// }
