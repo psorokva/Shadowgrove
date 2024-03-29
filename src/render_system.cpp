@@ -302,13 +302,17 @@ void RenderSystem::drawToScreen() {
     GLuint hit = glGetUniformLocation(night_program, "hit");
     glUniform1i(hit, player.hit);
 
+	int torches = registry.torches.size();
+	GLuint active_torches = glGetUniformLocation(night_program, "active_torches");
+	glUniform1i(active_torches, torches);
     
 	if (registry.helpScreen.size() > 0) {
 		GLuint help = glGetUniformLocation(night_program, "help");
 		HelpScreen& help_screen = registry.helpScreen.components[0];
 		glUniform1i(help, help_screen.help);
 	}
-   
+	GLuint torch_timer = glGetUniformLocation(night_program, "torch_timer");
+	glUniform1f(torch_timer, screen.torch_timer_ms);
 
 	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
 	glUniform1i(torch_mode, screen.torch_mode);
@@ -363,6 +367,17 @@ void RenderSystem::drawToScreen() {
 	GLuint helptorch = glGetUniformLocation(night_program, "helptorch");
 	glUniform1i(helptorch, 9);
 	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::HELPTORCH]);
+
+	glActiveTexture(GL_TEXTURE10);
+	GLuint light_05 = glGetUniformLocation(night_program, "light_05");
+	glUniform1i(light_05, 10);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_05]);
+
+	glActiveTexture(GL_TEXTURE11);
+	GLuint light_06 = glGetUniformLocation(night_program, "light_06");
+	glUniform1i(light_06, 11);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_06]);
+
 	gl_has_errors();
 	//glUniform1i(shad_00, 0);
 
