@@ -125,7 +125,7 @@ struct Escaper {
 };
 
 struct Torches {
-	float t_timer = 20000.0;
+	float t_timer = TORCH_LENGTH;
 };
 
 struct Deadly {
@@ -213,6 +213,7 @@ struct ScreenState {
 	int torch_mode = 0;
 	int torch_anim = 0;
 	float night_counter_ms = 0;
+	float torch_timer_ms = 0.0;
 };
 
 struct HelpScreen {
@@ -403,7 +404,9 @@ enum class TEXTURE_ASSET_ID {
 	TORCHLIGHT_00 = SIGN_02 + 1,
 	TORCHLIGHT_01 = TORCHLIGHT_00 + 1,
 	TORCHLIGHT_02 = TORCHLIGHT_01 + 1,
-	SHADOW_00 = TORCHLIGHT_02 + 1,
+	TORCHLIGHT_05 = TORCHLIGHT_02 + 1,
+	TORCHLIGHT_06 = TORCHLIGHT_05 + 1,
+	SHADOW_00 = TORCHLIGHT_06 + 1,
 	SHADOW_01 = SHADOW_00 + 1,
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
