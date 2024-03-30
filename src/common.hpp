@@ -39,10 +39,10 @@ const int TILE_SIZE = 55;
 const int MAZE_SIZE = 26;
 static bool DEBUG_PRINT = true;
 enum Direction { UP, DOWN, LEFT, RIGHT, NONE };
-const float TORCH_LENGTH = 15 * 1000.0;
+const float TORCH_LENGTH = 20 * 1000.0;
 const float TORCH_FADE_START = 0.2 * TORCH_LENGTH;
 //float torch_timer_ms = TORCH_LENGTH;
-const float NIGHT_DURATION = 40000.0f; // 30 sec
+const float NIGHT_DURATION = 60000.0f; // 30 sec
 /// These Durations adjust when light changes in the night shader
 const float NIGHT_DURATION_0 = NIGHT_DURATION * 0.1;
 const float NIGHT_DURATION_1 = NIGHT_DURATION * 0.3;
