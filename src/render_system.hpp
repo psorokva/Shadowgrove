@@ -147,6 +147,13 @@ class RenderSystem {
 			textures_path("plant_29.png"),
 			textures_path("plant_30.png"),
 			textures_path("plant_31.png"),
+			textures_path("face00.png"),
+			textures_path("face01.png"),
+			textures_path("face02.png"),
+			textures_path("dogface00.png"),
+			textures_path("dogface01.png"),
+			textures_path("text_bubble_brown_big.png"),
+			textures_path("text_bubble_brown_small.png"),
 			textures_path("daytimescreen.png"),
             textures_path("helpscreen.png"),
             textures_path("sign.png"),
@@ -227,6 +234,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawTexturedStaticMesh(Entity entity, const mat3& projection);
+	void RenderSystem::drawTexturedUIMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
 	Entity * win_dance;
 	// Window handle
