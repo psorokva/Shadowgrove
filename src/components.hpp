@@ -204,6 +204,9 @@ enum Game_screens {
     game_screen_day,
     game_screen_game_over,
     game_screen_win,
+    cut_scene_0,
+    cut_scene_1,
+    cut_scene_2,
 };
 
 // Sets the brightness of the screen
@@ -451,6 +454,13 @@ struct TextRenderRequest {
 	vec2 position = vec2(1.0f, 1.0f);
 	float scale = 1.0f;
 	vec3 color = vec3(1.0f, 1.0f, 1.0f); // default white
+};
+
+struct SpeechRenderRequest {
+    std::string text = "";
+    vec2 position = vec2(1.0f, 1.0f);
+    float scale = 0.3f;
+    vec3 color = vec3(0.0f, 0.0f, 0.0f); // default black
 };
 
 struct ChunkStitch {

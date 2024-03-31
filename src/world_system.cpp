@@ -1,6 +1,7 @@
 // Header
 #include "world_system.hpp"
 #include "world_init.hpp"
+#include "tiny_ecs.hpp"
 
 // stlib
 #include <cassert>
@@ -579,6 +580,8 @@ void WorldSystem::restart_game() {
 		registry.remove_all_components_of(registry.chunks.entities.back());
 	while (registry.players.entities.size() > 0)
 		registry.remove_all_components_of(registry.players.entities.back());
+    while (registry.speechRenderRequests.entities.size() > 0)
+        registry.remove_all_components_of(registry.speechRenderRequests.entities.back());
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -629,22 +632,19 @@ void WorldSystem::restart_game() {
     Player& player_component = registry.players.components[0];
     ScreenState &screen = registry.screenStates.components[0];
 
-
     if (screen.game_screen == game_screen_game_over) {
 //        printf("in game over screen\n");
 
         auto over = Entity();
         registry.textRenderRequests.insert(over,
                                            {"Game over", vec2(0.33 * window_width_px, 0.5 * window_height_px)});
-        TextRenderRequest& over_text = registry.textRenderRequests.get(over);
-        over_text.scale = 1.2;
+        registry.textRenderRequests.get(over).scale = 1.2;
         auto spaceKey = Entity();
         registry.textRenderRequests.insert(spaceKey,
                                            {
                                                    "Press space key to restart", vec2(0.27 * window_width_px, 0.4 * window_height_px) // might need to adjust position
                                            });
-        TextRenderRequest& spaceKeyText = registry.textRenderRequests.get(spaceKey);
-        spaceKeyText.scale = 0.6;
+        registry.textRenderRequests.get(spaceKey).scale = 0.6;
 
         Entity end_keeper = createKeeper(renderer, { window_width_px / 2, window_height_px / 2 });
         Motion& keeper_motion = registry.motions.get(end_keeper);
@@ -706,7 +706,6 @@ void WorldSystem::restart_game() {
             createDog({ 0.3 * window_width_px, 0.8 * window_height_px });
 
             createLogo();
-
             auto spaceKeyText = Entity();
             registry.textRenderRequests.insert(spaceKeyText,
                                                {
@@ -717,9 +716,62 @@ void WorldSystem::restart_game() {
         }
 
     }
+    else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2 ) {
+        Entity day = createDay();
+        registry.immobiles.get(day).scale = { 1.3 * window_width_px, 1.3 * window_height_px };
+        printf("day entity init %zu\n", day);
+        vec2 player_line1 = vec2(0.15 * window_width_px, 0.7 * window_height_px);
+        vec2 player_line2 = vec2(0.15 * window_width_px, 0.66 * window_height_px);
+        vec2 player_line3 = vec2(0.15 * window_width_px, 0.62 * window_height_px);
+        vec2 dog_line1 = vec2(0.45 * window_width_px, 0.4 * window_height_px);
+        vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
+
+        auto spaceKey = Entity();
+
+        if (screen.game_screen == cut_scene_0 ) {
+            registry.speechRenderRequests.insert(Entity(), {"Oh Sparky, did you eat", player_line1});
+            registry.speechRenderRequests.insert(Entity(), {"a forest Keeper again? you ", player_line2});
+            registry.speechRenderRequests.insert(Entity(), {"must be feeling so sick... ", player_line3});
+            registry.speechRenderRequests.insert(Entity(), {"woof! woof!", dog_line1});
+
+            registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
+            registry.textRenderRequests.get(spaceKey).scale = 0.5;
+
+        }
+        else if (screen.game_screen == cut_scene_1) {
+            registry.speechRenderRequests.insert(Entity(),{"You're lucky I know the magical", player_line1});
+            registry.speechRenderRequests.insert(Entity(), {"properties of Shadowgrove forest so well...", player_line2});
+            registry.speechRenderRequests.insert(Entity(), {"I'll be able to craft a healing potion for you ", player_line3});
+            registry.speechRenderRequests.insert(Entity(), {"woof!", dog_line1});
+
+            registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
+            registry.textRenderRequests.get(spaceKey).scale = 0.5;
+
+        }
+        else {
+            registry.speechRenderRequests.insert(Entity(),{"I'll search every night until I find", player_line1});
+            registry.speechRenderRequests.insert(Entity(), {"the right ingredients to make you", player_line2});
+            registry.speechRenderRequests.insert(Entity(), {"an orange, green, and purple potion", player_line3});
+            registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
+
+            registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
+            registry.textRenderRequests.get(spaceKey).scale = 0.5;
+
+            vec2 orange_potion_pos = {100, 300};
+            vec2 green_potion_pos = {150, 300};
+            vec2 purple_potion_pos = {200, 300};
+
+            Item orange_item = orange_potion;
+            Item green_item = green_potion;
+            Item purple_item = purple_potion;
+
+            Entity orange = createInventoryPotion(orange_item, orange_potion_pos);
+            Entity green = createInventoryPotion(green_item, green_potion_pos);
+            Entity purple = createInventoryPotion(purple_item, purple_potion_pos);
+        }
+    }
+
     else if (screen.game_screen == game_screen_win) {
-
-
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
@@ -729,40 +781,25 @@ void WorldSystem::restart_game() {
 
         Entity day = createDay();
         printf("day entity init %zu\n", day);
-		//screen.torch_mode = 0;
-		//screen.night_counter_ms = 0;
 
 		win_dance = createWinDance(renderer, { 0.5 * window_width_px, 0.75 * window_height_px });
-//		renderer->setDance(win_dance);
-		// get win animation
-
 
         auto win = Entity();
         registry.textRenderRequests.insert(win,
                                            {"You win!", vec2(0.35 * window_width_px, 0.64 * window_height_px)});
-        TextRenderRequest& over_text = registry.textRenderRequests.get(win);
-        over_text.scale = 1.4;
+        registry.textRenderRequests.get(win).scale = 1.4;
 
         auto savedDog = Entity();
         registry.textRenderRequests.insert(savedDog,
-                                           {
-                                                   "Congratulations! You saved your beloved dog!", vec2(0.12 * window_width_px, 0.56 * window_height_px) // might need to adjust position
-                                           });
-        TextRenderRequest& savedDogText = registry.textRenderRequests.get(savedDog);
-        savedDogText.scale = 0.6;
+                                           {"Congratulations! You saved your beloved dog!", vec2(0.12 * window_width_px, 0.56 * window_height_px)});
+        registry.textRenderRequests.get(savedDog).scale = 0.6;
 
         auto spaceKey = Entity();
         registry.textRenderRequests.insert(spaceKey,
-                                           {
-                                                   "Press space key to play again", vec2(0.23 * window_width_px, 0.5 * window_height_px) // might need to adjust position
-                                           });
-        TextRenderRequest& spaceKeyText = registry.textRenderRequests.get(spaceKey);
-        spaceKeyText.scale = 0.6;
-
+                                           {"Press space key to play again", vec2(0.23 * window_width_px, 0.5 * window_height_px)});
+        registry.textRenderRequests.get(spaceKey).scale = 0.6;
 
        // createDog({ window_width_px / 2, window_height_px - 200 });
-
-
     }
 
 	// Create empty "path" maze
@@ -1294,13 +1331,40 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 	}
 
-    // space to start game
-    if (screen.game_screen == game_screen_main_menu) {
-        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+    // space to start game + cut scenes
+    if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+        if (screen.game_screen == cut_scene_2) {
+            printf("hi 2 \n");
             screen.game_screen = game_screen_day;
             restart_game();
         }
+        if (screen.game_screen == cut_scene_1) {
+            printf("hi 1 \n");
+
+            screen.game_screen = cut_scene_2;
+            restart_game();
+        }
+        if (screen.game_screen == cut_scene_0) {
+            printf("hi 0 \n");
+
+            screen.game_screen = cut_scene_1;
+            restart_game();
+        }
+        if (screen.game_screen == game_screen_main_menu) {
+            screen.game_screen = cut_scene_0;
+            printf("hi \n");
+
+            restart_game();
+        }
     }
+
+//    // space to start game
+//    if (screen.game_screen == game_screen_main_menu) {
+//        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+//            screen.game_screen = cut_scene_0;
+//            restart_game();
+//        }
+//    }
 
     // space to restart
     if (screen.game_screen == game_screen_game_over) {

@@ -210,6 +210,7 @@ public:
 
 	// Print text to the screen
 	void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
+    void renderSpeechText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
 
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
