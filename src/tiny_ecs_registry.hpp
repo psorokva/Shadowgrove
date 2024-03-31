@@ -38,6 +38,7 @@ public:
     ComponentContainer<HitTimer> hitTimers;
     ComponentContainer<Invincible> invincibles;
 	ComponentContainer<TextRenderRequest> textRenderRequests;
+    ComponentContainer<SpeechRenderRequest> speechRenderRequests;
     ComponentContainer<Daytime> daytimes;
 	ComponentContainer<Torches> torches;
     ComponentContainer<Pause> pauses;
@@ -72,6 +73,7 @@ public:
         registry_list.push_back(&hitTimers);
         registry_list.push_back(&invincibles);
 		registry_list.push_back(&textRenderRequests);
+        registry_list.push_back(&speechRenderRequests);
         registry_list.push_back(&daytimes);
 		registry_list.push_back(&torches);
         registry_list.push_back(&pauses);

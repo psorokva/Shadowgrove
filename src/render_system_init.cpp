@@ -14,11 +14,15 @@
 #include <sstream>
 
 // setup fonts
-std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
-//std::string font_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
+//std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+std::string font_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
+//std::string speech_filename = "..//..//..//data//fonts//Kenney_Future_Narrow.ttf";
+std::string speech_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Future_Narrow.ttf";
+
 unsigned int font_default_size = 48;
 // fonts
 std::map<char, Character> m_ftCharacters;	// map of all characters and their textures
+std::map<char, Character> m_ftSpeechCharacters; // speech characters
 GLuint m_font_shaderProgram;				// drawing the font
 GLuint m_font_VAO;							// to isolate font things in separate VAO/VBO
 GLuint m_font_VBO;
@@ -397,15 +401,20 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 		return false;
 	}
 
-//    FT_Face face;
-//	if (FT_New_Face(ft, font_filename.c_str(), 0, &face))
-//	{
-//		std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filename << std::endl;
-//		return false;
-//	}
+    FT_Face face1;
+    if (FT_New_Face(ft, speech_filename.c_str(), 0, &face1)) {
+        std::cerr << "ERROR::FREETYPE: Failed to load font: " << speech_filename << std::endl;
+        //if (FT_New_Face(ft, font_filenameMAC.c_str(), 0, &face)) {
+        //	std::cerr << "ERROR::FREETYPE: Failed to load font: " << font_filenameMAC << std::endl;
+        //	return false;
+        //}
+        return false;
+    }
 
 	// extract a default size
 	FT_Set_Pixel_Sizes(face, 0, font_default_size);
+
+    FT_Set_Pixel_Sizes(face1, 0, font_default_size);
 
 	// disable byte-alignment restriction in OpenGL
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -453,6 +462,51 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
 		};
 		m_ftCharacters.insert(std::pair<char, Character>(c, character));
 	}
+
+    // load each of the speech chars - note only first 128 ASCII chars
+    for (unsigned char c = 0; c < 128; c++) {
+        // load character glyph
+        if (FT_Load_Char(face1, c, FT_LOAD_RENDER)) {
+            std::cerr << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+            continue;
+        }
+
+        // generate texture
+        unsigned int texture;
+        glGenTextures(1, &texture);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        // std::cout << "texture: " << c << " = " << texture << std::endl;
+
+        glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                GL_RED,
+                face1->glyph->bitmap.width,
+                face1->glyph->bitmap.rows,
+                0,
+                GL_RED,
+                GL_UNSIGNED_BYTE,
+                face1->glyph->bitmap.buffer
+        );
+
+        // set texture options
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        // now store character for later use
+        Character character = {
+                texture,
+                glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                static_cast<unsigned int>(face->glyph->advance.x),
+                (char) c
+        };
+        m_ftSpeechCharacters.insert(std::pair<char, Character>(c, character));
+    }
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// clean up
@@ -532,6 +586,68 @@ void RenderSystem::renderText(const std::string& text, float x, float y, float s
 
 	glBindVertexArray(0); // means stop
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+
+}
+
+void RenderSystem::renderSpeechText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans) {
+
+    // activate the shaders!
+    glUseProgram(m_font_shaderProgram);
+
+    GLint textColor_location = glGetUniformLocation(m_font_shaderProgram, "textColor");
+
+    assert(textColor_location > -1);
+
+    glUniform3f(textColor_location, color.x, color.y, color.z);
+
+    auto transform_location = glGetUniformLocation(m_font_shaderProgram, "transform");
+
+    assert(transform_location > -1);
+    glUniformMatrix4fv(transform_location, 1, GL_FALSE, glm::value_ptr(trans));
+
+    glBindVertexArray(m_font_VAO);
+
+    // iterate through all characters
+    std::string::const_iterator c;
+    for (c = text.begin(); c != text.end(); c++)
+    {
+        Character ch = m_ftSpeechCharacters[*c];
+
+        float xpos = x + ch.Bearing.x * scale + 100;
+        float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+        float w = ch.Size.x * scale;
+        float h = ch.Size.y * scale;
+        // update VBO for each character
+        float vertices[6][4] = {
+                { xpos,     ypos + h,   0.0f, 0.0f },
+                { xpos,     ypos,       0.0f, 1.0f },
+                { xpos + w, ypos,       1.0f, 1.0f },
+
+                { xpos,     ypos + h,   0.0f, 0.0f },
+                { xpos + w, ypos,       1.0f, 1.0f },
+                { xpos + w, ypos + h,   1.0f, 0.0f }
+        };
+
+        // render glyph texture over quad
+        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+        // std::cout << "binding texture: " << ch.character << " = " << ch.TextureID << std::endl;
+
+        // update content of VBO memory
+        glBindBuffer(GL_ARRAY_BUFFER, m_font_VBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        // render quad
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+        x += (ch.Advance >> 4) * scale; // bitshift by 6 to get value in pixels (2^6 = 64)
+    }
+
+    glBindVertexArray(0); // means stop
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 
 }
