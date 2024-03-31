@@ -552,6 +552,26 @@ void RenderSystem::draw() {
 //		drawTexturedMesh(&win_dance, projection_2D);
     }
 
+	// FOR INTRO ANIMATIONS 
+	if (screen.game_screen == game_screen_introduction ) { //|| screen.game_screen == game_screen_day) {
+		if (registry.daytimes.entities.size() >0 ) {
+			Entity background = registry.daytimes.entities[0];
+			drawTexturedStaticMesh(background, projection_2D);
+		}
+		if (registry.uicomps.entities.size() >0 ) {
+			for (Entity entity : registry.uicomps.entities) {
+				// UIComp& ui_comp = registry.uicomps.get(entity);
+				drawTexturedUIMesh(entity, projection_2D);
+			}
+		}
+	 // Then render text after 
+	 //for (text ..) { 
+	 // TODO: print dialogue;
+	 //}
+	}
+
+
+
 	glm::mat4 trans = glm::mat4(1.0f);
 	// Might need to use rotation and scaling in the future
 	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
@@ -575,6 +595,7 @@ void RenderSystem::draw() {
 	gl_has_errors();
 }
 
+
 mat3 RenderSystem::createProjectionMatrix() {
 	// Fake projection matrix, scales with respect to window coordinates
 	float left = 0.f;
@@ -590,6 +611,96 @@ mat3 RenderSystem::createProjectionMatrix() {
 	float ty = -(top + bottom) / (top - bottom);
 	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
 }
+
+void RenderSystem::drawTexturedUIMesh(Entity entity, const mat3& projection) {
+	UIComp& ui_comp = registry.uicomps.get(entity);
+	ScreenState& screen = registry.screenStates.components[0];
+	Transform transform;
+	transform.translate(ui_comp.position);
+	transform.scale(ui_comp.scale);
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	const GLuint used_effect_enum = (GLuint)render_request.used_effect;
+	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	// Input data location as in the vertex buffer
+	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		assert(in_position_loc >= 0);
+		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+		gl_has_errors();
+		assert(in_texcoord_loc >= 0);
+		glBindVertexArray(vao);
+		glEnableVertexAttribArray(in_position_loc);
+		gl_has_errors();
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
+		gl_has_errors();
+		glEnableVertexAttribArray(in_texcoord_loc);
+		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
+		// note the stride to skip the preceeding vertex position
+		// Enabling and binding texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id = texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+		gl_has_errors();
+	}
+	else if (render_request.used_effect == EFFECT_ASSET_ID::INVENTORY_LINE) {
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		GLint in_color_loc = glGetAttribLocation(program, "in_color");
+		gl_has_errors();
+		glBindVertexArray(vao);
+		glEnableVertexAttribArray(in_position_loc);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,sizeof(ColoredVertex), (void*)0);
+		gl_has_errors();
+		glEnableVertexAttribArray(in_color_loc);
+		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,sizeof(ColoredVertex), (void*)sizeof(vec3));
+		gl_has_errors();
+	} else {
+		assert(false && "Type of render request not supported");
+	}
+	// Getting uniform locations for glUniform* calls
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	gl_has_errors();
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+
+
+
 
 //void RenderSystem::renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans) {
 //

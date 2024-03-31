@@ -41,6 +41,9 @@ public:
     ComponentContainer<Daytime> daytimes;
 	ComponentContainer<Torches> torches;
     ComponentContainer<Pause> pauses;
+	ComponentContainer<UIComp> uicomps;
+	ComponentContainer<AnimatedFaceOject> face_animation;
+	ComponentContainer<AnimatedDogFace> dog_face_animation;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -72,6 +75,9 @@ public:
         registry_list.push_back(&daytimes);
 		registry_list.push_back(&torches);
         registry_list.push_back(&pauses);
+		registry_list.push_back(&uicomps);
+		registry_list.push_back(&face_animation); 
+		registry_list.push_back(&dog_face_animation);
 	}
 
 	void clear_all_components() {
