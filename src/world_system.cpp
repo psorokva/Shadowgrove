@@ -198,8 +198,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Don't do anything if game is paused
 	if (game_paused) return true;
 
-	if (registry.players.get(player).moving)
-	{
+	if (registry.players.get(player).moving) {
 		RenderRequest& r = registry.renderRequests.get(player);
 		r.used_texture = (TEXTURE_ASSET_ID)(animation_cycle + 1);
 	}
@@ -244,6 +243,35 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		animation_cycle++;
 		screen.torch_anim = animation_cycle % 3;
 		animation_cycle %= 4;
+		// DO INTRO STUFF LIKE ANIMATION
+		if (screen.game_screen == game_screen_introduction ) { // || screen.game_screen == game_screen_day
+			if (registry.face_animation.entities.size() > 0) {
+				for (Entity& animated_entity : registry.face_animation.entities) {
+					AnimatedFaceOject& face = registry.face_animation.get(animated_entity);
+					// No need to check if render request since should always have a render request
+					RenderRequest& anim_rr = registry.renderRequests.get(animated_entity);
+					face.current_cell++;
+					if (face.current_cell >= face.size) {
+						face.current_cell = 0;
+					}
+					anim_rr.used_texture = face.cells[face.current_cell];
+				}
+			}
+			if (registry.dog_face_animation.entities.size() > 0) {
+				// also do for dog
+				for (Entity& animated_entity : registry.dog_face_animation.entities) {
+					AnimatedDogFace& face = registry.dog_face_animation.get(animated_entity);
+					// No need to check if render request since should always have a render request
+					RenderRequest& anim_rr = registry.renderRequests.get(animated_entity);
+					face.current_cell++;
+					if (face.current_cell >= face.size) {
+						face.current_cell = 0;
+					}
+					anim_rr.used_texture = face.cells[face.current_cell];
+				}
+			}
+		}
+
 	}
 	//const float KEEPER_SPAWN_FREQ = 10.0 * 1000.0;
 	//f//loat keeper_spawn_time = 0.0f;
@@ -335,6 +363,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
         }
     }
+
 
 
     if (screen.game_screen == game_screen_day) {
@@ -619,6 +648,8 @@ void WorldSystem::restart_game() {
     help = createHelp();
 	//printf("MAP AND PLAYER CREATED\n");
 
+
+
 	// create a compass to calc player movement
 	Entity compass = createCompass(vec2(155.0,155.0));
 	Immobile& imo = registry.immobiles.get(compass);
@@ -679,11 +710,16 @@ void WorldSystem::restart_game() {
 		}
 
     }
-    else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
+    else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) { 
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
         printf("here\n");
+
+		// TODO: move to game_screen_intro
+		/// ADD ANIMATED FACE !! 
+		//createPortrait(renderer, vec2(150.0,200.0));
+		//createDogPortrait(renderer, vec2(750.0, 200.0));
 
         Motion& player_motion = registry.motions.get(player);
         player_motion.position = { 0.6 * window_width_px, 0.75 * window_height_px };
@@ -1200,19 +1236,22 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
     // Opening help screen
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
-        HelpScreen &screen = registry.helpScreen.components[0];
-        if (screen.help == 1) {
-           // printf("H key pressed, closing help screen\n");
-            screen.help = 0;
-            game_paused = false;
-        } else {
-            //printf("H key pressed, opening help screen\n");
-            screen.help = 1;
-            game_paused = true;
-            for (Motion& motion : registry.motions.components) {
-                motion.velocity = { 0, 0 };
-            }
-        }
+		if (registry.helpScreen.components.size() >0) {
+			HelpScreen& help_screen = registry.helpScreen.components[0];
+			if (help_screen.help == 1) {
+				// printf("H key pressed, closing help screen\n");
+				help_screen.help = 0;
+				game_paused = false;
+			} else {
+				//printf("H key pressed, opening help screen\n");
+				help_screen.help = 1;
+				game_paused = true;
+				for (Motion& motion : registry.motions.components) {
+					motion.velocity = { 0, 0 };
+				}
+			}
+		}
+
     }
 
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
