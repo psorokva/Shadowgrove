@@ -576,18 +576,6 @@ void RenderSystem::draw() {
         float timeBetweenLines = 10000.0f;
         float elapsedTime = 0.0f;
 
-        // Render all speech in the registry
-//        for (Entity entity : registry.speechRenderRequests.entities)
-//        {
-//            SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
-//            if (elapsedTime <= timeBetweenLines) {
-//                elapsedTime += 0.001;
-//            }
-//            elapsedTime = 0.0f;
-//            renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
-//
-//        }
-
         for (Entity entity : registry.speechRenderRequests.entities)
         {
             SpeechRenderRequest request = registry.speechRenderRequests.get(entity);

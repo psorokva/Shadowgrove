@@ -157,7 +157,8 @@ struct HitTimer {
 };
 
 struct SpeechTimer {
-    float counter_ms = 2000;
+    float counter_ms = 500;
+    int timestamp = 0;
 };
 
 struct TextTimer {
