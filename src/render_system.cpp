@@ -553,18 +553,40 @@ void RenderSystem::draw() {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
 
+        if (registry.daytimes.entities.size() >0 ) {
+            Entity background = registry.daytimes.entities[0];
+            drawTexturedStaticMesh(background, projection_2D);
+        }
+        if (registry.uicomps.entities.size() >0 ) {
+            for (Entity entity : registry.uicomps.entities) {
+                // UIComp& ui_comp = registry.uicomps.get(entity);
+                drawTexturedUIMesh(entity, projection_2D);
+            }
+        }
+
         glm::mat4 trans = glm::mat4(1.0f);
-//        float timeBetweenLines = 10000.0f; // Adjust this value to control the time between lines
-//        float elapsedTime = 0.0f;
+        float timeBetweenLines = 10000.0f;
+        float elapsedTime = 0.0f;
 
         // Render all speech in the registry
-        for (Entity entity : registry.speechRenderRequests.entities)
-        {
-            SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
-//            while (elapsedTime <= timeBetweenLines) {
+//        for (Entity entity : registry.speechRenderRequests.entities)
+//        {
+//            SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
+//            if (elapsedTime <= timeBetweenLines) {
 //                elapsedTime += 0.001;
 //            }
 //            elapsedTime = 0.0f;
+//            renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+//
+//        }
+
+        for (Entity entity : registry.speechRenderRequests.entities)
+        {
+            SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
+            if (elapsedTime <= timeBetweenLines) {
+                elapsedTime += 0.001;
+            }
+            elapsedTime = 0.0f;
             renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
 
         }
@@ -577,23 +599,23 @@ void RenderSystem::draw() {
 
     }
 
-	// FOR INTRO ANIMATIONS 
-	if (screen.game_screen == game_screen_introduction ) { //|| screen.game_screen == game_screen_day) {
-		if (registry.daytimes.entities.size() >0 ) {
-			Entity background = registry.daytimes.entities[0];
-			drawTexturedStaticMesh(background, projection_2D);
-		}
-		if (registry.uicomps.entities.size() >0 ) {
-			for (Entity entity : registry.uicomps.entities) {
-				// UIComp& ui_comp = registry.uicomps.get(entity);
-				drawTexturedUIMesh(entity, projection_2D);
-			}
-		}
-	 // Then render text after 
-	 //for (text ..) { 
-	 // TODO: print dialogue;
-	 //}
-	}
+//	// FOR INTRO ANIMATIONS
+//	if (screen.game_screen == game_screen_introduction ) { //|| screen.game_screen == game_screen_day) {
+//		if (registry.daytimes.entities.size() >0 ) {
+//			Entity background = registry.daytimes.entities[0];
+//			drawTexturedStaticMesh(background, projection_2D);
+//		}
+//		if (registry.uicomps.entities.size() >0 ) {
+//			for (Entity entity : registry.uicomps.entities) {
+//				// UIComp& ui_comp = registry.uicomps.get(entity);
+//				drawTexturedUIMesh(entity, projection_2D);
+//			}
+//		}
+//	 // Then render text after
+//	 //for (text ..) {
+//	 // TODO: print dialogue;
+//	 //}
+//	}
 
 
 

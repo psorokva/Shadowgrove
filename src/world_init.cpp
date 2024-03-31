@@ -34,7 +34,7 @@ Entity createSpeechBubble(RenderSystem* renderer, vec2 pos, bool direction) {
 	auto entity = Entity();
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
 	ui_comp.position = pos;
-	ui_comp.scale = vec2(350.0, 200.0 );
+	ui_comp.scale = vec2(540.0, 200.0 );
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUBBLE0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }

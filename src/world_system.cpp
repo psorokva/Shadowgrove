@@ -244,7 +244,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		screen.torch_anim = animation_cycle % 3;
 		animation_cycle %= 4;
 		// DO INTRO STUFF LIKE ANIMATION
-		if (screen.game_screen == game_screen_introduction ) { // || screen.game_screen == game_screen_day
+		if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2 ) { // || screen.game_screen == game_screen_day
 			if (registry.face_animation.entities.size() > 0) {
 				for (Entity& animated_entity : registry.face_animation.entities) {
 					AnimatedFaceOject& face = registry.face_animation.get(animated_entity);
@@ -716,10 +716,6 @@ void WorldSystem::restart_game() {
         fprintf(stderr, "Loaded music\n");
         printf("here\n");
 
-		// TODO: move to game_screen_intro
-		/// ADD ANIMATED FACE !! 
-		//createPortrait(renderer, vec2(150.0,200.0));
-		//createDogPortrait(renderer, vec2(750.0, 200.0));
 
         Motion& player_motion = registry.motions.get(player);
         player_motion.position = { 0.6 * window_width_px, 0.75 * window_height_px };
@@ -756,18 +752,28 @@ void WorldSystem::restart_game() {
         Entity day = createDay();
         registry.immobiles.get(day).scale = { 1.3 * window_width_px, 1.3 * window_height_px };
         printf("day entity init %zu\n", day);
-        vec2 player_line1 = vec2(0.15 * window_width_px, 0.7 * window_height_px);
-        vec2 player_line2 = vec2(0.15 * window_width_px, 0.66 * window_height_px);
-        vec2 player_line3 = vec2(0.15 * window_width_px, 0.62 * window_height_px);
-        vec2 dog_line1 = vec2(0.45 * window_width_px, 0.4 * window_height_px);
+        vec2 player_line1 = vec2(0.18 * window_width_px, 0.7 * window_height_px);
+        vec2 player_line2 = vec2(0.18 * window_width_px, 0.66 * window_height_px);
+        vec2 player_line3 = vec2(0.18 * window_width_px, 0.62 * window_height_px);
+        vec2 player_line4 = vec2(0.18 * window_width_px, 0.58 * window_height_px);
+        vec2 dog_line1 = vec2(0.435 * window_width_px, 0.4 * window_height_px);
         vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
+
+        // TODO: move to game_screen_intro
+        /// ADD ANIMATED FACE !!
+        createPortrait(renderer, vec2(150.0,400.0));
+        createDogPortrait(renderer, vec2(900.0, 400.0));
+
+        Entity player_bubble = createSpeechBubble(renderer, {525, 300}, 1);
+        Entity dog_bubble = createSpeechBubble(renderer, {685, 470}, 1);
+        registry.uicomps.get(dog_bubble).scale = {-250, -70};
 
         auto spaceKey = Entity();
 
         if (screen.game_screen == cut_scene_0 ) {
-            registry.speechRenderRequests.insert(Entity(), {"Oh Sparky, did you eat", player_line1});
-            registry.speechRenderRequests.insert(Entity(), {"a forest Keeper again? you ", player_line2});
-            registry.speechRenderRequests.insert(Entity(), {"must be feeling so sick... ", player_line3});
+            registry.speechRenderRequests.insert(Entity(), {"Oh Sparky, did you eat a forest", player_line1});
+            registry.speechRenderRequests.insert(Entity(), {"Keeper again?", player_line2});
+            registry.speechRenderRequests.insert(Entity(), {"You must be feeling so sick... ", player_line3});
             registry.speechRenderRequests.insert(Entity(), {"woof! woof!", dog_line1});
 
             registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
@@ -775,9 +781,10 @@ void WorldSystem::restart_game() {
 
         }
         else if (screen.game_screen == cut_scene_1) {
-            registry.speechRenderRequests.insert(Entity(),{"You're lucky I know the magical", player_line1});
-            registry.speechRenderRequests.insert(Entity(), {"properties of Shadowgrove forest so well...", player_line2});
-            registry.speechRenderRequests.insert(Entity(), {"I'll be able to craft a healing potion for you ", player_line3});
+            registry.speechRenderRequests.insert(Entity(),{"You're lucky i know the ", player_line1});
+            registry.speechRenderRequests.insert(Entity(), {"magical properties of Shadowgrove ", player_line2});
+            registry.speechRenderRequests.insert(Entity(), {"forest so well... i'll be able to", player_line3});
+            registry.speechRenderRequests.insert(Entity(), {"craft a healing potion for you ", player_line4});
             registry.speechRenderRequests.insert(Entity(), {"woof!", dog_line1});
 
             registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
@@ -785,9 +792,10 @@ void WorldSystem::restart_game() {
 
         }
         else {
-            registry.speechRenderRequests.insert(Entity(),{"I'll search every night until I find", player_line1});
-            registry.speechRenderRequests.insert(Entity(), {"the right ingredients to make you", player_line2});
-            registry.speechRenderRequests.insert(Entity(), {"an orange, green, and purple potion", player_line3});
+            registry.speechRenderRequests.insert(Entity(),{"i'll search every night until i", player_line1});
+            registry.speechRenderRequests.insert(Entity(), {"find the right ingredients to", player_line2});
+            registry.speechRenderRequests.insert(Entity(), {"make you an orange, green, and", player_line3});
+            registry.speechRenderRequests.insert(Entity(), {"purple potion", player_line4});
             registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
 
             registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});

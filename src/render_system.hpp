@@ -235,7 +235,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawTexturedStaticMesh(Entity entity, const mat3& projection);
-	void RenderSystem::drawTexturedUIMesh(Entity entity, const mat3& projection);
+	void drawTexturedUIMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
 	Entity * win_dance;
 	// Window handle
