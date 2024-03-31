@@ -156,6 +156,14 @@ struct HitTimer {
     float counter_ms = 3000;
 };
 
+struct SpeechTimer {
+    float counter_ms = 2000;
+};
+
+struct TextTimer {
+    float counter_ms = 2000;
+};
+
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };

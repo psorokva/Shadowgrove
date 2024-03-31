@@ -540,6 +540,47 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         }
     }
 
+    // rolling speech
+    float speech_counter_ms = 2000.f;
+    for (Entity entity : registry.textTimers.entities)
+    {
+        // progress timer
+        TextTimer &counter = registry.textTimers.get(entity);
+        counter.counter_ms -= elapsed_ms_since_last_update;
+
+        if (counter.counter_ms < speech_counter_ms)
+        {
+            speech_counter_ms = counter.counter_ms;
+        }
+
+        if (counter.counter_ms < 0)
+        {
+            // credits
+            if (registry.textRenderRequests.has(entity)) {
+                float y_pos = registry.textRenderRequests.get(entity).position.y;
+                if (y_pos > 1100) {
+                    // check if out of bounds
+                    registry.remove_all_components_of(entity);
+                    // otherwise move entity
+                } else {
+                    registry.textRenderRequests.get(entity).position.y += 2;
+                }
+            }
+
+            // speech
+            if (registry.speechRenderRequests.has(entity)) {
+                float y_pos = registry.speechRenderRequests.get(entity).position.y;
+                if (y_pos > 1100) {
+                    // check if out of bounds
+                    registry.remove_all_components_of(entity);
+                    // otherwise move entity
+                } else {
+                    registry.speechRenderRequests.get(entity).position.y += 2;
+                }
+            }
+        }
+    }
+
 	return true;
 }
 
@@ -820,30 +861,46 @@ void WorldSystem::restart_game() {
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
 
-//        Motion& player_motion = registry.motions.get(player);
-//        player_motion.position = { window_width_px / 2, window_height_px - 200 };
-
         Entity day = createDay();
         printf("day entity init %zu\n", day);
 
 		win_dance = createWinDance(renderer, { 0.5 * window_width_px, 0.75 * window_height_px });
 
         auto win = Entity();
-        registry.textRenderRequests.insert(win,
-                                           {"You win!", vec2(0.35 * window_width_px, 0.64 * window_height_px)});
+        registry.textTimers.emplace(win);
+        registry.textRenderRequests.insert(win,{"You win!", vec2(0.35 * window_width_px, 0.64 * window_height_px)});
         registry.textRenderRequests.get(win).scale = 1.4;
-
         auto savedDog = Entity();
-        registry.textRenderRequests.insert(savedDog,
-                                           {"Congratulations! You saved your beloved dog!", vec2(0.12 * window_width_px, 0.56 * window_height_px)});
+        registry.textTimers.emplace(savedDog);
+        registry.textRenderRequests.insert(savedDog,{"Congratulations! You saved your beloved dog!", vec2(0.12 * window_width_px, 0.56 * window_height_px)});
         registry.textRenderRequests.get(savedDog).scale = 0.6;
-
         auto spaceKey = Entity();
-        registry.textRenderRequests.insert(spaceKey,
-                                           {"Press space key to play again", vec2(0.23 * window_width_px, 0.5 * window_height_px)});
-        registry.textRenderRequests.get(spaceKey).scale = 0.6;
+        registry.textRenderRequests.insert(spaceKey,{"Press space key to play again", vec2(0.335 * window_width_px, 0.12 * window_height_px)});
+        registry.textRenderRequests.get(spaceKey).scale = 0.4;
 
-       // createDog({ window_width_px / 2, window_height_px - 200 });
+        auto credit1 = Entity();
+        registry.textTimers.emplace(credit1);
+        registry.speechRenderRequests.insert(credit1, {"Super Awesome Game By", vec2(300, -50)});
+        auto credit2 = Entity();
+        registry.textTimers.emplace(credit2);
+        registry.speechRenderRequests.insert(credit2, {"Madeleine", vec2(385, -130)});
+        auto credit3 = Entity();
+        registry.textTimers.emplace(credit3);
+        registry.speechRenderRequests.insert(credit3, {"Peter", vec2(410, -200)});
+        auto credit4 = Entity();
+        registry.textTimers.emplace(credit4);
+        registry.speechRenderRequests.insert(credit4, {"Polina", vec2(405, -270)});
+        auto credit5 = Entity();
+        registry.textTimers.emplace(credit5);
+        registry.speechRenderRequests.insert(credit5, {"Luka", vec2(415, -340)});
+        auto credit6 = Entity();
+        registry.textTimers.emplace(credit6);
+        registry.speechRenderRequests.insert(credit6, {"Aviral", vec2(405, -410)});
+        auto credit7 = Entity();
+        registry.textTimers.emplace(credit7);
+        registry.speechRenderRequests.insert(credit7, {"thanks for playing!", vec2(305, -500)});
+
+
     }
 
 	// Create empty "path" maze
