@@ -43,9 +43,9 @@ Entity createPortrait(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
 	ui_comp.position = pos;
-	ui_comp.scale = vec2(200.0, 300.0);
+	ui_comp.scale = vec2(250.0, 300.0);
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PORTRAIT0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-
+	AnimatedFaceOject& animation = registry.face_animation.emplace(entity);
 	return entity;
 }
 
@@ -53,9 +53,9 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
 	ui_comp.position = pos;
-	ui_comp.scale = vec2(200.0, 300.0);
+	ui_comp.scale = vec2(250.0, 300.0);
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::DOG_PORTRAIT0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
-
+	AnimatedDogFace& animation = registry.dog_face_animation.emplace(entity);
 	return entity;
 }
 

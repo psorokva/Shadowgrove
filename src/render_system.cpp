@@ -553,18 +553,22 @@ void RenderSystem::draw() {
     }
 
 	// FOR INTRO ANIMATIONS 
-	//if (screen.game_screen == game_screen_introduction) {
-	//	Entity background = registry.daytimes.entities[0];
-	//	drawTexturedStaticMesh(background, projection_2D);
-	//	for (Entity entity : registry.uicomps.entities) {
-	//		// UIComp& ui_comp = registry.uicomps.get(entity);
-	//		drawTexturedUIMesh(entity, projection_2D);
-	//	}
-	// // Then render text after 
-	// //for (text ..) { 
-	// // TODO: print dialogue;
-	// //}
-	//}
+	if (screen.game_screen == game_screen_introduction ) { //|| screen.game_screen == game_screen_day) {
+		if (registry.daytimes.entities.size() >0 ) {
+			Entity background = registry.daytimes.entities[0];
+			drawTexturedStaticMesh(background, projection_2D);
+		}
+		if (registry.uicomps.entities.size() >0 ) {
+			for (Entity entity : registry.uicomps.entities) {
+				// UIComp& ui_comp = registry.uicomps.get(entity);
+				drawTexturedUIMesh(entity, projection_2D);
+			}
+		}
+	 // Then render text after 
+	 //for (text ..) { 
+	 // TODO: print dialogue;
+	 //}
+	}
 
 
 
