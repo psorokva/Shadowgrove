@@ -540,6 +540,125 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         }
     }
 
+    // dialogue positons
+    vec2 player_line1 = vec2(0.18 * window_width_px, 0.7 * window_height_px);
+    vec2 player_line2 = vec2(0.18 * window_width_px, 0.66 * window_height_px);
+    vec2 player_line3 = vec2(0.18 * window_width_px, 0.62 * window_height_px);
+    vec2 player_line4 = vec2(0.18 * window_width_px, 0.58 * window_height_px);
+    vec2 dog_line1 = vec2(0.435 * window_width_px, 0.4 * window_height_px);
+
+    // moving dialogue in cutscenes 0-2
+    if (screen.game_screen == cut_scene_0) {
+        float speech_counter_ms = 500.f;
+        for (Entity entity : registry.speechTimers.entities) {
+            SpeechTimer &counter = registry.speechTimers.get(entity);
+            counter.counter_ms -= elapsed_ms_since_last_update;
+
+            if (counter.counter_ms < speech_counter_ms) {
+                speech_counter_ms = counter.counter_ms;
+            }
+            if (counter.counter_ms < 0) {
+                if (counter.timestamp == 1) {
+                    registry.speechRenderRequests.insert(entity, {"Oh Sparky, did you eat a forest", player_line1});
+                } if (counter.timestamp == 2) {
+                    registry.speechRenderRequests.insert(entity, {"Keeper again?", player_line2});
+                } if (counter.timestamp == 3) {
+                    registry.speechRenderRequests.insert(entity, {"You must be feeling so sick... ", player_line3});
+                } if (counter.timestamp == 4) {
+                    registry.speechRenderRequests.insert(entity, {"woof! woof!", dog_line1});
+                }
+                registry.speechTimers.remove(entity);
+                return true;
+            }
+        }
+    }
+    if (screen.game_screen == cut_scene_1) {
+        float speech_counter_ms = 500.f;
+        for (Entity entity : registry.speechTimers.entities) {
+            SpeechTimer &counter = registry.speechTimers.get(entity);
+            counter.counter_ms -= elapsed_ms_since_last_update;
+
+            if (counter.counter_ms < speech_counter_ms) {
+                speech_counter_ms = counter.counter_ms;
+            }
+            if (counter.counter_ms < 0) {
+                if (counter.timestamp == 1) {
+                    registry.speechRenderRequests.insert(entity,{"You're lucky i know the ", player_line1});
+                } if (counter.timestamp == 2) {
+                    registry.speechRenderRequests.insert(entity, {"magical properties of Shadowgrove ", player_line2});
+                } if (counter.timestamp == 3) {
+                    registry.speechRenderRequests.insert(entity, {"forest so well... i'll be able to", player_line3});
+                } if (counter.timestamp == 4) {
+                    registry.speechRenderRequests.insert(entity, {"craft a healing potion for you ", player_line4});
+                } if (counter.timestamp == 5) {
+                    registry.speechRenderRequests.insert(entity, {"woof!", dog_line1});
+                }
+                registry.speechTimers.remove(entity);
+                return true;
+            }
+        }
+    }
+
+    if (screen.game_screen == cut_scene_2) {
+        float speech_counter_ms = 500.f;
+        for (Entity entity : registry.speechTimers.entities) {
+            SpeechTimer &counter = registry.speechTimers.get(entity);
+            counter.counter_ms -= elapsed_ms_since_last_update;
+
+            if (counter.counter_ms < speech_counter_ms) {
+                speech_counter_ms = counter.counter_ms;
+            }
+            if (counter.counter_ms < 0) {
+                if (counter.timestamp == 1) {
+                    registry.speechRenderRequests.insert(Entity(),{"i'll search every night until i", player_line1});
+                } if (counter.timestamp == 2) {
+                    registry.speechRenderRequests.insert(Entity(), {"find the right ingredients to", player_line2});
+                } if (counter.timestamp == 3) {
+                    registry.speechRenderRequests.insert(Entity(), {"make you an orange, green, and", player_line3});
+                } if (counter.timestamp == 4) {
+                    registry.speechRenderRequests.insert(Entity(), {"purple potion", player_line4});
+                } if (counter.timestamp == 5) {
+                    registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
+                }
+                registry.speechTimers.remove(entity);
+                return true;
+            }
+        }
+    }
+
+    // rolling credits
+    float text_counter_ms = 2000.f;
+    for (Entity entity : registry.textTimers.entities) {
+        TextTimer &counter = registry.textTimers.get(entity);
+        counter.counter_ms -= elapsed_ms_since_last_update;
+
+        if (counter.counter_ms < text_counter_ms) {
+            text_counter_ms = counter.counter_ms;
+        }
+        if (counter.counter_ms < 0) {
+            // credits
+            if (registry.textRenderRequests.has(entity)) {
+                float y_pos = registry.textRenderRequests.get(entity).position.y;
+                if (y_pos > 1100) {
+                    // check if out of bounds
+                    registry.remove_all_components_of(entity);
+                } else {
+                    registry.textRenderRequests.get(entity).position.y += 2;
+                }
+            }
+            // speech
+            if (registry.speechRenderRequests.has(entity)) {
+                float y_pos = registry.speechRenderRequests.get(entity).position.y;
+                if (y_pos > 1100) {
+                    // check if out of bounds
+                    registry.remove_all_components_of(entity);
+                } else {
+                    registry.speechRenderRequests.get(entity).position.y += 2;
+                }
+            }
+        }
+    }
+
 	return true;
 }
 
@@ -581,16 +700,7 @@ void WorldSystem::restart_game() {
     game_paused = false;
 	// Reset the game speed
 	current_speed = 1.f;
-//    inventory = 0;
 	num_of_item_on_screen = 0;
-	// Remove all entities that we created
-	// All that have a motion, we could also iterate over all bug, eagles, ... but that would be more cumbersome
-//    for (Entity entity : registry.motions.entities)
-//    {
-//        if (!registry.helpScreen.has(entity)) {
-//            registry.remove_all_components_of(entity);
-//        }
-//    }
 	Inventory i = Inventory();
 	if (registry.inventory.components.size() > 0) {
 		i = registry.inventory.components[0];
@@ -611,6 +721,10 @@ void WorldSystem::restart_game() {
 		registry.remove_all_components_of(registry.players.entities.back());
     while (registry.speechRenderRequests.entities.size() > 0)
         registry.remove_all_components_of(registry.speechRenderRequests.entities.back());
+    while (registry.speechTimers.entities.size() > 0)
+        registry.remove_all_components_of(registry.speechTimers.entities.back());
+    while (registry.textTimers.entities.size() > 0)
+        registry.remove_all_components_of(registry.textTimers.entities.back());
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -626,29 +740,20 @@ void WorldSystem::restart_game() {
 	// Create a new player
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
-	//player = createPlayer(renderer, { start_x, start_y 
-	
-	//vec2 player_starting_location = registry.get_empty_spawn_location();
-	//player = createPlayer(renderer, player_starting_location);
 
 	player = createPlayer(renderer, vec2{0,0}); // TODO: update this after
-	
 
 	// vec2(start_x, start_y);
 	//if (level > 1) {
 	//	registry.inventory.insert(player,tempInventory);
 	//} else {
 	registry.inventory.emplace(player);
-
 	registry.inventory.get(player) = i;
 
     //save_state.loadInventory();
 
-
     help = createHelp();
 	//printf("MAP AND PLAYER CREATED\n");
-
-
 
 	// create a compass to calc player movement
 	Entity compass = createCompass(vec2(155.0,155.0));
@@ -752,12 +857,6 @@ void WorldSystem::restart_game() {
         Entity day = createDay();
         registry.immobiles.get(day).scale = { 1.3 * window_width_px, 1.3 * window_height_px };
         printf("day entity init %zu\n", day);
-        vec2 player_line1 = vec2(0.18 * window_width_px, 0.7 * window_height_px);
-        vec2 player_line2 = vec2(0.18 * window_width_px, 0.66 * window_height_px);
-        vec2 player_line3 = vec2(0.18 * window_width_px, 0.62 * window_height_px);
-        vec2 player_line4 = vec2(0.18 * window_width_px, 0.58 * window_height_px);
-        vec2 dog_line1 = vec2(0.435 * window_width_px, 0.4 * window_height_px);
-        vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
 
         // TODO: move to game_screen_intro
         /// ADD ANIMATED FACE !!
@@ -768,39 +867,37 @@ void WorldSystem::restart_game() {
         Entity dog_bubble = createSpeechBubble(renderer, {685, 470}, 1);
         registry.uicomps.get(dog_bubble).scale = {-250, -70};
 
+        Entity line1 = Entity();
+        SpeechTimer& line1_speech = registry.speechTimers.emplace(line1);
+        line1_speech.timestamp = 1;
+
+        Entity line2 = Entity();
+        SpeechTimer& line2_speech = registry.speechTimers.emplace(line2);
+        line2_speech.timestamp = 2;
+        line2_speech.counter_ms = 1000;
+
+        Entity line3 = Entity();
+        SpeechTimer& line3_speech = registry.speechTimers.emplace(line3);
+        line3_speech.timestamp = 3;
+        line3_speech.counter_ms = 1500;
+
+        Entity line4 = Entity();
+        SpeechTimer& line4_speech = registry.speechTimers.emplace(line4);
+        line4_speech.timestamp = 4;
+        line4_speech.counter_ms = 2200;
+
+        Entity line5 = Entity();
+        SpeechTimer& line5_speech = registry.speechTimers.emplace(line5);
+        line5_speech.timestamp = 5;
+        line5_speech.counter_ms = 3000;
+
         auto spaceKey = Entity();
+        vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
 
-        if (screen.game_screen == cut_scene_0 ) {
-            registry.speechRenderRequests.insert(Entity(), {"Oh Sparky, did you eat a forest", player_line1});
-            registry.speechRenderRequests.insert(Entity(), {"Keeper again?", player_line2});
-            registry.speechRenderRequests.insert(Entity(), {"You must be feeling so sick... ", player_line3});
-            registry.speechRenderRequests.insert(Entity(), {"woof! woof!", dog_line1});
+        registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
+        registry.textRenderRequests.get(spaceKey).scale = 0.5;
 
-            registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
-            registry.textRenderRequests.get(spaceKey).scale = 0.5;
-
-        }
-        else if (screen.game_screen == cut_scene_1) {
-            registry.speechRenderRequests.insert(Entity(),{"You're lucky i know the ", player_line1});
-            registry.speechRenderRequests.insert(Entity(), {"magical properties of Shadowgrove ", player_line2});
-            registry.speechRenderRequests.insert(Entity(), {"forest so well... i'll be able to", player_line3});
-            registry.speechRenderRequests.insert(Entity(), {"craft a healing potion for you ", player_line4});
-            registry.speechRenderRequests.insert(Entity(), {"woof!", dog_line1});
-
-            registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
-            registry.textRenderRequests.get(spaceKey).scale = 0.5;
-
-        }
-        else {
-            registry.speechRenderRequests.insert(Entity(),{"i'll search every night until i", player_line1});
-            registry.speechRenderRequests.insert(Entity(), {"find the right ingredients to", player_line2});
-            registry.speechRenderRequests.insert(Entity(), {"make you an orange, green, and", player_line3});
-            registry.speechRenderRequests.insert(Entity(), {"purple potion", player_line4});
-            registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
-
-            registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
-            registry.textRenderRequests.get(spaceKey).scale = 0.5;
-
+        if (screen.game_screen == cut_scene_2 ) {
             vec2 orange_potion_pos = {100, 300};
             vec2 green_potion_pos = {150, 300};
             vec2 purple_potion_pos = {200, 300};
@@ -820,30 +917,44 @@ void WorldSystem::restart_game() {
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
 
-//        Motion& player_motion = registry.motions.get(player);
-//        player_motion.position = { window_width_px / 2, window_height_px - 200 };
-
         Entity day = createDay();
         printf("day entity init %zu\n", day);
 
 		win_dance = createWinDance(renderer, { 0.5 * window_width_px, 0.75 * window_height_px });
 
         auto win = Entity();
-        registry.textRenderRequests.insert(win,
-                                           {"You win!", vec2(0.35 * window_width_px, 0.64 * window_height_px)});
+        registry.textTimers.emplace(win);
+        registry.textRenderRequests.insert(win,{"You win!", vec2(0.35 * window_width_px, 0.64 * window_height_px)});
         registry.textRenderRequests.get(win).scale = 1.4;
-
         auto savedDog = Entity();
-        registry.textRenderRequests.insert(savedDog,
-                                           {"Congratulations! You saved your beloved dog!", vec2(0.12 * window_width_px, 0.56 * window_height_px)});
+        registry.textTimers.emplace(savedDog);
+        registry.textRenderRequests.insert(savedDog,{"Congratulations! You saved your beloved dog!", vec2(0.12 * window_width_px, 0.56 * window_height_px)});
         registry.textRenderRequests.get(savedDog).scale = 0.6;
-
         auto spaceKey = Entity();
-        registry.textRenderRequests.insert(spaceKey,
-                                           {"Press space key to play again", vec2(0.23 * window_width_px, 0.5 * window_height_px)});
-        registry.textRenderRequests.get(spaceKey).scale = 0.6;
+        registry.textRenderRequests.insert(spaceKey,{"Press space key to play again", vec2(0.335 * window_width_px, 0.12 * window_height_px)});
+        registry.textRenderRequests.get(spaceKey).scale = 0.4;
 
-       // createDog({ window_width_px / 2, window_height_px - 200 });
+        auto credit1 = Entity();
+        registry.textTimers.emplace(credit1);
+        registry.speechRenderRequests.insert(credit1, {"Super Awesome Game By", vec2(300, -50)});
+        auto credit2 = Entity();
+        registry.textTimers.emplace(credit2);
+        registry.speechRenderRequests.insert(credit2, {"Madeleine", vec2(385, -130)});
+        auto credit3 = Entity();
+        registry.textTimers.emplace(credit3);
+        registry.speechRenderRequests.insert(credit3, {"Peter", vec2(410, -200)});
+        auto credit4 = Entity();
+        registry.textTimers.emplace(credit4);
+        registry.speechRenderRequests.insert(credit4, {"Polina", vec2(405, -270)});
+        auto credit5 = Entity();
+        registry.textTimers.emplace(credit5);
+        registry.speechRenderRequests.insert(credit5, {"Luka", vec2(415, -340)});
+        auto credit6 = Entity();
+        registry.textTimers.emplace(credit6);
+        registry.speechRenderRequests.insert(credit6, {"Aviral", vec2(405, -410)});
+        auto credit7 = Entity();
+        registry.textTimers.emplace(credit7);
+        registry.speechRenderRequests.insert(credit7, {"thanks for playing!", vec2(305, -500)});
     }
 
 	// Create empty "path" maze

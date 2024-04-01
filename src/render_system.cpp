@@ -413,6 +413,7 @@ void RenderSystem::draw() {
 							  // sprites back to front
 	gl_has_errors();
 	mat3 projection_2D = createProjectionMatrix();
+    glm::mat4 trans = glm::mat4(1.0f);
 
     ScreenState &screen = registry.screenStates.components[0];
 
@@ -547,6 +548,13 @@ void RenderSystem::draw() {
             }
         }
 
+        for (Entity entity : registry.speechRenderRequests.entities)
+        {
+            SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
+            renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+
+        }
+
 //		drawTexturedMesh(&win_dance, projection_2D);
     }
     else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2) {
@@ -564,21 +572,9 @@ void RenderSystem::draw() {
             }
         }
 
-        glm::mat4 trans = glm::mat4(1.0f);
+//        glm::mat4 trans = glm::mat4(1.0f);
         float timeBetweenLines = 10000.0f;
         float elapsedTime = 0.0f;
-
-        // Render all speech in the registry
-//        for (Entity entity : registry.speechRenderRequests.entities)
-//        {
-//            SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
-//            if (elapsedTime <= timeBetweenLines) {
-//                elapsedTime += 0.001;
-//            }
-//            elapsedTime = 0.0f;
-//            renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
-//
-//        }
 
         for (Entity entity : registry.speechRenderRequests.entities)
         {
@@ -619,7 +615,7 @@ void RenderSystem::draw() {
 
 
 
-	glm::mat4 trans = glm::mat4(1.0f);
+//	glm::mat4 trans = glm::mat4(1.0f);
 	// Might need to use rotation and scaling in the future
 	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
 	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));

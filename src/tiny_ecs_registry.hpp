@@ -36,6 +36,8 @@ public:
 	ComponentContainer<Inventory> inventory;
     ComponentContainer<HelpScreen> helpScreen;
     ComponentContainer<HitTimer> hitTimers;
+    ComponentContainer<SpeechTimer> speechTimers;
+    ComponentContainer<TextTimer> textTimers;
     ComponentContainer<Invincible> invincibles;
 	ComponentContainer<TextRenderRequest> textRenderRequests;
     ComponentContainer<SpeechRenderRequest> speechRenderRequests;
@@ -71,6 +73,8 @@ public:
 		registry_list.push_back(&inventory);
         registry_list.push_back(&helpScreen);
         registry_list.push_back(&hitTimers);
+        registry_list.push_back(&speechTimers);
+        registry_list.push_back(&textTimers);
         registry_list.push_back(&invincibles);
 		registry_list.push_back(&textRenderRequests);
         registry_list.push_back(&speechRenderRequests);
