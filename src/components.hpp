@@ -102,13 +102,16 @@ enum Item {
 	magical_strawberry,
 	magical_grapes,
 	magical_mushroom,
+	magical_shell,
 	magical_carrot,
-	special_lotus,
+	red_lotus,
+	white_lotus,
 	red_potion,
 	green_potion,
 	purple_potion,
 	orange_potion,
-	food,
+	blue_potion,
+	yellow_potion,
 	torch,
 	nullval
 };
@@ -141,7 +144,7 @@ struct Interactable {
 struct Inventory {
 	unsigned int size = 0;
 	std::vector<Item> holding;
-	std::vector<unsigned int> crafted;
+	std::vector<vec2> crafted;
 	unsigned int select_state = 0;
 	bool is_open = false;
 	std::vector<Item> inUI;

@@ -357,12 +357,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             createCraftingUI({0.5 * window_width_px, 0.5 * window_height_px});
             for (int i = 0; i < registry.inventory.get(player).inUI.size(); i++) {
                 Item item = registry.inventory.get(player).inUI[i];
-                Entity e = createInventoryPotion(item, { pos.x - 472 + (197 * i), pos.y + 115});
+                Entity e = createInventoryPotion(item, { pos.x - 492 + (137 * i), pos.y + 137});
                 registry.immobiles.get(e).scale = { 90, 90 };
             }
             checkCrafted();
-            std::vector<unsigned int> allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
-            auto rec1 = std::find(allCrafted.begin(), allCrafted.end(), 1);
+            std::vector<vec2> allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
+            /*auto rec1 = std::find(allCrafted.begin(), allCrafted.end(), 1);
 			if (rec1 != allCrafted.end()) {
 				Entity check = createCheck({ pos.x + 35, pos.y + 320 });
 				registry.immobiles.get(check).scale = { 110, 90 };
@@ -382,48 +382,40 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
 				restart_game();
             }
+			*/
         }
     }
 
 	//createShadowOverlay(renderer);
 
 	if (num_of_item_on_screen < NUM_POTIONS) {
-		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10,11 };
+		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8 };
 		for (int i = 0; i < 5; i++) {
 			Item& item = registry.inventory.get(player).holding[i];
 			switch (item) {
 				case (magical_mushroom):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 0), randomizer.end());
 					break;
-				case (magical_strawberry):
+				case (magical_shell):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 1), randomizer.end());
 					break;
-				case (magical_grapes):
+				case (magical_strawberry):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 2), randomizer.end());
 					break;
-				case (red_potion):
+				case (magical_grapes):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 3), randomizer.end());
 					break;
-				case (green_potion):
+				case (magical_apple):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 4), randomizer.end());
 					break;
-				case (purple_potion):
+				case (red_lotus):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 5), randomizer.end());
 					break;
-				case (orange_potion):
+				case (white_lotus):
 					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 6), randomizer.end());
 					break;
-				case (magical_apple):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 7), randomizer.end());
-					break;
 				case (magical_carrot):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 8), randomizer.end());
-					break;
-				case (food):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 9), randomizer.end());
-					break;
-				case (special_lotus):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 10), randomizer.end());
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 7), randomizer.end());
 					break;
 				case (torch):
 					break;
@@ -507,31 +499,126 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 }
 
 void WorldSystem::checkCrafted() {
-	std::vector<Item> UIItem = registry.inventory.get(registry.players.entities[0]).inUI;
-	auto rec1 = std::find(UIItem.begin(), UIItem.end(), magical_mushroom);
-	auto rec2 = std::find(UIItem.begin(), UIItem.end(), green_potion);
-	auto rec3 = std::find(UIItem.begin(), UIItem.end(), orange_potion);
-	auto rec4 = std::find(UIItem.begin(), UIItem.end(), magical_strawberry);
-	auto rec5 = std::find(UIItem.begin(), UIItem.end(), red_potion);
-	auto rec6 = std::find(UIItem.begin(), UIItem.end(), magical_carrot);
-	auto rec7 = std::find(UIItem.begin(), UIItem.end(), magical_grapes);
-	auto rec8 = std::find(UIItem.begin(), UIItem.end(), purple_potion);
-	auto rec9 = std::find(UIItem.begin(), UIItem.end(), magical_apple);
-	if (rec1 != UIItem.end() && rec2 != UIItem.end() && rec3 != UIItem.end()) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back(1);
+	std::vector<int> cc = {-1, -1, -1};
+
+	// receipe 1
+	for (Item i : registry.inventory.get(registry.players.entities[0]).inUI) {
+		if (i == magical_strawberry) {
+			cc[0] = 1;
+		} else if (i == magical_carrot) {
+			cc[1] = 2;
+		} else if (i == red_lotus) {
+			cc[2] = 3;
+		}
+	}
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 1, registry.inventory.get(registry.players.entities[0]).index[0] });
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
+		return;
 	}
-	if (rec4 != UIItem.end() && rec5 != UIItem.end() && rec6 != UIItem.end()) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back(2);
+	cc = {-1, -1, -1};
+
+	// receipe 2
+	for (Item i : registry.inventory.get(registry.players.entities[0]).inUI) {
+		if (i == magical_shell && cc[0] == -1) {
+			cc[0] = 1;
+		}
+		else if (i == magical_shell && cc[0] == 1) {
+			cc[1] = 2;
+		}
+		else if (i == magical_mushroom) {
+			cc[2] = 3;
+		}
+	}
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 2, registry.inventory.get(registry.players.entities[0]).index[0] });
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
+		return;
 	}
-	if (rec7 != UIItem.end() && rec8 != UIItem.end() && rec9 != UIItem.end()) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back(3);
+	cc = { -1, -1, -1 };
+
+	// receipe 3
+	for (Item i : registry.inventory.get(registry.players.entities[0]).inUI) {
+		if (i == white_lotus) {
+			cc[0] = 1;
+		}
+		else if (i == magical_apple) {
+			cc[1] = 2;
+		}
+		else if (i == magical_mushroom) {
+			cc[2] = 3;
+		}
+	}
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 3, registry.inventory.get(registry.players.entities[0]).index[0] });
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
+		return;
 	}
+	cc = { -1, -1, -1 };
+
+	// receipe 4
+	for (Item i : registry.inventory.get(registry.players.entities[0]).inUI) {
+		if (i == magical_shell) {
+			cc[0] = 1;
+		}
+		else if (i == red_lotus) {
+			cc[1] = 2;
+		}
+		else if (i == magical_strawberry) {
+			cc[2] = 3;
+		}
+	}
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 4, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
+		registry.inventory.get(registry.players.entities[0]).index = {};
+		return;
+	}
+	cc = { -1, -1, -1 };
+
+	// receipe 5
+	for (Item i : registry.inventory.get(registry.players.entities[0]).inUI) {
+		if (i == white_lotus) {
+			cc[0] = 1;
+		}
+		else if (i == magical_shell) {
+			cc[1] = 2;
+		}
+		else if (i == magical_mushroom) {
+			cc[2] = 3;
+		}
+	}
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 5, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
+		registry.inventory.get(registry.players.entities[0]).index = {};
+		return;
+	}
+	cc = { -1, -1, -1 };
+
+	// receipe 6
+	for (Item i : registry.inventory.get(registry.players.entities[0]).inUI) {
+		if (i == magical_carrot) {
+			cc[0] = 1;
+		}
+		else if (i == magical_apple) {
+			cc[1] = 2;
+		}
+		else if (i == magical_grapes) {
+			cc[2] = 3;
+		}
+	}
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 6, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).inUI = {};
+		registry.inventory.get(registry.players.entities[0]).index = {};
+		return;
+	}
+	cc = { -1, -1, -1 };
+	
 }
 
 // Reset the world state to its initial state
@@ -1058,11 +1145,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		registry.inventory.get(registry.players.entities[0]).select_state = 4;
 	}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_Z) {
-		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
-		registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
-	}
-
 	if (action == GLFW_RELEASE && key == GLFW_KEY_M && is_in_debug) {
 		//std::cout << "in here!" << std::endl;
 		while (registry.enemies.entities.size() > 0)
@@ -1126,12 +1208,48 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_RELEASE && key == GLFW_KEY_X) {
 		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
 		if (registry.inventory.get(registry.players.entities[0]).is_open == false) {
-			if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == food) {
+			if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_mushroom) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 5;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_apple) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 5;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_shell) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 10;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == red_lotus) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 10;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_strawberry) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 15;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == white_lotus) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 15;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_grapes) {
 				int new_health = registry.players.get(registry.players.entities[0]).health + 20;
 				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
-			}
-			else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_carrot) {
+				int new_health = registry.players.get(registry.players.entities[0]).health + 20;
+				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == red_potion) {
+				registry.players.get(registry.players.entities[0]).health = 100;
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == yellow_potion) {
+				// do yellowpotion stuff
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == blue_potion) {
+				// do blue potion stuff
+				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
 				registry.torches.emplace(Entity());
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			}
@@ -1374,8 +1492,8 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 
 	}
 	
-	
 }
+
 
 void WorldSystem::draw_chunk_borders() {
 	if (!chunk_border) {
