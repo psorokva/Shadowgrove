@@ -884,12 +884,12 @@ void WorldSystem::restart_game() {
         Entity line4 = Entity();
         SpeechTimer& line4_speech = registry.speechTimers.emplace(line4);
         line4_speech.timestamp = 4;
-        line4_speech.counter_ms = 2000;
+        line4_speech.counter_ms = 2200;
 
         Entity line5 = Entity();
         SpeechTimer& line5_speech = registry.speechTimers.emplace(line5);
         line5_speech.timestamp = 5;
-        line5_speech.counter_ms = 2500;
+        line5_speech.counter_ms = 3000;
 
         auto spaceKey = Entity();
         vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
