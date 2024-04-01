@@ -59,6 +59,27 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createConverstionPotion(RenderSystem* renderer, vec2 pos, int type) {
+	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default 
+	
+	auto entity = Entity();
+	UIComp& ui_comp = registry.uicomps.emplace(entity);
+	ui_comp.position = pos;
+	ui_comp.scale = vec2(50, 50.0);
+	if (type == 0) {
+		// GREEN
+		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	} else if (type == 1) {
+		// PURPLE
+		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	} else {
+		// ORANGE
+		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	}
+	return entity;
+}
+
+
 Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 

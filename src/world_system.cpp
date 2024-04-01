@@ -898,17 +898,18 @@ void WorldSystem::restart_game() {
         registry.textRenderRequests.get(spaceKey).scale = 0.5;
 
         if (screen.game_screen == cut_scene_2 ) {
-            vec2 orange_potion_pos = {100, 300};
-            vec2 green_potion_pos = {150, 300};
-            vec2 purple_potion_pos = {200, 300};
+			vec2 orange_potion_pos = {525, 330 };
+            vec2 green_potion_pos = {575, 330 };
+            vec2 purple_potion_pos = {625, 330};
 
-            Item orange_item = orange_potion;
-            Item green_item = green_potion;
-            Item purple_item = purple_potion;
+            //Item orange_item = orange_potion;
+            //Item green_item = green_potion;
+            //Item purple_item = purple_potion;
 
-            Entity orange = createInventoryPotion(orange_item, orange_potion_pos);
-            Entity green = createInventoryPotion(green_item, green_potion_pos);
-            Entity purple = createInventoryPotion(purple_item, purple_potion_pos);
+			// TODO: PETER
+            Entity orange = createConverstionPotion(renderer, orange_potion_pos, 2);
+            Entity green = createConverstionPotion(renderer, green_potion_pos, 0);
+            Entity purple = createConverstionPotion(renderer, purple_potion_pos, 1);
         }
     }
 
