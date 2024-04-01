@@ -144,7 +144,7 @@ struct Interactable {
 struct Inventory {
 	unsigned int size = 0;
 	std::vector<Item> holding;
-	std::vector<vec2> crafted;
+	vec2 crafted;
 	unsigned int select_state = 0;
 	bool is_open = false;
 	std::vector<Item> inUI;

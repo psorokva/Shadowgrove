@@ -358,31 +358,40 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             for (int i = 0; i < registry.inventory.get(player).inUI.size(); i++) {
                 Item item = registry.inventory.get(player).inUI[i];
                 Entity e = createInventoryPotion(item, { pos.x - 492 + (137 * i), pos.y + 137});
-                registry.immobiles.get(e).scale = { 90, 90 };
+                registry.immobiles.get(e).scale = { 80, 80 };
             }
             checkCrafted();
-            std::vector<vec2> allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
-            /*auto rec1 = std::find(allCrafted.begin(), allCrafted.end(), 1);
-			if (rec1 != allCrafted.end()) {
-				Entity check = createCheck({ pos.x + 35, pos.y + 320 });
-				registry.immobiles.get(check).scale = { 110, 90 };
+            vec2 allCrafted = registry.inventory.get(registry.players.entities[0]).crafted;
+			if (allCrafted.x == 1) {
+				Item item = red_potion;
+				Entity e = createInventoryPotion(item, { pos.x - 75, pos.y + 137 });
+				registry.immobiles.get(e).scale = { 80, 80 };
+			} else if (allCrafted.x == 2) {
+				Item item = yellow_potion;
+				Entity e = createInventoryPotion(item, { pos.x - 75, pos.y + 137 });
+				registry.immobiles.get(e).scale = { 80, 80 };
+			} else if (allCrafted.x == 3) {
+				Item item = blue_potion;
+				Entity e = createInventoryPotion(item, { pos.x - 75, pos.y + 137 });
+				registry.immobiles.get(e).scale = { 80, 80 };
+			} else if (allCrafted.x == 4) {
+				Item item = orange_potion;
+				Entity e = createInventoryPotion(item, { pos.x - 75, pos.y + 137 });
+				registry.immobiles.get(e).scale = { 80, 80 };
+			} else if (allCrafted.x == 5) {
+				Item item = green_potion;
+				Entity e = createInventoryPotion(item, { pos.x - 75, pos.y + 137 });
+				registry.immobiles.get(e).scale = { 80, 80 };
+			} else if (allCrafted.x == 6) {
+				Item item = purple_potion;
+				Entity e = createInventoryPotion(item, { pos.x - 75, pos.y + 137 });
+				registry.immobiles.get(e).scale = { 80, 80 };
 			}
-            auto rec2 = std::find(allCrafted.begin(), allCrafted.end(), 2);
-			if (rec2 != allCrafted.end()) {
-				Entity check = createCheck({ pos.x + 35, pos.y + 430 });
-				registry.immobiles.get(check).scale = { 110, 90 };
-			}
-            auto rec3 = std::find(allCrafted.begin(), allCrafted.end(), 3);
-			if (rec3 != allCrafted.end()) {
-				Entity check = createCheck({ pos.x + 35, pos.y + 550 });
-				registry.immobiles.get(check).scale = { 110, 90 };
-			}
-            if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
-				screen.game_screen = game_screen_win;
-				registry.inventory.get(registry.players.entities[0]).crafted = {};
-				restart_game();
-            }
-			*/
+            //if (rec1 != allCrafted.end() && rec2 != allCrafted.end() && rec3 != allCrafted.end()) {
+			//	screen.game_screen = game_screen_win;
+			//	registry.inventory.get(registry.players.entities[0]).crafted = {};
+			//	restart_game();
+            //}
         }
     }
 
@@ -512,7 +521,7 @@ void WorldSystem::checkCrafted() {
 		}
 	}
 	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 1, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).crafted = { 1, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
 		return;
@@ -532,7 +541,7 @@ void WorldSystem::checkCrafted() {
 		}
 	}
 	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 2, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).crafted = { 2, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
 		return;
@@ -552,7 +561,7 @@ void WorldSystem::checkCrafted() {
 		}
 	}
 	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 3, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).crafted = { 3, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
 		return;
@@ -572,7 +581,7 @@ void WorldSystem::checkCrafted() {
 		}
 	}
 	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 4, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).crafted = { 4, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
 		return;
@@ -592,7 +601,7 @@ void WorldSystem::checkCrafted() {
 		}
 	}
 	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 5, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).crafted = { 5, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
 		return;
@@ -612,7 +621,7 @@ void WorldSystem::checkCrafted() {
 		}
 	}
 	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
-		registry.inventory.get(registry.players.entities[0]).crafted.push_back({ 6, registry.inventory.get(registry.players.entities[0]).index[0] });
+		registry.inventory.get(registry.players.entities[0]).crafted = { 6, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
 		return;
@@ -692,7 +701,7 @@ void WorldSystem::restart_game() {
 
     save_state.loadInventory();
 
-
+	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
 	//printf("MAP AND PLAYER CREATED\n");
 
@@ -1264,6 +1273,28 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_U && registry.screenStates.components[0].game_screen == game_screen_day) {
+		if (registry.inventory.get(registry.players.entities[0]).is_open) {
+			vec2 craft = registry.inventory.get(registry.players.entities[0]).crafted;
+			if (craft.x == 1) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = red_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			} else if (craft.x == 2) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = yellow_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			} else if (craft.x == 3) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = blue_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			} else if (craft.x == 4) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = orange_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			} else if (craft.x == 5) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			} else if (craft.x == 6) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			}
+		}
 		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
 		for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
 			registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
