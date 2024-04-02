@@ -38,6 +38,13 @@ int level = 0;
 bool game_paused = false;
 bool is_in_debug = false;
 
+bool go_up_key_released = true;
+bool go_down_key_released = true;
+bool go_right_key_released = true;
+bool go_left_key_released = true;
+bool moving_x = false;
+bool moving_y = false;
+
 // Create the bug world
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
 	// Seeding rng with random device
@@ -116,6 +123,7 @@ GLFWwindow* WorldSystem::create_window() {
 	auto mouse_click_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_click(_0, _1, _2); };
 
 	glfwSetKeyCallback(window, key_redirect);
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 	glfwSetMouseButtonCallback(window, mouse_click_redirect);
 
@@ -1398,76 +1406,93 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (!game_paused && !registry.deathTimers.has(player)) {
 		auto& motion = registry.motions.get(player);
 
+		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) go_up_key_released = action == GLFW_RELEASE;
+		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) go_down_key_released = action == GLFW_RELEASE;
+		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) go_right_key_released = action == GLFW_RELEASE;
+		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) go_left_key_released = action == GLFW_RELEASE;
+			
         ScreenState& screen = registry.screenStates.components[0];
         if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day) {
             // Character movement
             // Move Up
-            if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-				if (action == GLFW_RELEASE)
+			if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+				if (action == GLFW_RELEASE|| !go_down_key_released) // if both up and down are pressed
+				
 				{
-					registry.players.get(player).moving = false;
+					//printf("not up\n");
+					//registry.players.get(player).moving = false;
+					moving_y = false;
+					motion.velocity.y = 0.f;
 				}
-				else
+				else 
 				{
-					registry.players.get(player).moving = true;
+					//printf("up\n");
+					playerDirection = UP;
+					moving_y = true;
+					motion.velocity.y -= CHARACTER_SPEED;
+					//registry.players.get(player).moving = true;
 				}
-                playerDirection = UP;
-                //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
-				motion.velocity.y -= CHARACTER_SPEED;
-				//printf("motion.velocity.y %f/n", motion.velocity.y);
             }
 
             // Move Down
             if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
-				if (action == GLFW_RELEASE)
+				if (action == GLFW_RELEASE || !go_up_key_released) // if both up and down are pressed
 				{
-					registry.players.get(player).moving = false;
+					//printf("not down\n");
+					//registry.players.get(player).moving = false;
+					moving_y = false;
+					motion.velocity.y = 0.f;
 				}
 				else
 				{
-					registry.players.get(player).moving = true;
+					//printf("down\n");
+					playerDirection = DOWN;
+					moving_y = true;
+					//registry.players.get(player).moving = true;
+					motion.velocity.y += CHARACTER_SPEED;
 				}
-                playerDirection = DOWN;
-                //motion.velocity = vec2(0.f, CHARACTER_SPEED);
-				motion.velocity.y += CHARACTER_SPEED;
+				
             }
 
             // Move Right
             if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-				if (action == GLFW_RELEASE)
+				if (action == GLFW_RELEASE || !go_left_key_released) // if both right and left are pressed
 				{
-					registry.players.get(player).moving = false;
+					//registry.players.get(player).moving = false;
+					moving_x = false;
+					motion.velocity.x = 0.f;
 				}
 				else
 				{
-					registry.players.get(player).moving = true;
+					//registry.players.get(player).moving = true;
+					moving_x = true;
+					playerDirection = RIGHT;
+					motion.velocity.x += CHARACTER_SPEED;
 				}
-                playerDirection = RIGHT;
-                //motion.velocity = vec2(CHARACTER_SPEED, 0.f);
-				motion.velocity.x += CHARACTER_SPEED;
+
                 if (screen.game_screen == game_screen_day) {
                     motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
                 } else {
                     motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
-               
-                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 
             // Move Left
             if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
-				if (action == GLFW_RELEASE)
+				if (action == GLFW_RELEASE || !go_right_key_released) // if both right and left are pressed
 				{
-					registry.players.get(player).moving = false;
+					//registry.players.get(player).moving = false;
+					moving_x = false;
+					motion.velocity.x = 0.f;
 				}
 				else
 				{
-					registry.players.get(player).moving = true;
+					//registry.players.get(player).moving = true
+					moving_x = true;
+					playerDirection = LEFT;
+					motion.velocity.x -= CHARACTER_SPEED;
 				}
-                playerDirection = LEFT;
-               
-                //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
-				motion.velocity.x -= CHARACTER_SPEED;
+
                 if (screen.game_screen == game_screen_day) 
 				{
                     motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
@@ -1475,21 +1500,28 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				{
                     motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
                 }
-                
-                //printf("pos: %f %f \n", motion.position.x, motion.position.y);
             }
 			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
 			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
         }
 
-		// Stop moving when key is released
-		if (action == GLFW_RELEASE) {
-			motion.velocity = vec2(0.f, 0.f);
+		//// Stop moving when key is released
+		//if (go_right_key_released && go_left_key_released && go_up_key_released && go_down_key_released) {
+		//	registry.players.get(player).moving = false;
+		//	RenderRequest& r = registry.renderRequests.get(player);
+		//	r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1;
+		//}
+
+		if (moving_x || moving_y) {
+			registry.players.get(player).moving = true;
+		}
+		else {
+			registry.players.get(player).moving = false;
 			RenderRequest& r = registry.renderRequests.get(player);
 			r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1;
 		}
 	}
-
+	
     // space to start game + cut scenes
     if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
         if (screen.game_screen == cut_scene_2) {
@@ -1517,13 +1549,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
     }
 
-//    // space to start game
-//    if (screen.game_screen == game_screen_main_menu) {
-//        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-//            screen.game_screen = cut_scene_0;
-//            restart_game();
-//        }
-//    }
+    // space to start game
+    if (screen.game_screen == game_screen_main_menu) {
+        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+            screen.game_screen = cut_scene_0;
+            restart_game();
+        }
+    }
 
     // space to restart
     if (screen.game_screen == game_screen_game_over) {
