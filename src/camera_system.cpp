@@ -28,6 +28,18 @@ void CameraSystem::step() {
 		float yDiff = player_motion.position[1] - fixed.position[1];
 
 		fixed.camera_position = { player_motion.camera_position[0] - xDiff, player_motion.camera_position[1] - yDiff };
+
+		if (fixed.camera_position.x > (0 - on_screen_buffer)
+			&& fixed.camera_position.x < (window_width_px + on_screen_buffer)
+			&& fixed.camera_position.y > (0 - on_screen_buffer)
+			&& fixed.camera_position.y < (window_height_px + on_screen_buffer))
+		{
+			fixed.on_screen = true;
+		}
+		else
+		{
+			fixed.on_screen = false;
+		}
 	}
 
 	auto& chunks = registry.chunks;

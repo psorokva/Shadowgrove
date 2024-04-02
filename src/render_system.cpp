@@ -129,6 +129,10 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 	// thus ORDER IS IMPORTANT
 	Transform transform;
     if (screen.game_screen == game_screen_night) {
+		if (!immobile.on_screen)
+		{
+			return;
+		}
         transform.translate(immobile.camera_position);
     } else {
         transform.translate(immobile.position);
