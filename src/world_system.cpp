@@ -38,6 +38,11 @@ int level = 0;
 bool game_paused = false;
 bool is_in_debug = false;
 
+bool go_up_key_released = true;
+bool go_down_key_released = true;
+bool go_right_key_released = true;
+bool go_left_key_released = true;
+
 // Create the bug world
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
 	// Seeding rng with random device
@@ -1232,42 +1237,42 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
 
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_L && is_in_debug) {
-		chunk_border = !chunk_border;
-	}
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_L && is_in_debug) {
+	//	chunk_border = !chunk_border;
+	//}
 
 
-	// remove items from slot on num key press
-	if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
-		registry.inventory.get(registry.players.entities[0]).select_state = 0;
-	}
+	//// remove items from slot on num key press
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
+	//	registry.inventory.get(registry.players.entities[0]).select_state = 0;
+	//}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_2) {
-		registry.inventory.get(registry.players.entities[0]).select_state = 1;
-	}
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_2) {
+	//	registry.inventory.get(registry.players.entities[0]).select_state = 1;
+	//}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_3) {
-		registry.inventory.get(registry.players.entities[0]).select_state = 2;
-	}
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_3) {
+	//	registry.inventory.get(registry.players.entities[0]).select_state = 2;
+	//}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_4) {
-		registry.inventory.get(registry.players.entities[0]).select_state = 3;
-	}
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_4) {
+	//	registry.inventory.get(registry.players.entities[0]).select_state = 3;
+	//}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_5) {
-		registry.inventory.get(registry.players.entities[0]).select_state = 4;
-	}
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_5) {
+	//	registry.inventory.get(registry.players.entities[0]).select_state = 4;
+	//}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_Z) {
-		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
-		registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
-	}
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_Z) {
+	//	int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
+	//	registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
+	//}
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_M && is_in_debug) {
-		//std::cout << "in here!" << std::endl;
-		while (registry.enemies.entities.size() > 0)
-			registry.remove_all_components_of(registry.enemies.entities.back());
-	}
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_M && is_in_debug) {
+	//	//std::cout << "in here!" << std::endl;
+	//	while (registry.enemies.entities.size() > 0)
+	//		registry.remove_all_components_of(registry.enemies.entities.back());
+	//}
 
 	// Exiting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
@@ -1323,7 +1328,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
          restart_game();
     }
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_X) {
+	/*if (action == GLFW_RELEASE && key == GLFW_KEY_X) {
 		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
 		if (registry.inventory.get(registry.players.entities[0]).is_open == false) {
 			if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == food) {
@@ -1343,45 +1348,45 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			}
 		}
-	}
+	}*/
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_U && registry.screenStates.components[0].game_screen == game_screen_day) {
-		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
-		for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
-			registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
-		}
-		registry.inventory.get(registry.players.entities[0]).index = {};
-		registry.inventory.get(registry.players.entities[0]).inUI = {};
-	}
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_U && registry.screenStates.components[0].game_screen == game_screen_day) {
+	//	registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
+	//	for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
+	//		registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
+	//	}
+	//	registry.inventory.get(registry.players.entities[0]).index = {};
+	//	registry.inventory.get(registry.players.entities[0]).inUI = {};
+	//}
 
-    // Opening help screen
-    if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
-		if (registry.helpScreen.components.size() >0) {
-			HelpScreen& help_screen = registry.helpScreen.components[0];
-			if (help_screen.help == 1) {
-				// printf("H key pressed, closing help screen\n");
-				help_screen.help = 0;
-				game_paused = false;
-			} else {
-				//printf("H key pressed, opening help screen\n");
-				help_screen.help = 1;
-				game_paused = true;
-				for (Motion& motion : registry.motions.components) {
-					motion.velocity = { 0, 0 };
-				}
-			}
-		}
+ //   // Opening help screen
+ //   if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
+	//	if (registry.helpScreen.components.size() >0) {
+	//		HelpScreen& help_screen = registry.helpScreen.components[0];
+	//		if (help_screen.help == 1) {
+	//			// printf("H key pressed, closing help screen\n");
+	//			help_screen.help = 0;
+	//			game_paused = false;
+	//		} else {
+	//			//printf("H key pressed, opening help screen\n");
+	//			help_screen.help = 1;
+	//			game_paused = true;
+	//			for (Motion& motion : registry.motions.components) {
+	//				motion.velocity = { 0, 0 };
+	//			}
+	//		}
+	//	}
 
-    }
+ //   }
 
-	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
-	if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night && is_in_debug) {
-		screen.torch_mode = (screen.torch_mode + 1) %2;
-		//if (torch_timer_ms == 0.0 && screen.torch_mode == 1) {
-		//	//torch_timer_ms = TORCH_LENGTH;
-		//}
+	//// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
+	//if (key == GLFW_KEY_T && action == GLFW_RELEASE && screen.game_screen == game_screen_night && is_in_debug) {
+	//	screen.torch_mode = (screen.torch_mode + 1) %2;
+	//	//if (torch_timer_ms == 0.0 && screen.torch_mode == 1) {
+	//	//	//torch_timer_ms = TORCH_LENGTH;
+	//	//}
 
-	}
+	//}
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_B) {
 		is_in_debug = !is_in_debug;
@@ -1398,53 +1403,67 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (!game_paused && !registry.deathTimers.has(player)) {
 		auto& motion = registry.motions.get(player);
 
+		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) go_up_key_released = action == GLFW_RELEASE;
+		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) go_down_key_released = action == GLFW_RELEASE;
+		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) go_right_key_released = action == GLFW_RELEASE;
+		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) go_left_key_released = action == GLFW_RELEASE;
+		
+
         ScreenState& screen = registry.screenStates.components[0];
         if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day) {
             // Character movement
             // Move Up
-            if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-				if (action == GLFW_RELEASE)
+			if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
+				if (action == GLFW_RELEASE|| !go_down_key_released) // if both up and down are pressed
+				
 				{
+					//printf("not up\n");
 					registry.players.get(player).moving = false;
+					motion.velocity.y = 0.f;
 				}
-				else
+				else 
 				{
+					//printf("up\n");
+					playerDirection = UP;
+					motion.velocity.y -= CHARACTER_SPEED;
 					registry.players.get(player).moving = true;
 				}
-                playerDirection = UP;
-                //motion.velocity = vec2(0.f, -CHARACTER_SPEED);
-				motion.velocity.y -= CHARACTER_SPEED;
+                
 				//printf("motion.velocity.y %f/n", motion.velocity.y);
             }
 
             // Move Down
             if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
-				if (action == GLFW_RELEASE)
+				if (action == GLFW_RELEASE || !go_up_key_released) // if both up and down are pressed
 				{
+					//printf("not down\n");
 					registry.players.get(player).moving = false;
+					motion.velocity.y = 0.f;
 				}
 				else
 				{
+					//printf("down\n");
+					playerDirection = DOWN;
 					registry.players.get(player).moving = true;
+					motion.velocity.y += CHARACTER_SPEED;
 				}
-                playerDirection = DOWN;
-                //motion.velocity = vec2(0.f, CHARACTER_SPEED);
-				motion.velocity.y += CHARACTER_SPEED;
+				
             }
 
             // Move Right
             if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-				if (action == GLFW_RELEASE)
+				if (action == GLFW_RELEASE || !go_left_key_released) // if both right and left are pressed
 				{
 					registry.players.get(player).moving = false;
+					motion.velocity.x = 0.f;
 				}
 				else
 				{
 					registry.players.get(player).moving = true;
+					playerDirection = RIGHT;
+					motion.velocity.x += CHARACTER_SPEED;
 				}
-                playerDirection = RIGHT;
-                //motion.velocity = vec2(CHARACTER_SPEED, 0.f);
-				motion.velocity.x += CHARACTER_SPEED;
+
                 if (screen.game_screen == game_screen_day) {
                     motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
                 } else {
@@ -1456,18 +1475,18 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
             // Move Left
             if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
-				if (action == GLFW_RELEASE)
+				if (action == GLFW_RELEASE || !go_right_key_released) // if both right and left are pressed
 				{
 					registry.players.get(player).moving = false;
+					motion.velocity.x = 0.f;
 				}
 				else
 				{
+					playerDirection = LEFT;
+					motion.velocity.x -= CHARACTER_SPEED;
 					registry.players.get(player).moving = true;
 				}
-                playerDirection = LEFT;
-               
-                //motion.velocity = vec2(-CHARACTER_SPEED, 0.f);
-				motion.velocity.x -= CHARACTER_SPEED;
+
                 if (screen.game_screen == game_screen_day) 
 				{
                     motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
@@ -1482,12 +1501,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
         }
 
-		// Stop moving when key is released
-		if (action == GLFW_RELEASE) {
-			motion.velocity = vec2(0.f, 0.f);
-			RenderRequest& r = registry.renderRequests.get(player);
-			r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1;
-		}
+		//// Stop moving when key is released
+		//if (action == GLFW_RELEASE) {
+		//	motion.velocity = vec2(0.f, 0.f);
+		//	RenderRequest& r = registry.renderRequests.get(player);
+		//	r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1;
+		//}
 	}
 
     // space to start game + cut scenes
