@@ -643,6 +643,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     registry.speechRenderRequests.insert(Entity(), {"purple potion", player_line4});
                 } if (counter.timestamp == 5) {
                     registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
+                } if (counter.timestamp == 6) {
+                    vec2 purple_potion_pos = {625, 330};
+                    createConverstionPotion(renderer, purple_potion_pos, 1);
+                }  if (counter.timestamp == 7) {
+                    vec2 green_potion_pos = {575, 330 };
+                    createConverstionPotion(renderer, green_potion_pos, 0);
+                }  if (counter.timestamp == 8) {
+
+                    vec2 orange_potion_pos = {525, 330 };
+                    createConverstionPotion(renderer, orange_potion_pos, 2);
                 }
                 registry.speechTimers.remove(entity);
                 return true;
@@ -749,6 +759,9 @@ void WorldSystem::restart_game() {
         registry.remove_all_components_of(registry.speechTimers.entities.back());
     while (registry.textTimers.entities.size() > 0)
         registry.remove_all_components_of(registry.textTimers.entities.back());
+    while (registry.uicomps.entities.size() > 0)
+        registry.remove_all_components_of(registry.uicomps.entities.back());
+
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -814,31 +827,6 @@ void WorldSystem::restart_game() {
 
         player_component.alive = 0;
     }
-    else if (screen.game_screen == game_screen_night) {
-        printf("in game night screen\n");
-        // Playing background music indefinitely
-		createNight();
-
-        Mix_PlayMusic(night_music, -1);
-        fprintf(stderr, "Loaded music\n");
-		generator->makeNoise(level);
-        generator->createWorldMap();
-		Motion& p_motion = registry.motions.get(player);
-		p_motion.position = registry.get_empty_spawn_keeper_location();
-		if (level < 9) {
-			level++;
-			keeper_rate-= 0.8;
-			KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
-		}
-		for (int k = 0; k < level +2; k++) {
-			vec2 spawn_point = registry.get_empty_spawn_keeper_location();
-			createKeeper(renderer, spawn_point);
-		}
-		for (int num_keepers = 0; num_keepers < level; num_keepers++) {
-			createKeeper(renderer, registry.get_empty_spawn_location());
-		}
-
-    }
     else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) { 
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
@@ -891,29 +879,24 @@ void WorldSystem::restart_game() {
         Entity dog_bubble = createSpeechBubble(renderer, {685, 470}, 1);
         registry.uicomps.get(dog_bubble).scale = {-250, -70};
 
-        Entity line1 = Entity();
-        SpeechTimer& line1_speech = registry.speechTimers.emplace(line1);
-        line1_speech.timestamp = 1;
+        SpeechTimer& line1 = registry.speechTimers.emplace(Entity());
+        line1.timestamp = 1;
 
-        Entity line2 = Entity();
-        SpeechTimer& line2_speech = registry.speechTimers.emplace(line2);
-        line2_speech.timestamp = 2;
-        line2_speech.counter_ms = 1000;
+        SpeechTimer& line2 = registry.speechTimers.emplace(Entity());
+        line2.timestamp = 2;
+        line2.counter_ms = 1000;
 
-        Entity line3 = Entity();
-        SpeechTimer& line3_speech = registry.speechTimers.emplace(line3);
-        line3_speech.timestamp = 3;
-        line3_speech.counter_ms = 1500;
+        SpeechTimer& line3 = registry.speechTimers.emplace(Entity());
+        line3.timestamp = 3;
+        line3.counter_ms = 1500;
 
-        Entity line4 = Entity();
-        SpeechTimer& line4_speech = registry.speechTimers.emplace(line4);
-        line4_speech.timestamp = 4;
-        line4_speech.counter_ms = 2200;
+        SpeechTimer& line4 = registry.speechTimers.emplace(Entity());
+        line4.timestamp = 4;
+        line4.counter_ms = 2200;
 
-        Entity line5 = Entity();
-        SpeechTimer& line5_speech = registry.speechTimers.emplace(line5);
-        line5_speech.timestamp = 5;
-        line5_speech.counter_ms = 3000;
+        SpeechTimer& line5 = registry.speechTimers.emplace(Entity());
+        line5.timestamp = 5;
+        line5.counter_ms = 3000;
 
         auto spaceKey = Entity();
         vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
@@ -922,21 +905,17 @@ void WorldSystem::restart_game() {
         registry.textRenderRequests.get(spaceKey).scale = 0.5;
 
         if (screen.game_screen == cut_scene_2 ) {
-			vec2 orange_potion_pos = {525, 330 };
-            vec2 green_potion_pos = {575, 330 };
-            vec2 purple_potion_pos = {625, 330};
-
-            //Item orange_item = orange_potion;
-            //Item green_item = green_potion;
-            //Item purple_item = purple_potion;
-
-			// TODO: PETER
-            Entity orange = createConverstionPotion(renderer, orange_potion_pos, 2);
-            Entity green = createConverstionPotion(renderer, green_potion_pos, 0);
-            Entity purple = createConverstionPotion(renderer, purple_potion_pos, 1);
+            SpeechTimer& orange = registry.speechTimers.emplace(Entity());
+            orange.timestamp = 6;
+            orange.counter_ms = 3050;
+            SpeechTimer& green = registry.speechTimers.emplace(Entity());
+            green.timestamp = 7;
+            green.counter_ms = 3050;
+            SpeechTimer& purple = registry.speechTimers.emplace(Entity());
+            purple.timestamp = 8;
+            purple.counter_ms = 3050;
         }
     }
-
     else if (screen.game_screen == game_screen_win) {
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
@@ -981,41 +960,66 @@ void WorldSystem::restart_game() {
         registry.textTimers.emplace(credit7);
         registry.speechRenderRequests.insert(credit7, {"thanks for playing!", vec2(305, -500)});
     }
+    else if (screen.game_screen == game_screen_night) {
+        printf("in game night screen\n");
+        // Playing background music indefinitely
+        createNight();
 
-	// Create empty "path" maze
-	std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
-	//// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers
-	auto& chunks = generator->chunks;
-	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
-	//for (Chunk c : chunks) {
-	for (uint i = 0; i < chunks.size(); i++) { //chunks.size()
-		auto entity = Entity();
-		registry.chunks.insert(entity, chunks[i], false);
+        Mix_PlayMusic(night_music, -1);
+        fprintf(stderr, "Loaded music\n");
+        generator->makeNoise(level);
+        generator->createWorldMap();
+        Motion& p_motion = registry.motions.get(player);
+        p_motion.position = registry.get_empty_spawn_keeper_location();
+        if (level < 9) {
+            level++;
+            keeper_rate-= 0.8;
+            KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
+        }
+        for (int k = 0; k < level +2; k++) {
+            vec2 spawn_point = registry.get_empty_spawn_keeper_location();
+            createKeeper(renderer, spawn_point);
+        }
+        for (int num_keepers = 0; num_keepers < level; num_keepers++) {
+            createKeeper(renderer, registry.get_empty_spawn_location());
+        }
 
-		for (int row = 0; row < MAZE_SIZE; row++) {
-			for (int col = 0; col < MAZE_SIZE; col++) {
-				Chunk c = chunks[i];
-				if ( c.grid[row][col] > 0) {
-					int major_row = c.y * MAZE_SIZE + row;
-					int major_col = c.x * MAZE_SIZE + col;
-					// add the TILE_SIZE / 2 so that plants are aligned with their respective cell
-					int plant_x = c.offset_x + col * TILE_SIZE + TILE_SIZE / 2;
-					int plant_y = c.offset_y + row * TILE_SIZE + TILE_SIZE / 2;
-					// TODO store plant type in // c.grid[row][col]
-					createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); //
-					//printf("tile: %d %d ", c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col);
-					//updateTile(renderer, maze, c.offset_y + row, c.offset_x + col, 1);
-					//updateTile(renderer, maze, c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col, c.grid[row][col]);
-				}
+        // Create empty "path" maze
+        std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
+        //// ADD PLANTS HERE Note: ordering matter here unless we implement a z axis for layers
+        auto& chunks = generator->chunks;
+        //for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
+        //for (Chunk c : chunks) {
+        for (uint i = 0; i < chunks.size(); i++) { //chunks.size()
+            auto entity = Entity();
+            registry.chunks.insert(entity, chunks[i], false);
 
-			}
-			//printf("\n");
-		}
-		//printf("--------\n");
-	}
-	// wait();
-	// Debugging for memory/component leaks
-	//torchEntity = createShadowOverlay(renderer);
+            for (int row = 0; row < MAZE_SIZE; row++) {
+                for (int col = 0; col < MAZE_SIZE; col++) {
+                    Chunk c = chunks[i];
+                    if ( c.grid[row][col] > 0) {
+                        int major_row = c.y * MAZE_SIZE + row;
+                        int major_col = c.x * MAZE_SIZE + col;
+                        // add the TILE_SIZE / 2 so that plants are aligned with their respective cell
+                        int plant_x = c.offset_x + col * TILE_SIZE + TILE_SIZE / 2;
+                        int plant_y = c.offset_y + row * TILE_SIZE + TILE_SIZE / 2;
+                        // TODO store plant type in // c.grid[row][col]
+                        createPlant(renderer, { plant_x, plant_y }, generator->biome_filter[major_row][major_col], generator->bignoise[major_row][major_col]); //
+                        //printf("tile: %d %d ", c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col);
+                        //updateTile(renderer, maze, c.offset_y + row, c.offset_x + col, 1);
+                        //updateTile(renderer, maze, c.y * MAZE_SIZE + row, c.x * MAZE_SIZE + col, c.grid[row][col]);
+                    }
+
+                }
+                //printf("\n");
+            }
+            //printf("--------\n");
+        }
+        // wait();
+        // Debugging for memory/component leaks
+        //torchEntity = createShadowOverlay(renderer);
+
+    }
 
 	if (screen.game_screen == game_screen_night)
 	{
