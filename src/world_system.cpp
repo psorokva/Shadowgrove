@@ -792,7 +792,7 @@ void WorldSystem::restart_game() {
 
     if (screen.game_screen == game_screen_game_over) {
 //        printf("in game over screen\n");
-
+		
         auto over = Entity();
         registry.textRenderRequests.insert(over,
                                            {"Game over", vec2(0.33 * window_width_px, 0.5 * window_height_px)});
@@ -929,9 +929,9 @@ void WorldSystem::restart_game() {
             //Item purple_item = purple_potion;
 
 			// TODO: PETER
-            Entity orange = createConverstionPotion(renderer, orange_potion_pos, 2);
-            Entity green = createConverstionPotion(renderer, green_potion_pos, 0);
-            Entity purple = createConverstionPotion(renderer, purple_potion_pos, 1);
+            Entity orange = createConversationPotion(renderer, orange_potion_pos, 2);
+            Entity green = createConversationPotion(renderer, green_potion_pos, 0);
+            Entity purple = createConversationPotion(renderer, purple_potion_pos, 1);
         }
     }
 
