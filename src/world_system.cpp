@@ -267,7 +267,63 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		animation_cycle++;
 		screen.torch_anim = animation_cycle % 3;
 		animation_cycle %= 4;
+
+		if (registry.player_sparkle_animation.entities.size() > 0) {
+			// also do for dog
+			for (Entity& animated_entity : registry.player_sparkle_animation.entities) {
+				AnimatedPlayerSparkle& face = registry.player_sparkle_animation.get(animated_entity);
+				// No need to check if render request since should always have a render request
+				RenderRequest& anim_rr = registry.renderRequests.get(animated_entity);
+				face.current_cell++;
+				if (face.current_cell >= face.size) {
+					face.current_cell = 0;
+				}
+				anim_rr.used_texture = face.cells[face.current_cell];
+			}
+		}
+
+		if (registry.torch_off_animation.entities.size() > 0) {
+			// also do for dog
+			for (Entity& animated_entity : registry.torch_off_animation.entities) {
+				AnimatedTorchOff& face = registry.torch_off_animation.get(animated_entity);
+				// No need to check if render request since should always have a render request
+				RenderRequest& anim_rr = registry.renderRequests.get(animated_entity);
+				face.current_cell++;
+				if (face.current_cell >= face.size) {
+					face.current_cell = 0;
+				}
+				anim_rr.used_texture = face.cells[face.current_cell];
+			}
+		}
+		if (registry.torch_on_animation.entities.size() > 0) {
+			// also do for dog
+			for (Entity& animated_entity : registry.torch_on_animation.entities) {
+				AnimatedTorchOn& face = registry.torch_on_animation.get(animated_entity);
+				// No need to check if render request since should always have a render request
+				RenderRequest& anim_rr = registry.renderRequests.get(animated_entity);
+				face.current_cell++;
+				if (face.current_cell >= face.size) {
+					face.current_cell = 0;
+				}
+				anim_rr.used_texture = face.cells[face.current_cell];
+			}
+		}
+		if (registry.sparkle_animation.entities.size() > 0) {
+			// also do for dog
+			for (Entity& animated_entity : registry.sparkle_animation.entities) {
+				AnimatedSparkle& face = registry.sparkle_animation.get(animated_entity);
+				// No need to check if render request since should always have a render request
+				RenderRequest& anim_rr = registry.renderRequests.get(animated_entity);
+				face.current_cell++;
+				if (face.current_cell >= face.size) {
+					face.current_cell = 0;
+				}
+				anim_rr.used_texture = face.cells[face.current_cell];
+			}
+		}
+
 		// DO INTRO STUFF LIKE ANIMATION
+
 		if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2 ) { // || screen.game_screen == game_screen_day
 			if (registry.face_animation.entities.size() > 0) {
 				for (Entity& animated_entity : registry.face_animation.entities) {
@@ -294,6 +350,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 					anim_rr.used_texture = face.cells[face.current_cell];
 				}
 			}
+
+
 		}
 
 	}
@@ -880,7 +938,8 @@ void WorldSystem::restart_game() {
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
 
 	player = createPlayer(renderer, vec2{0,0}); // TODO: update this after
-
+	// createPlayerSparkle(renderer, vec2{ window_width_px / 2, window_height_px / 2 });
+	
 	// vec2(start_x, start_y);
 	//if (level > 1) {
 	//	registry.inventory.insert(player,tempInventory);

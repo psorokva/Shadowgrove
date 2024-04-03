@@ -447,12 +447,38 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 		case (8):
 			registry.healers.get(entity).item_name = torch;
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_OFF0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.torch_off_animation.emplace(entity);
 			break;
 	}
-	
-
+	Entity other = createSparkle(renderer, position);
+	Paired& pair = registry.pairs.emplace(entity);
+	pair.other = other;
 	return entity;
 }
+
+
+Entity createSparkle(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos; // +vec2(0.0, -10.0);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE*1.3, MUSHROOM_SIZE * 1.3 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::SPARK0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	AnimatedSparkle& spark = registry.sparkle_animation.emplace(entity);
+	return entity;
+}
+
+Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	UIComp& motion = registry.uicomps.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_HEIGHT *1.5, PLAYER_HEIGHT * 1.5 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BSPARK0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	AnimatedPlayerSparkle& spark = registry.player_sparkle_animation.emplace(entity);
+	return entity;
+}
+
 
 // just an invisible marker to calculate where player is in relation to
 Entity createCompass(vec2 position) {
@@ -582,6 +608,7 @@ Entity createInventoryPotion(Item& item, vec2 position) {
 		case torch:
 			registry.healers.get(entity).item_name = torch;
 			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_OFF0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.torch_off_animation.emplace(entity);
 			break; 
     }
 
