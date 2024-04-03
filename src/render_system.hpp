@@ -169,7 +169,6 @@ class RenderSystem {
 			textures_path("ShadowOverlay_01.png"),
 			textures_path("MidnightOverlay_00.png"),
 			textures_path("MidnightOverlay_01.png"),
-			textures_path("torch_00.png"),
 			textures_path("CRAFTING2.png"),
 			textures_path("NightHelpOverlay.png"),
 			textures_path("NightHelpTorchlight.png"),
@@ -178,6 +177,20 @@ class RenderSystem {
 			textures_path("win0.png"),
 			textures_path("win1.png"),
 			textures_path("f1CHECKO.png"),
+			textures_path("spark_00.png"),
+			textures_path("spark_01.png"),
+			textures_path("spark_02.png"),
+			textures_path("spark_03.png"),
+			textures_path("spark_04.png"),
+			textures_path("spark_05.png"),
+			textures_path("spark_06.png"),
+			textures_path("spark_07.png"),
+			textures_path("torch_03.png"),
+			textures_path("torch_04.png"),
+			textures_path("torch_05.png"),
+			textures_path("torch_00.png"),
+			textures_path("torch_01.png"),
+			textures_path("torch_02.png"),
 
 	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
 

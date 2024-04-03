@@ -446,7 +446,7 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 			break;
 		case (8):
 			registry.healers.get(entity).item_name = torch;
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_OFF0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break;
 	}
 	
@@ -581,7 +581,7 @@ Entity createInventoryPotion(Item& item, vec2 position) {
 			break;
 		case torch:
 			registry.healers.get(entity).item_name = torch;
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_OFF0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 			break; 
     }
 
