@@ -102,13 +102,16 @@ enum Item {
 	magical_strawberry,
 	magical_grapes,
 	magical_mushroom,
+	magical_shell,
 	magical_carrot,
-	special_lotus,
+	red_lotus,
+	white_lotus,
 	red_potion,
 	green_potion,
 	purple_potion,
 	orange_potion,
-	food,
+	blue_potion,
+	yellow_potion,
 	torch,
 	nullval
 };
@@ -141,7 +144,7 @@ struct Interactable {
 struct Inventory {
 	unsigned int size = 0;
 	std::vector<Item> holding;
-	std::vector<unsigned int> crafted;
+	vec2 crafted;
 	unsigned int select_state = 0;
 	bool is_open = false;
 	std::vector<Item> inUI;
@@ -187,7 +190,9 @@ struct UIComp {
 };
 
 
-
+struct Paired {
+	Entity other;
+};
 
 //std::vector<Item> inUI;
 
@@ -425,7 +430,9 @@ enum class TEXTURE_ASSET_ID {
 	BUBBLE0 = DOG_PORTRAIT1 + 1,
 	BUBBLE1 = BUBBLE0 +1,
 	DAY_SCREEN = BUBBLE1 + 1,
-    HELP_SCREEN = DAY_SCREEN +1,
+	END_SCREEN = DAY_SCREEN + 1,
+	INTRO_SCREEN = END_SCREEN + 1,
+    HELP_SCREEN = INTRO_SCREEN +1,
     SIGN_01 = HELP_SCREEN + 1,
     SIGN_02 = SIGN_01 +1,
 	TORCHLIGHT_00 = SIGN_02 + 1,
@@ -437,8 +444,7 @@ enum class TEXTURE_ASSET_ID {
 	SHADOW_01 = SHADOW_00 + 1,
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
-	TORCH_00 = MIDNIGHT_01 + 1,
-	CRAFTING = TORCH_00 + 1,
+	CRAFTING = MIDNIGHT_01 + 1,
 	HELPNIGHT = CRAFTING + 1,
 	HELPTORCH = HELPNIGHT + 1,
     LOGO_00 = HELPTORCH + 1,
@@ -446,7 +452,29 @@ enum class TEXTURE_ASSET_ID {
 	WIN0 = LOGO_01 + 1,
 	WIN1 = WIN0 + 1,
 	CHECK = WIN1 + 1,
-	TEXTURE_COUNT = CHECK + 1
+	SPARK0 = CHECK + 1,
+	SPARK1 = SPARK0 + 1,
+	SPARK2 = SPARK1 + 1,
+	SPARK3 = SPARK2 + 1,
+	SPARK4 = SPARK3 + 1,
+	SPARK5 = SPARK4 + 1,
+	SPARK6 = SPARK5 + 1,
+	SPARK7 = SPARK6 + 1,
+	BSPARK0 = SPARK7 + 1,
+	BSPARK1 = BSPARK0 + 1,
+	BSPARK2 = BSPARK1 + 1,
+	BSPARK3 = BSPARK2 + 1,
+	BSPARK4 = BSPARK3 + 1,
+	BSPARK5 = BSPARK4 + 1,
+	BSPARK6 = BSPARK5 + 1,
+	BSPARK7 = BSPARK6 + 1,
+	TORCH_OFF0 = BSPARK7 + 1,
+	TORCH_OFF1 = TORCH_OFF0 + 1,
+	TORCH_OFF2 = TORCH_OFF1 + 1,
+	TORCH_00 = TORCH_OFF2 + 1,
+	TORCH_01 = TORCH_00 + 1,
+	TORCH_02 = TORCH_01 + 1,
+	TEXTURE_COUNT = TORCH_02 + 1,
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -495,8 +523,48 @@ struct ChunkStitch {
 	int location = 0;
 };
 
+struct AnimatedTorchOn {
+	uint size = 3;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[3] = {
+		TEXTURE_ASSET_ID::TORCH_00,
+		TEXTURE_ASSET_ID::TORCH_01,
+		TEXTURE_ASSET_ID::TORCH_02,
+	};
+};
 
-//
+
+struct AnimatedTorchOff {
+	uint size = 3;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[3] = {
+		TEXTURE_ASSET_ID::TORCH_OFF0,
+		TEXTURE_ASSET_ID::TORCH_OFF1,
+		TEXTURE_ASSET_ID::TORCH_OFF2,
+	};
+};
+
+
+struct AnimatedSparkle {
+	uint size = 8;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[8] = {
+		TEXTURE_ASSET_ID::SPARK0, TEXTURE_ASSET_ID::SPARK1, TEXTURE_ASSET_ID::SPARK2, TEXTURE_ASSET_ID::SPARK3,
+		TEXTURE_ASSET_ID::SPARK4, TEXTURE_ASSET_ID::SPARK5, TEXTURE_ASSET_ID::SPARK6, TEXTURE_ASSET_ID::SPARK7,
+	};
+};
+
+struct AnimatedPlayerSparkle {
+	uint size = 8;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[8] = {
+		TEXTURE_ASSET_ID::BSPARK0, TEXTURE_ASSET_ID::BSPARK1, TEXTURE_ASSET_ID::BSPARK2, TEXTURE_ASSET_ID::BSPARK3,
+		TEXTURE_ASSET_ID::BSPARK4, TEXTURE_ASSET_ID::BSPARK5, TEXTURE_ASSET_ID::BSPARK6, TEXTURE_ASSET_ID::BSPARK7,
+	};
+};
+
+
+
 //TEXTURE_ASSET_ID base_asset = TEXTURE_ASSET_ID::PORTRAIT0;
 //int base = (int)base_asset;
 struct AnimatedFaceOject {
