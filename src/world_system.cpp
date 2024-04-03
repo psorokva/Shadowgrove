@@ -268,6 +268,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		screen.torch_anim = animation_cycle % 3;
 		animation_cycle %= 4;
 
+		if (registry.player_sparkle_animation.entities.size() > 0) {
+			// also do for dog
+			for (Entity& animated_entity : registry.player_sparkle_animation.entities) {
+				AnimatedPlayerSparkle& face = registry.player_sparkle_animation.get(animated_entity);
+				// No need to check if render request since should always have a render request
+				RenderRequest& anim_rr = registry.renderRequests.get(animated_entity);
+				face.current_cell++;
+				if (face.current_cell >= face.size) {
+					face.current_cell = 0;
+				}
+				anim_rr.used_texture = face.cells[face.current_cell];
+			}
+		}
+
 		if (registry.torch_off_animation.entities.size() > 0) {
 			// also do for dog
 			for (Entity& animated_entity : registry.torch_off_animation.entities) {
@@ -924,7 +938,8 @@ void WorldSystem::restart_game() {
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
 
 	player = createPlayer(renderer, vec2{0,0}); // TODO: update this after
-
+	// createPlayerSparkle(renderer, vec2{ window_width_px / 2, window_height_px / 2 });
+	
 	// vec2(start_x, start_y);
 	//if (level > 1) {
 	//	registry.inventory.insert(player,tempInventory);

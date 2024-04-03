@@ -469,6 +469,16 @@ Entity createSparkle(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	UIComp& motion = registry.uicomps.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_HEIGHT *1.5, PLAYER_HEIGHT * 1.5 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BSPARK0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	AnimatedPlayerSparkle& spark = registry.player_sparkle_animation.emplace(entity);
+	return entity;
+}
+
 
 // just an invisible marker to calculate where player is in relation to
 Entity createCompass(vec2 position) {

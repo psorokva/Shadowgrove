@@ -25,7 +25,7 @@ Entity createPortrait(RenderSystem* renderer, vec2 pos);
 Entity createDogPortrait(RenderSystem* renderer, vec2 pos);
 Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type);
 Entity createSparkle(RenderSystem* renderer, vec2 pos);
-
+Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos);
 
 //Entity createMapChunk(vec2 position);
 Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 });

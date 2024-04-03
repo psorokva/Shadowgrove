@@ -48,6 +48,7 @@ public:
 	ComponentContainer<AnimatedFaceOject> face_animation;
 	ComponentContainer<AnimatedDogFace> dog_face_animation;
 	ComponentContainer<AnimatedSparkle> sparkle_animation;
+	ComponentContainer<AnimatedPlayerSparkle> player_sparkle_animation;
 	ComponentContainer<AnimatedTorchOn> torch_on_animation;
 	ComponentContainer<AnimatedTorchOff> torch_off_animation;
 	ComponentContainer<Paired> pairs;
@@ -89,6 +90,7 @@ public:
 		registry_list.push_back(&face_animation); 
 		registry_list.push_back(&dog_face_animation);
 		registry_list.push_back(&sparkle_animation);
+		registry_list.push_back(&player_sparkle_animation);
 		registry_list.push_back(&torch_on_animation);
 		registry_list.push_back(&torch_off_animation);
 		registry_list.push_back(&pairs);
