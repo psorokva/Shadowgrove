@@ -656,6 +656,21 @@ Chunk& MapGen::createMapChunk(vec2 position) {
 			} else if ((maze[r][c] & PATH_N) != 0 && (maze[r][c] & PATH_E) != 0 && (maze[r][c] & PATH_S) != 0 && (maze[r][c] & PATH_W) == 0) {
 				// not w
 				chosen_path_vector = path_var_notw;
+				///////////////////////////////////////////////////////
+			} else if ((maze[r][c] & PATH_N) != 0 && (maze[r][c] & PATH_E) == 0 && (maze[r][c] & PATH_S) == 0 && (maze[r][c] & PATH_W) == 0) {
+				// only n 
+				chosen_path_vector = path_var_only_n;
+			} else if ((maze[r][c] & PATH_N) == 0 && (maze[r][c] & PATH_E) == 0 && (maze[r][c] & PATH_S) != 0 && (maze[r][c] & PATH_W) == 0) {
+				// only s
+				chosen_path_vector = path_var_only_s;
+			} else if ((maze[r][c] & PATH_N) == 0 && (maze[r][c] & PATH_E) != 0 && (maze[r][c] & PATH_S) == 0 && (maze[r][c] & PATH_W) == 0) {
+				// only e
+				chosen_path_vector = path_var_only_e;
+			} else if ((maze[r][c] & PATH_N) == 0 && (maze[r][c] & PATH_E) == 0 && (maze[r][c] & PATH_S) == 0 && (maze[r][c] & PATH_W) != 0) {
+				// only w
+				chosen_path_vector = path_var_only_w;
+
+
 			} else {
 				// cover edge cases after like single ends etc
 				chosen_path_vector = path_var_all;
@@ -768,7 +783,10 @@ void MapGen::initPaths() {
 	path_var_corsw = std::vector< std::vector< std::vector<int>>>();
 	stitch_var_we = std::vector< std::vector< std::vector<int>>>();
 	stitch_var_ns = std::vector< std::vector< std::vector<int>>>();
-
+	path_var_only_n = std::vector< std::vector< std::vector<int>>>();
+	path_var_only_w = std::vector< std::vector< std::vector<int>>>();
+	path_var_only_s = std::vector< std::vector< std::vector<int>>>();
+	path_var_only_e = std::vector< std::vector< std::vector<int>>>();
 
 	std::vector < std::vector<int> > temp = std::vector < std::vector<int> >();
 	for (const auto& row : path_var_clear) {
@@ -902,6 +920,47 @@ void MapGen::initPaths() {
 	temp = std::vector < std::vector<int> >();
 	for (const auto& row : stitch_var_ns3) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	stitch_var_ns.push_back(temp);
+
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_s0) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_s.push_back(temp);
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_s1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_s.push_back(temp);
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_s2) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_s.push_back(temp);
+
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_n0) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_n.push_back(temp);
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_n1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_n.push_back(temp);
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_n2) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_n.push_back(temp);
+
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_w0) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_w.push_back(temp);
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_w1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_w.push_back(temp);
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_w2) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_w.push_back(temp);
+
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_e0) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_e.push_back(temp);
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_e1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_e.push_back(temp);
+	temp = std::vector < std::vector<int> >();
+	for (const auto& row : path_var_e2) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	path_var_only_e.push_back(temp);
+
 
 }
 

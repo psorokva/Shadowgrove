@@ -55,6 +55,10 @@ void main() {
     if (torch_mode == 1){
         torch_exists = 1.0;
     }
+    int override = 0;
+    if (in_color == vec4(1.0,1.0,1.0,1.0) ) {
+        override = 1;
+    } 
 
     if (alive == 1) {
         /// Help Screen
@@ -150,6 +154,13 @@ void main() {
             /// MIDNIGHT NO TORCH
             vec4 night_color = in_color * vec4(dark_color.r*dark_color.a, dark_color.g*dark_color.a, dark_color.b*dark_color.a, 1.0);
             color = day_portion * day_color + eve_portion * eve_color + dark_portion * night_color;
+        }
+
+        // hack for sparkle shaders
+        if (override == 1 ) {
+            // TODO adjust for dist to player at night
+            color.r += 0.2;
+            color.g += 0.4;
         }
 
         // if player is hit and temporarily invincible

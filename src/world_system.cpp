@@ -26,6 +26,8 @@ Direction playerDirection;
 const uint NUM_POTIONS = 25;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
+const int SPARKLE_SLOWDOWN_FPS = 1;
+int sparkle_slowdown = 0;
 float keeper_rate = 10.0;
 float KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 float keeper_spawn_time = 0.0f;
@@ -267,8 +269,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		animation_cycle++;
 		screen.torch_anim = animation_cycle % 3;
 		animation_cycle %= 4;
+		sparkle_slowdown++;
+		if (sparkle_slowdown > SPARKLE_SLOWDOWN_FPS) {
+			sparkle_slowdown = 0;
+		}
 
-		if (registry.player_sparkle_animation.entities.size() > 0) {
+		if (sparkle_slowdown == 0 && registry.player_sparkle_animation.entities.size() > 0) {
 			// also do for dog
 			for (Entity& animated_entity : registry.player_sparkle_animation.entities) {
 				AnimatedPlayerSparkle& face = registry.player_sparkle_animation.get(animated_entity);
@@ -308,7 +314,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				anim_rr.used_texture = face.cells[face.current_cell];
 			}
 		}
-		if (registry.sparkle_animation.entities.size() > 0) {
+		if (sparkle_slowdown == 0 && registry.sparkle_animation.entities.size() > 0) {
 			// also do for dog
 			for (Entity& animated_entity : registry.sparkle_animation.entities) {
 				AnimatedSparkle& face = registry.sparkle_animation.get(animated_entity);
