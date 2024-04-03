@@ -33,8 +33,8 @@ int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
-const float TORCH_LENGTH = 25 * 1000.0;
-float torch_timer_ms = TORCH_LENGTH;
+//const float TORCH_LENGTH = 25 * 1000.0;
+//float torch_timer_ms = TORCH_LENGTH;
 
 bool game_paused = false;
 bool is_in_debug = false;
@@ -651,7 +651,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     vec2 green_potion_pos = {575, 330 };
                     createConverstionPotion(renderer, green_potion_pos, 0);
                 }  if (counter.timestamp == 8) {
-
                     vec2 orange_potion_pos = {525, 330 };
                     createConverstionPotion(renderer, orange_potion_pos, 2);
                 }
@@ -836,8 +835,12 @@ void WorldSystem::restart_game() {
 		i = registry.inventory.components[0];
 	}
 	else {
-		i.holding = { torch, nullval, nullval, nullval, nullval };
-	}
+//		i.holding = { torch, nullval, nullval, nullval, nullval };
+        i.holding = { magical_shell, red_lotus, magical_strawberry, white_lotus, magical_shell }; // orange
+//        i.holding = { torch, white_lotus, magical_shell, magical_muchroom, nullval }; // green
+//        i.holding = { torch, magical_carrot, magical_apple, magical_grapes, nullval }; // purple
+
+    }
 
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());
@@ -855,9 +858,6 @@ void WorldSystem::restart_game() {
         registry.remove_all_components_of(registry.speechTimers.entities.back());
     while (registry.textTimers.entities.size() > 0)
         registry.remove_all_components_of(registry.textTimers.entities.back());
-    while (registry.uicomps.entities.size() > 0)
-        registry.remove_all_components_of(registry.uicomps.entities.back());
-
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -1522,14 +1522,20 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = blue_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
 			} else if (craft.x == 4) {
-				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = orange_potion;
+//				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = orange_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
+                vec2 orange_potion_pos = {850, 660 };
+                Entity orange = createConverstionPotion(renderer, orange_potion_pos, 2);
 			} else if (craft.x == 5) {
-				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
+//				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
+                vec2 green_potion_pos = {900, 660 };
+                Entity green = createConverstionPotion(renderer, green_potion_pos, 0);
 			} else if (craft.x == 6) {
-				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
+//				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
+                vec2 purple_potion_pos = {950, 660};
+                Entity purple = createConverstionPotion(renderer, purple_potion_pos, 1);
 			}
 		}
 		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
@@ -1705,6 +1711,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         if (screen.game_screen == cut_scene_2) {
             printf("hi 2 \n");
             screen.game_screen = game_screen_day;
+            while (registry.uicomps.entities.size() > 0)
+                registry.remove_all_components_of(registry.uicomps.entities.back());
             restart_game();
         }
         if (screen.game_screen == cut_scene_1) {
