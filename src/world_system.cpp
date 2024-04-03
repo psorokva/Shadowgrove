@@ -835,12 +835,11 @@ void WorldSystem::restart_game() {
 		i = registry.inventory.components[0];
 	}
 	else {
-//		i.holding = { torch, nullval, nullval, nullval, nullval };
-        i.holding = { magical_shell, red_lotus, magical_strawberry, white_lotus, magical_shell }; // orange
+        i.holding = { torch, nullval, nullval, nullval, nullval };
+//        i.holding = { magical_shell, red_lotus, magical_strawberry, white_lotus, magical_shell }; // orange
 //        i.holding = { torch, white_lotus, magical_shell, magical_muchroom, nullval }; // green
 //        i.holding = { torch, magical_carrot, magical_apple, magical_grapes, nullval }; // purple
-
-    }
+	}
 
 	while (registry.motions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.motions.entities.back());

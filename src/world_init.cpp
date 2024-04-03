@@ -59,7 +59,7 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
-Entity createConverstionPotion(RenderSystem* renderer, vec2 pos, int type) {
+Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
 	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default 
 	
 	auto entity = Entity();
@@ -590,6 +590,42 @@ Entity createInventoryPotion(Item& item, vec2 position) {
 }
 
 Entity createDay() {
+	auto entity = Entity();
+
+	auto& day = registry.screenStates.emplace(entity);
+	Daytime& sign = registry.daytimes.emplace(entity);
+
+	auto& fixed = registry.immobiles.emplace(entity);
+	//    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
+	fixed.position = { window_width_px / 2, 0.5 * window_height_px };
+	fixed.scale = { window_width_px, window_height_px };
+	//    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
+
+		// TEXTURE_COUNT indicates that no txture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createIntroScreem() {
+	auto entity = Entity();
+
+	auto& day = registry.screenStates.emplace(entity);
+	Daytime& sign = registry.daytimes.emplace(entity);
+
+	auto& fixed = registry.immobiles.emplace(entity);
+	//    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
+	fixed.position = { window_width_px / 2, 0.5 * window_height_px };
+	fixed.scale = { window_width_px, window_height_px };
+	//    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
+
+		// TEXTURE_COUNT indicates that no txture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INTRO_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createEnd() {
     auto entity = Entity();
 
     auto& day = registry.screenStates.emplace(entity);
@@ -602,7 +638,7 @@ Entity createDay() {
 //    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
 
     // TEXTURE_COUNT indicates that no txture is needed
-    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::END_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
 }

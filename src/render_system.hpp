@@ -155,6 +155,8 @@ class RenderSystem {
 			textures_path("text_bubble_brown_big.png"),
 			textures_path("text_bubble_brown_small.png"),
 			textures_path("daytimescreen.png"),
+			textures_path("endscreen.png"),
+			textures_path("introscreen.png"),
             textures_path("helpscreen.png"),
             textures_path("sign.png"),
             textures_path("sign2.png"),
