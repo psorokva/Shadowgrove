@@ -96,7 +96,12 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 
 	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
 	auto& enemy = registry.enemies.emplace(entity);
-	enemy.attack = 50;
+
+	// adjust these as needed for game balance
+	unsigned int lower_bound_damage = 10;
+	unsigned int upper_bound_damage = 30;
+	enemy.attack = rand() % (upper_bound_damage - lower_bound_damage + 1) + lower_bound_damage;
+
 	enemy.e_id = entity;
 	registry.deadlys.emplace(entity); // Do we still need this?
 	// TEXTURE_COUNT indicates that no texture is needed
