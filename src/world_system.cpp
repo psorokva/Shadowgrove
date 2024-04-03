@@ -861,6 +861,8 @@ void WorldSystem::restart_game() {
         registry.remove_all_components_of(registry.speechTimers.entities.back());
     while (registry.textTimers.entities.size() > 0)
         registry.remove_all_components_of(registry.textTimers.entities.back());
+	while (registry.torches.entities.size() > 0)
+		registry.remove_all_components_of(registry.torches.entities.back());
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
