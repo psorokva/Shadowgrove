@@ -1164,7 +1164,12 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 					Mix_PlayChannel(-1, mushroom_sound, 0);
 				}
 				else {
-					Mix_PlayChannel(-1, inventory_full_sound, 0);
+					ScreenState& screen = registry.screenStates.components[0];
+
+					// only play sound during night
+					if (screen.game_screen == game_screen_night) {
+						Mix_PlayChannel(-1, inventory_full_sound, 0);
+					}
 				}
 			}
 		}
