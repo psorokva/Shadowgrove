@@ -646,13 +646,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
                 } if (counter.timestamp == 6) {
                     vec2 purple_potion_pos = {625, 330};
-                    createConverstionPotion(renderer, purple_potion_pos, 1);
+                    createConversationPotion(renderer, purple_potion_pos, 1);
                 }  if (counter.timestamp == 7) {
                     vec2 green_potion_pos = {575, 330 };
-                    createConverstionPotion(renderer, green_potion_pos, 0);
+                    createConversationPotion(renderer, green_potion_pos, 0);
                 }  if (counter.timestamp == 8) {
                     vec2 orange_potion_pos = {525, 330 };
-                    createConverstionPotion(renderer, orange_potion_pos, 2);
+                    createConversationPotion(renderer, orange_potion_pos, 2);
                 }
                 registry.speechTimers.remove(entity);
                 return true;
@@ -1524,17 +1524,17 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = orange_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 orange_potion_pos = {850, 660 };
-                Entity orange = createConverstionPotion(renderer, orange_potion_pos, 2);
+                Entity orange = createConversationPotion(renderer, orange_potion_pos, 2);
 			} else if (craft.x == 5) {
 //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 green_potion_pos = {900, 660 };
-                Entity green = createConverstionPotion(renderer, green_potion_pos, 0);
+                Entity green = createConversationPotion(renderer, green_potion_pos, 0);
 			} else if (craft.x == 6) {
 //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 purple_potion_pos = {950, 660};
-                Entity purple = createConverstionPotion(renderer, purple_potion_pos, 1);
+                Entity purple = createConversationPotion(renderer, purple_potion_pos, 1);
 			}
 		}
 		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
