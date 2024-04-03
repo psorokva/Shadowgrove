@@ -47,6 +47,10 @@ public:
 	ComponentContainer<UIComp> uicomps;
 	ComponentContainer<AnimatedFaceOject> face_animation;
 	ComponentContainer<AnimatedDogFace> dog_face_animation;
+	ComponentContainer<AnimatedSparkle> sparkle_animation;
+	ComponentContainer<AnimatedTorchOn> torch_on_animation;
+	ComponentContainer<AnimatedTorchOff> torch_off_animation;
+	ComponentContainer<Paired> pairs;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -84,6 +88,10 @@ public:
 		registry_list.push_back(&uicomps);
 		registry_list.push_back(&face_animation); 
 		registry_list.push_back(&dog_face_animation);
+		registry_list.push_back(&sparkle_animation);
+		registry_list.push_back(&torch_on_animation);
+		registry_list.push_back(&torch_off_animation);
+		registry_list.push_back(&pairs);
 	}
 
 	void clear_all_components() {
@@ -106,8 +114,19 @@ public:
 	}
 
 	void remove_all_components_of(Entity e) {
-		for (ContainerInterface* reg : registry_list)
-			reg->remove(e);
+		if (pairs.has(e)) {
+			Paired& pair = pairs.get(e);
+			Entity& other = pair.other;
+			//printf("Removing Pair");
+			for (ContainerInterface* reg : registry_list) {
+				reg->remove(e);
+				reg->remove(other);
+			}
+		} else {
+			for (ContainerInterface* reg : registry_list) {
+				reg->remove(e);
+			}
+		}
 	}
 
 	// 
