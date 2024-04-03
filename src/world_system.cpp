@@ -70,6 +70,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(player_hit_sound);
 	if (rooster_sound != nullptr)
 		Mix_FreeChunk(rooster_sound);
+    if (torch_sound != nullptr)
+        Mix_FreeChunk(torch_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -149,10 +151,11 @@ GLFWwindow* WorldSystem::create_window() {
     inventory_full_sound = Mix_LoadWAV(audio_path("inventory_full.wav").c_str());
 	player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
 	rooster_sound = Mix_LoadWAV(audio_path("rooster.wav").c_str());
+    torch_sound = Mix_LoadWAV(audio_path("torch.wav").c_str());
 
 	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
-        player_death_sound == nullptr || inventory_full_sound == nullptr || rooster_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n %s %s \n make sure the data directory is present",
+        player_death_sound == nullptr || inventory_full_sound == nullptr || rooster_sound == nullptr || torch_sound == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s %s \n make sure the data directory is present",
 			audio_path("forest_night.wav").c_str(),
 			audio_path("day.wav").c_str(),
 			audio_path("bird_noises.wav").c_str(),
@@ -160,7 +163,8 @@ GLFWwindow* WorldSystem::create_window() {
 			audio_path("player_death.wav").c_str(),
 			audio_path("inventory_full.wav").c_str(),
 			audio_path("player_hit.wav").c_str(),
-			audio_path("rooster.wav").c_str());
+			audio_path("rooster.wav").c_str(),
+            audio_path("torch.wav").c_str());
 
 		return nullptr;
 	}
@@ -1358,6 +1362,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			}
 			else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
 				registry.torches.emplace(Entity());
+                Mix_PlayChannel(-1, torch_sound, 0);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			}
 		}
