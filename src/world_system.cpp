@@ -386,6 +386,53 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                 registry.motions.get(localItem).scale = { 50, 50 };
             }
         }
+
+		//createShadowOverlay(renderer);
+
+		if (num_of_item_on_screen < NUM_POTIONS) {
+			std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8 };
+			for (int i = 0; i < 5; i++) {
+				Item& item = registry.inventory.get(player).holding[i];
+				switch (item) {
+				case (magical_mushroom):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 0), randomizer.end());
+					break;
+				case (magical_shell):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 1), randomizer.end());
+					break;
+				case (magical_strawberry):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 2), randomizer.end());
+					break;
+				case (magical_grapes):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 3), randomizer.end());
+					break;
+				case (magical_apple):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 4), randomizer.end());
+					break;
+				case (red_lotus):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 5), randomizer.end());
+					break;
+				case (white_lotus):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 6), randomizer.end());
+					break;
+				case (magical_carrot):
+					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 7), randomizer.end());
+					break;
+				case (torch):
+					break;
+				}
+			}
+
+			vec2 spawn_pos = registry.get_empty_spawn_location();
+			createPotion(renderer, spawn_pos, randomizer);
+			//for (size_t i = 0; i < randomizer.size(); ++i) {
+			//	printf("%d ", randomizer[i]);
+			//}
+			//printf("\n");
+			num_of_item_on_screen++;
+		}
+
+
     }
 
 
@@ -449,50 +496,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         }
     }
 
-	//createShadowOverlay(renderer);
 
-	if (num_of_item_on_screen < NUM_POTIONS) {
-		std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8 };
-		for (int i = 0; i < 5; i++) {
-			Item& item = registry.inventory.get(player).holding[i];
-			switch (item) {
-				case (magical_mushroom):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 0), randomizer.end());
-					break;
-				case (magical_shell):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 1), randomizer.end());
-					break;
-				case (magical_strawberry):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 2), randomizer.end());
-					break;
-				case (magical_grapes):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 3), randomizer.end());
-					break;
-				case (magical_apple):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 4), randomizer.end());
-					break;
-				case (red_lotus):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 5), randomizer.end());
-					break;
-				case (white_lotus):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 6), randomizer.end());
-					break;
-				case (magical_carrot):
-					randomizer.erase(std::remove(randomizer.begin(), randomizer.end(), 7), randomizer.end());
-					break;
-				case (torch):
-					break;
-			}
-		}
-
-		vec2 spawn_pos = registry.get_empty_spawn_location();
-		createPotion(renderer, spawn_pos, randomizer);
-		//for (size_t i = 0; i < randomizer.size(); ++i) {
-		//	printf("%d ", randomizer[i]);
-		//}
-		//printf("\n");
-		num_of_item_on_screen++;
-	}
 
 
     float min_counter_ms = 3000.f;
@@ -1403,7 +1407,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		else {
 			std::cout << "EXIT GAME" << std::endl;
 			if (registry.screenStates.components[0].game_screen == game_screen_day) {
-				save_state.saveInventory();
+				//save_state.saveInventory();
 			}
 			glfwSetWindowShouldClose(window, true);
 		}
