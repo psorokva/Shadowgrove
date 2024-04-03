@@ -522,6 +522,15 @@ void RenderSystem::draw() {
             }
         }
 
+        // render dog potions
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.uicomps.has(entity)) {
+//                if (registry.daytimes.has(entity)) {
+                    drawTexturedUIMesh(entity, projection_2D);
+//                }
+            }
+        }
+
 		if (registry.helpScreen.size() > 0) {
 			HelpScreen& help = registry.helpScreen.components[0];
 			if (help.help == 1) {

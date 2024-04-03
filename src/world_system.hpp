@@ -91,6 +91,7 @@ private:
     Mix_Chunk* inventory_full_sound;
 	Mix_Chunk* player_hit_sound;
 	Mix_Chunk* rooster_sound;
+    Mix_Chunk* torch_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;
