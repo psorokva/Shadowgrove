@@ -252,6 +252,7 @@ struct DeathTimer {
 // A timer that will switch from night to day
 struct NightTimer {
 	float counter_ms = NIGHT_DURATION;
+	bool rooster_played = false;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)

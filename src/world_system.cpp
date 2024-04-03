@@ -3,6 +3,7 @@
 #include "world_init.hpp"
 #include "tiny_ecs.hpp"
 
+
 // stlib
 #include <cassert>
 #include <sstream>
@@ -67,6 +68,8 @@ WorldSystem::~WorldSystem() {
         Mix_FreeChunk(inventory_full_sound);
 	if (player_hit_sound != nullptr)
 		Mix_FreeChunk(player_hit_sound);
+	if (rooster_sound != nullptr)
+		Mix_FreeChunk(rooster_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -145,17 +148,19 @@ GLFWwindow* WorldSystem::create_window() {
     player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
     inventory_full_sound = Mix_LoadWAV(audio_path("inventory_full.wav").c_str());
 	player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
+	rooster_sound = Mix_LoadWAV(audio_path("rooster.wav").c_str());
 
 	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
-        player_death_sound == nullptr || inventory_full_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n %s \n make sure the data directory is present",
-            audio_path("forest_night.wav").c_str(),
-            audio_path("day.wav").c_str(),
-            audio_path("bird_noises.wav").c_str(),
-            audio_path("mushroom.wav").c_str(),
-            audio_path("player_death.wav").c_str(),
-            audio_path("inventory_full.wav").c_str(),
-			audio_path("player_hit.wav").c_str());
+        player_death_sound == nullptr || inventory_full_sound == nullptr || rooster_sound == nullptr) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n %s %s \n make sure the data directory is present",
+			audio_path("forest_night.wav").c_str(),
+			audio_path("day.wav").c_str(),
+			audio_path("bird_noises.wav").c_str(),
+			audio_path("mushroom.wav").c_str(),
+			audio_path("player_death.wav").c_str(),
+			audio_path("inventory_full.wav").c_str(),
+			audio_path("player_hit.wav").c_str(),
+			audio_path("rooster.wav").c_str());
 
 		return nullptr;
 	}
@@ -230,6 +235,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         if (night_counter.counter_ms < min_night_counter_ms) {
             min_night_counter_ms = night_counter.counter_ms;
         }
+
+		// if we are nearing day and we haven't played the rooster sound yet
+		if (night_counter.counter_ms < NIGHT_DURATION / 10 && !night_counter.rooster_played)
+		{
+			Mix_PlayChannel(-1, rooster_sound, 0);
+			night_counter.rooster_played = true;
+		}
 
 		// switch to day after night timer expired
 		if (night_counter.counter_ms < 0) {
