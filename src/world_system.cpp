@@ -23,12 +23,12 @@ const int MAZE_HEIGHT = MAZE_SIZE;
 //bool blockedWest = false;
 
 Direction playerDirection;
-const uint NUM_POTIONS = 25;
+const uint NUM_POTIONS = 10;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const int SPARKLE_SLOWDOWN_FPS = 1;
 int sparkle_slowdown = 0;
-float keeper_rate = 10.0;
+float keeper_rate = 12.0;
 float KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
