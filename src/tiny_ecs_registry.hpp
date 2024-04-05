@@ -52,7 +52,7 @@ public:
 	ComponentContainer<AnimatedTorchOn> torch_on_animation;
 	ComponentContainer<AnimatedTorchOff> torch_off_animation;
 	ComponentContainer<Paired> pairs;
-
+	ComponentContainer<Rotator> rotators;
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
 	ECSRegistry() {
@@ -94,6 +94,7 @@ public:
 		registry_list.push_back(&torch_on_animation);
 		registry_list.push_back(&torch_off_animation);
 		registry_list.push_back(&pairs);
+		registry_list.push_back(&rotators);
 	}
 
 	void clear_all_components() {
