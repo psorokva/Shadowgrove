@@ -1298,9 +1298,9 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				// initiate death unless already dying
 				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && player_component.alive == 1) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
-
-					if ((p.health - e.attack) > 0) {
-						p.health = p.health - e.attack;
+					p.health = p.health - e.attack;
+					if (p.health > 0) {
+						//p.health = p.health - e.attack;
                         p.hit = 1;
                         // make player temporarily invincible
                         if (!registry.invincibles.has(entity))
