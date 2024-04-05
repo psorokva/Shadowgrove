@@ -35,6 +35,7 @@ int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
+bool morning_warning = false;
 //const float TORCH_LENGTH = 25 * 1000.0;
 //float torch_timer_ms = TORCH_LENGTH;
 
@@ -369,7 +370,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createKeeper(renderer, spawn_pos);
 	}
 	
-
+	if ( registry.rotators.size() > 0) {
+		//const float degrees = 360.0;
+		const float full_spin = M_PI * 2.0;
+		Rotator& rotation = registry.rotators.components[0];
+		rotation.angle += (elapsed_ms_since_last_update / NIGHT_DURATION) * full_spin;
+		if (!morning_warning && registry.nightTimer.size() > 0 && registry.nightTimer.components[0].counter_ms < 2000.0) {
+			morning_warning = true;
+			Entity morning = Entity();
+			registry.textRenderRequests.insert(morning, { "Good Morning!", vec2(0.32 * window_width_px, 0.64 * window_height_px) });
+		}
+	}
 
 
 	// Updating window title with points
@@ -893,7 +904,7 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 
 	printf("Restarting\n");
-
+	morning_warning = false;
     game_paused = false;
 	// Reset the game speed
 	current_speed = 1.f;
@@ -927,6 +938,8 @@ void WorldSystem::restart_game() {
         registry.remove_all_components_of(registry.textTimers.entities.back());
 	while (registry.torches.entities.size() > 0)
 		registry.remove_all_components_of(registry.torches.entities.back());
+	while (registry.uicomps.entities.size() > 0)
+		registry.remove_all_components_of(registry.uicomps.entities.back());
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -954,8 +967,7 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player) = i;
 
     //save_state.loadInventory();
-
-//    save_state.loadInventory();
+	//save_state.loadInventory();
 
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
@@ -1190,11 +1202,10 @@ void WorldSystem::restart_game() {
 
     }
 
-	if (screen.game_screen == game_screen_night)
-	{
+	if (screen.game_screen == game_screen_night) 	{
 		vec2 player_spawn = registry.get_empty_spawn_keeper_location();
-
 		registry.motions.get(player).position = player_spawn;
+		Entity spinner = createSunMoonSpinner(renderer, vec2(window_width_px*0.5, window_height_px));
 	}
 
 
@@ -1287,9 +1298,9 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				// initiate death unless already dying
 				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && player_component.alive == 1) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
-
-					if ((p.health - e.attack) > 0) {
-						p.health = p.health - e.attack;
+					p.health = p.health - e.attack;
+					if (p.health > 0) {
+						//p.health = p.health - e.attack;
                         p.hit = 1;
                         // make player temporarily invincible
                         if (!registry.invincibles.has(entity))

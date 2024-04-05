@@ -479,6 +479,20 @@ Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createSunMoonSpinner(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	auto entityBG = Entity();
+	UIComp& motion = registry.uicomps.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_HEIGHT * 2., PLAYER_HEIGHT * 2.0 });
+	Rotator& rot = registry.rotators.emplace(entity);
+	UIComp& uibg = registry.uicomps.emplace(entityBG);
+	uibg.position = pos;
+	uibg.scale = vec2({ PLAYER_HEIGHT * 2., PLAYER_HEIGHT * 2.0 });
+	registry.renderRequests.insert(entityBG, { TEXTURE_ASSET_ID::DAYNIGHT0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::DAYNIGHT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
 
 // just an invisible marker to calculate where player is in relation to
 Entity createCompass(vec2 position) {
