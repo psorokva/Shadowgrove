@@ -420,23 +420,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 //    Entity p = registry.players.entities[0];
     Motion& p_motion = registry.motions.get(player);
 
-//   createHelp();
+    // Displaying health bar
+    auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
+    registry.colors.insert(healthBG, { 0, 0, 0 });
+
+    auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
+    registry.colors.insert(healthBar, { 1, 0, 0 });
+
     if (screen.game_screen == game_screen_night) {
-        // Displaying health bar
-        auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
-        registry.colors.insert(healthBG, { 0, 0, 0 });
-
-        auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
-        registry.colors.insert(healthBar, { 1, 0, 0 });
-
         // inventory bar position on screen
         vec2 pos = {720, 60};
         createInventory(pos);
-
-//    createHelp();
-//    Entity help = registry.helpScreen.entities[0];
-//    vec2 help_pos = registry.motions.get(help).camera_position;
-//    help_pos = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
 
         for (int i = 0; i < 5; i++) {
             Inventory& player_inv = registry.inventory.get(player);
@@ -745,7 +739,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     // check if out of bounds
                     registry.remove_all_components_of(entity);
                 } else {
-                    registry.textRenderRequests.get(entity).position.y += 2;
+                    registry.textRenderRequests.get(entity).position.y += 1;
                 }
             }
             // speech
@@ -755,7 +749,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     // check if out of bounds
                     registry.remove_all_components_of(entity);
                 } else {
-                    registry.speechRenderRequests.get(entity).position.y += 2;
+                    registry.speechRenderRequests.get(entity).position.y += 1;
                 }
             }
         }
@@ -1070,7 +1064,7 @@ void WorldSystem::restart_game() {
         auto spaceKey = Entity();
         vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
 
-        registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
+        registry.textRenderRequests.insert(spaceKey,{"Press space key to continue!!", spaceKey_line});
         registry.textRenderRequests.get(spaceKey).scale = 0.5;
 
         if (screen.game_screen == cut_scene_2 ) {
@@ -1779,29 +1773,46 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // space to start game + cut scenes
     if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
         if (screen.game_screen == cut_scene_2) {
-            printf("hi 2 \n");
-            screen.game_screen = game_screen_day;
-            while (registry.uicomps.entities.size() > 0)
-                registry.remove_all_components_of(registry.uicomps.entities.back());
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = game_screen_day;
+                while (registry.uicomps.entities.size() > 0)
+                    registry.remove_all_components_of(registry.uicomps.entities.back());
+                restart_game();
+            }
         }
         if (screen.game_screen == cut_scene_1) {
-            printf("hi 1 \n");
-
-            screen.game_screen = cut_scene_2;
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_2;
+                restart_game();
+            }
         }
         if (screen.game_screen == cut_scene_0) {
-            printf("hi 0 \n");
-
-            screen.game_screen = cut_scene_1;
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_1;
+                restart_game();
+            }
         }
         if (screen.game_screen == game_screen_main_menu) {
-            screen.game_screen = cut_scene_0;
-            printf("hi \n");
-
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_0;
+                restart_game();
+            }
         }
     }
 

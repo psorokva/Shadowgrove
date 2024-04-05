@@ -591,17 +591,9 @@ void RenderSystem::draw() {
             }
         }
 
-//        glm::mat4 trans = glm::mat4(1.0f);
-        float timeBetweenLines = 10000.0f;
-        float elapsedTime = 0.0f;
-
         for (Entity entity : registry.speechRenderRequests.entities)
         {
             SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
-            if (elapsedTime <= timeBetweenLines) {
-                elapsedTime += 0.001;
-            }
-            elapsedTime = 0.0f;
             renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
 
         }
