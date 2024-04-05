@@ -12,6 +12,7 @@ struct Chunk {
 	float offset_y = 0;
 	float campos_x = 0;
 	float campos_y = 0;
+	bool keeper_spawned_here = false;
 	int grid[MAZE_SIZE][MAZE_SIZE] = {
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
