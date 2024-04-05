@@ -681,6 +681,11 @@ void RenderSystem::drawTexturedUIMesh(Entity entity, const mat3& projection) {
 	Transform transform;
 	transform.translate(ui_comp.position);
 	transform.scale(ui_comp.scale);
+	if (registry.rotators.has(entity)) {
+		Rotator& rotator = registry.rotators.get(entity);
+		transform.rotate(rotator.angle);
+	}
+
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);

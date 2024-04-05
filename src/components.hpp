@@ -12,6 +12,7 @@ struct Chunk {
 	float offset_y = 0;
 	float campos_x = 0;
 	float campos_y = 0;
+	bool keeper_spawned_here = false;
 	int grid[MAZE_SIZE][MAZE_SIZE] = {
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -187,6 +188,11 @@ struct Immobile {
 struct UIComp {
 	vec2 position = { 0, 0 };
 	vec2 scale = { 10, 10 };
+};
+
+struct Rotator {
+	float angle = 0;
+	//float speed = 360 LENGTH OF NIGHT_ms   
 };
 
 
@@ -476,7 +482,9 @@ enum class TEXTURE_ASSET_ID {
 	TORCH_00 = TORCH_OFF2 + 1,
 	TORCH_01 = TORCH_00 + 1,
 	TORCH_02 = TORCH_01 + 1,
-	TEXTURE_COUNT = TORCH_02 + 1,
+	DAYNIGHT0 = TORCH_02 + 1,
+	DAYNIGHT1 = DAYNIGHT0 + 1,
+	TEXTURE_COUNT = DAYNIGHT1 + 1,
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

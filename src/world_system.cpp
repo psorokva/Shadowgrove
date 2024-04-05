@@ -35,6 +35,7 @@ int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
+bool morning_warning = false;
 //const float TORCH_LENGTH = 25 * 1000.0;
 //float torch_timer_ms = TORCH_LENGTH;
 
@@ -369,7 +370,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createKeeper(renderer, spawn_pos);
 	}
 	
-
+	if ( registry.rotators.size() > 0) {
+		//const float degrees = 360.0;
+		const float full_spin = M_PI * 2.0;
+		Rotator& rotation = registry.rotators.components[0];
+		rotation.angle += (elapsed_ms_since_last_update / NIGHT_DURATION) * full_spin;
+		if (!morning_warning && registry.nightTimer.size() > 0 && registry.nightTimer.components[0].counter_ms < 2000.0) {
+			morning_warning = true;
+			Entity morning = Entity();
+			registry.textRenderRequests.insert(morning, { "Good Morning!", vec2(0.32 * window_width_px, 0.64 * window_height_px) });
+		}
+	}
 
 
 	// Updating window title with points
@@ -893,10 +904,10 @@ void WorldSystem::checkCrafted() {
 // Reset the world state to its initial state
 void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
-	registry.list_all_components();
+	//registry.list_all_components();
 
 	printf("Restarting\n");
-
+	morning_warning = false;
     game_paused = false;
 	// Reset the game speed
 	current_speed = 1.f;
@@ -930,6 +941,8 @@ void WorldSystem::restart_game() {
         registry.remove_all_components_of(registry.textTimers.entities.back());
 	while (registry.torches.entities.size() > 0)
 		registry.remove_all_components_of(registry.torches.entities.back());
+	while (registry.uicomps.entities.size() > 0)
+		registry.remove_all_components_of(registry.uicomps.entities.back());
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -941,7 +954,9 @@ void WorldSystem::restart_game() {
 	//registry.clear_all_components();
 	generator->clearMap();
 	//printf("AFTER CLEARED REGISTRY");
-	registry.list_all_components();
+
+	//registry.list_all_components();
+
 	// Create a new player
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
@@ -957,8 +972,7 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player) = i;
 
     //save_state.loadInventory();
-
-//    save_state.loadInventory();
+	//save_state.loadInventory();
 
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
@@ -1003,8 +1017,8 @@ void WorldSystem::restart_game() {
     else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
-        fprintf(stderr, "Loaded music\n");
-        printf("here\n");
+       // fprintf(stderr, "Loaded music\n");
+       // printf("here\n");
 
 
         Motion& player_motion = registry.motions.get(player);
@@ -1012,18 +1026,16 @@ void WorldSystem::restart_game() {
         // put player alive again
         player_component.alive = 1;
         player_motion.scale = { 2 * 60, 2 * 80 };
-        printf("created player\n");
+       // printf("created player\n");
 
         if (screen.game_screen == game_screen_day) {
             createDay();
-            printf("in game day screen\n");
             createDog({ 0.85 * window_width_px, 0.75 * window_height_px });
 
             createSign();
             createSign2();
         } else {
             createIntroScreen();
-            printf("in game start screen\n");
             createDog({ 0.3 * window_width_px, 0.8 * window_height_px });
 
             createLogo();
@@ -1040,7 +1052,7 @@ void WorldSystem::restart_game() {
     else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2 ) {
         Entity day = createDay();
         registry.immobiles.get(day).scale = { 1.3 * window_width_px, 1.3 * window_height_px };
-        printf("day entity init %zu\n", day);
+        //printf("day entity init %zu\n", day);
 
         // TODO: move to game_screen_intro
         /// ADD ANIMATED FACE !!
@@ -1091,7 +1103,7 @@ void WorldSystem::restart_game() {
     else if (screen.game_screen == game_screen_win) {
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
-        fprintf(stderr, "Loaded music\n");
+        //fprintf(stderr, "Loaded music\n");
 
         createEnd();
 
@@ -1132,28 +1144,18 @@ void WorldSystem::restart_game() {
         registry.speechRenderRequests.insert(credit7, {"thanks for playing!", vec2(305, -500)});
     }
     else if (screen.game_screen == game_screen_night) {
-        printf("in game night screen\n");
+        //printf("in game night screen\n");
         // Playing background music indefinitely
         createNight();
 
         Mix_PlayMusic(night_music, -1);
-        fprintf(stderr, "Loaded music\n");
+        //fprintf(stderr, "Loaded music\n");
         generator->makeNoise(level);
         generator->createWorldMap();
         Motion& p_motion = registry.motions.get(player);
         p_motion.position = registry.get_empty_spawn_keeper_location();
-        if (level < 9) {
-            level++;
-            keeper_rate-= 0.8;
-            KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
-        }
-        for (int k = 0; k < level +2; k++) {
-            vec2 spawn_point = registry.get_empty_spawn_keeper_location();
-            createKeeper(renderer, spawn_point);
-        }
-        for (int num_keepers = 0; num_keepers < level; num_keepers++) {
-            createKeeper(renderer, registry.get_empty_spawn_location());
-        }
+
+
 
         // Create empty "path" maze
         std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
@@ -1189,12 +1191,30 @@ void WorldSystem::restart_game() {
         // wait();
         // Debugging for memory/component leaks
         //torchEntity = createShadowOverlay(renderer);
-
-        vec2 player_spawn = registry.get_empty_spawn_keeper_location();
-
-        registry.motions.get(player).position = player_spawn;
-
+		if (level < 9) {
+			level++;
+			keeper_rate -= 0.8;
+			KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
+		}
+		for (int k = 0; k < level + 2; k++) {
+			vec2 spawn_point = registry.get_empty_spawn_keeper_location();
+			printf("KeeperSpawn at %f, %f\n", spawn_point.x, spawn_point.y);
+			createKeeper(renderer, spawn_point);
+		}
+		for (int num_keepers = 0; num_keepers < level; num_keepers++) {
+			createKeeper(renderer, registry.get_empty_spawn_location());
+		}
+		for (Entity& e : registry.enemies.entities) {
+			Motion& spawn_point = registry.motions.get(e);
+			printf("Keeperat %f, %f\n", spawn_point.position.x, spawn_point.position.y);
+		}
     }
+
+	if (screen.game_screen == game_screen_night) 	{
+		vec2 player_spawn = registry.get_empty_spawn_keeper_location();
+		registry.motions.get(player).position = player_spawn;
+		Entity spinner = createSunMoonSpinner(renderer, vec2(window_width_px*0.5, window_height_px));
+	}
 
 	registry.list_all_components();
 
@@ -1283,9 +1303,9 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				// initiate death unless already dying
 				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && player_component.alive == 1) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
-
-					if ((p.health - e.attack) > 0) {
-						p.health = p.health - e.attack;
+					p.health = p.health - e.attack;
+					if (p.health > 0) {
+						//p.health = p.health - e.attack;
                         p.hit = 1;
                         // make player temporarily invincible
                         if (!registry.invincibles.has(entity))
@@ -1498,7 +1518,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_N && is_in_debug) {
-        printf("N key pressed, switching screen");
+        // printf("N key pressed, switching screen");
 		for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
 			registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
 		}
@@ -1866,7 +1886,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // space to restart
     if (screen.game_screen == game_screen_game_over) {
         if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-            printf("in game over screen on key \n");
+           // printf("in game over screen on key \n");
             screen.game_screen = game_screen_main_menu;
             screen.torch_mode = 0;
             screen.night_counter_ms = 0;
@@ -1880,7 +1900,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // space to restart
     if (screen.game_screen == game_screen_win) {
         if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-            printf("in game win screen on key \n");
+            //printf("in game win screen on key \n");
             screen.game_screen = game_screen_main_menu;
 //            screen.torch_mode = 0;
             screen.night_counter_ms = 0;

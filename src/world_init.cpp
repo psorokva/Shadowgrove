@@ -29,6 +29,7 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+
 Entity createSpeechBubble(RenderSystem* renderer, vec2 pos, bool direction) {
 	auto entity = Entity();
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
@@ -473,6 +474,21 @@ Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos) {
 	motion.scale = vec2({ PLAYER_HEIGHT *1.5, PLAYER_HEIGHT * 1.5 });
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BSPARK0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	AnimatedPlayerSparkle& spark = registry.player_sparkle_animation.emplace(entity);
+	return entity;
+}
+
+Entity createSunMoonSpinner(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	auto entityBG = Entity();
+	UIComp& motion = registry.uicomps.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_HEIGHT * 2., PLAYER_HEIGHT * 2.0 });
+	Rotator& rot = registry.rotators.emplace(entity);
+	UIComp& uibg = registry.uicomps.emplace(entityBG);
+	uibg.position = pos;
+	uibg.scale = vec2({ PLAYER_HEIGHT * 2., PLAYER_HEIGHT * 2.0 });
+	registry.renderRequests.insert(entityBG, { TEXTURE_ASSET_ID::DAYNIGHT0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::DAYNIGHT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
 
