@@ -615,6 +615,87 @@ const int path_var_csw3[PV_SIZE][PV_SIZE]{
 	{0,0,0,1},
 	{0,0,0,1},
 };
+//// single directions
+
+const int path_var_s0[PV_SIZE][PV_SIZE]{
+	{1,1,1,1},
+	{1,0,0,1},
+	{1,0,0,1},
+	{0,0,0,0},
+};
+const int path_var_s1[PV_SIZE][PV_SIZE]{
+	{1,1,1,1},
+	{1,1,1,1},
+	{1,0,0,1},
+	{0,0,0,0},
+};
+
+const int path_var_s2[PV_SIZE][PV_SIZE]{
+	{1,0,1,1},
+	{0,0,0,1},
+	{0,0,0,0},
+	{0,0,0,0},
+};
+
+
+const int path_var_n0[PV_SIZE][PV_SIZE]{
+	{0,0,0,0},
+	{1,0,0,1},
+	{1,0,0,1},
+	{1,1,1,1},
+};
+const int path_var_n1[PV_SIZE][PV_SIZE]{
+	{0,0,0,0},
+	{1,0,0,1},
+	{1,1,1,1},
+	{1,1,1,1},
+};
+
+const int path_var_n2[PV_SIZE][PV_SIZE]{
+	{0,0,0,0},
+	{0,0,0,0},
+	{1,0,0,0},
+	{1,1,0,1},
+};
+
+const int path_var_e0[PV_SIZE][PV_SIZE]{
+	{1,1,1,0},
+	{1,0,0,0},
+	{1,0,0,0},
+	{1,1,1,0},
+};
+const int path_var_e1[PV_SIZE][PV_SIZE]{
+	{1,1,1,0},
+	{1,1,0,0},
+	{1,1,0,0},
+	{1,1,1,0},
+};
+
+const int path_var_e2[PV_SIZE][PV_SIZE]{
+	{1,0,0,0},
+	{0,0,0,0},
+	{1,0,0,0},
+	{1,1,0,0},
+};
+
+const int path_var_w0[PV_SIZE][PV_SIZE]{
+	{0,1,1,1},
+	{0,0,0,1},
+	{0,0,0,1},
+	{0,1,1,1},
+};
+const int path_var_w1[PV_SIZE][PV_SIZE]{
+	{0,1,1,1},
+	{0,0,1,1},
+	{0,0,1,1},
+	{0,1,1,1},
+};
+const int path_var_w2[PV_SIZE][PV_SIZE]{
+	{0,0,1,1},
+	{0,0,0,1},
+	{0,0,0,0},
+	{0,0,0,1},
+};
 
 //const int path_var_all[4][PV_SIZE][PV_SIZE] = {
 //	path_var_round,
