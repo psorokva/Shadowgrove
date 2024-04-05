@@ -167,15 +167,31 @@ public:
 	}
 
 	vec2 get_empty_spawn_keeper_location() {
+		Entity ent;
+		Chunk chunk;
 		vec2 location;
 		int num_chunks = chunks.size();
 		if (num_chunks < 1) {
 			return vec2(0.0, 0.0);
 		}
-		Entity& ent = chunks.entities[rand() % num_chunks];
+		bool notfound = true;
+		for (int c = 0; c < chunks.entities.size() && notfound; c++ ) {
+			Chunk& temp_chunk = chunks.components[c];
+			if (temp_chunk.keeper_spawned_here) {
+				temp_chunk.keeper_spawned_here = true;
+				notfound = false;
+				chunk = temp_chunk;
+			}
+		}
+		if (notfound) {
+			ent = chunks.entities[rand() % num_chunks];
+			chunk = chunks.get(ent);
+		}
+
+
 		// if (num_chunks == 1) { ent = chunks.entities[0]; } // no need for [0] because %1 == 0
 		int count = 0;
-		Chunk& chunk = chunks.get(ent);
+		//Chunk& chunk = chunks.get(ent);
 		int r = rand() % MAZE_SIZE;
 		int c = rand() % MAZE_SIZE;
 		bool location_found = false;
