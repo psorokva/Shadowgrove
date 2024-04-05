@@ -67,6 +67,10 @@ WorldSystem::~WorldSystem() {
         Mix_FreeChunk(inventory_full_sound);
 	if (player_hit_sound != nullptr)
 		Mix_FreeChunk(player_hit_sound);
+	if (page_turn_sound != nullptr)
+		Mix_FreeChunk(page_turn_sound);
+	if (menu_close_sound != nullptr)
+		Mix_FreeChunk(menu_close_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -145,6 +149,8 @@ GLFWwindow* WorldSystem::create_window() {
     player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
     inventory_full_sound = Mix_LoadWAV(audio_path("inventory_full.wav").c_str());
 	player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
+	page_turn_sound = Mix_LoadWAV(audio_path("page_turn.wav").c_str());
+	menu_close_sound = Mix_LoadWAV(audio_path("menu_close.wav").c_str());
 
 	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
         player_death_sound == nullptr || inventory_full_sound == nullptr) {
@@ -155,7 +161,9 @@ GLFWwindow* WorldSystem::create_window() {
             audio_path("mushroom.wav").c_str(),
             audio_path("player_death.wav").c_str(),
             audio_path("inventory_full.wav").c_str(),
-			audio_path("player_hit.wav").c_str());
+			audio_path("player_hit.wav").c_str(),
+			audio_path("page_turn.wav").c_str(),
+			audio_path("menu_close.wav").c_str());
 
 		return nullptr;
 	}
@@ -340,7 +348,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 //    Entity p = registry.players.entities[0];
     Motion& p_motion = registry.motions.get(player);
 
-//   createHelp();
     if (screen.game_screen == game_screen_night) {
         // Displaying health bar
         auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
@@ -353,7 +360,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         vec2 pos = {720, 60};
         createInventory(pos);
 
-//    createHelp();
 //    Entity help = registry.helpScreen.entities[0];
 //    vec2 help_pos = registry.motions.get(help).camera_position;
 //    help_pos = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
@@ -392,6 +398,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         }
 
         if (registry.inventory.get(player).is_open == true) {
+			game_paused = true;
             createCraftingUI({0.5 * window_width_px, 0.5 * window_height_px});
             for (int i = 0; i < registry.inventory.get(player).inUI.size(); i++) {
                 Item item = registry.inventory.get(player).inUI[i];
@@ -761,6 +768,7 @@ void WorldSystem::restart_game() {
     //save_state.loadInventory();
 
     help = createHelp();
+	createTutorial();
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -827,7 +835,6 @@ void WorldSystem::restart_game() {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
-        printf("here\n");
 
 
         Motion& player_motion = registry.motions.get(player);
@@ -1018,7 +1025,6 @@ void WorldSystem::restart_game() {
 void WorldSystem::pause_game() {
 
 	game_paused = true;
-	//printf("Game paused \n");
 
 	auto entity = Entity();
     registry.pauses.emplace(entity);
@@ -1169,7 +1175,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
     // handle boundaries during daytime
     ScreenState& screen = registry.screenStates.components[0];
     if (screen.game_screen == game_screen_day) {
-		resume_game();
+		//resume_game();  // ?? what was this for?
         Motion& player_motion = registry.motions.get(player);
         float x_pos = player_motion.position.x;
         float y_pos = player_motion.position.y;
@@ -1281,8 +1287,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		if (registry.inventory.components[0].is_open) {
 			registry.inventory.components[0].is_open = false;
+			game_paused = false;
 		}
-		else {
+		else if(!registry.tutorialSequence.components[0].visible) {
 			std::cout << "EXIT GAME" << std::endl;
 			if (registry.screenStates.components[0].game_screen == game_screen_day) {
 				save_state.saveInventory();
@@ -1374,9 +1381,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				//printf("H key pressed, opening help screen\n");
 				help_screen.help = 1;
 				game_paused = true;
-				for (Motion& motion : registry.motions.components) {
-					motion.velocity = { 0, 0 };
-				}
+				//for (Motion& motion : registry.motions.components) {
+				//	motion.velocity = { 0, 0 };
+				//}
 			}
 		}
 
@@ -1525,29 +1532,79 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // space to start game + cut scenes
     if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
         if (screen.game_screen == cut_scene_2) {
-            printf("hi 2 \n");
+            //printf("hi 2 \n");
             screen.game_screen = game_screen_day;
             restart_game();
+			registry.tutorialSequence.components[0].visible = true;
+			game_paused = true;
+			Mix_PlayChannel(-1, page_turn_sound, 0);
         }
         if (screen.game_screen == cut_scene_1) {
-            printf("hi 1 \n");
+            //printf("hi 1 \n");
 
             screen.game_screen = cut_scene_2;
             restart_game();
         }
         if (screen.game_screen == cut_scene_0) {
-            printf("hi 0 \n");
+           // printf("hi 0 \n");
 
             screen.game_screen = cut_scene_1;
             restart_game();
         }
         if (screen.game_screen == game_screen_main_menu) {
             screen.game_screen = cut_scene_0;
-            printf("hi \n");
+            //printf("hi \n");
 
             restart_game();
         }
     }
+
+	// Opening tutorial
+	if (registry.tutorialSequence.entities.size() > 0) {
+		TutorialSequence& tutorial = registry.tutorialSequence.components[0];
+
+		if (action == GLFW_RELEASE && key == GLFW_KEY_T && registry.screenStates.components[0].game_screen == game_screen_day) {
+			if (!tutorial.visible) {
+				printf("T key pressed, opening tutorial screen\n");
+				tutorial.visible = true;
+				game_paused = true;
+				Mix_PlayChannel(-1, page_turn_sound, 0);
+			}
+			else {
+				printf("T key pressed, closing tutorial screen\n");
+				tutorial.visible = false;
+				game_paused = false;
+				Mix_PlayChannel(-1, menu_close_sound, 0);
+			}
+		}
+		if (tutorial.visible && registry.screenStates.components[0].game_screen == game_screen_day) {
+			RenderRequest& tut_rr = registry.renderRequests.get(registry.tutorialSequence.entities[0]);
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_RIGHT) {
+				if (tutorial.current_page < tutorial.size - 1) {
+					tutorial.current_page++;
+					tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+					Mix_PlayChannel(-1, page_turn_sound, 0);
+				}
+			}
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_LEFT) {
+				if (tutorial.current_page > 0) {
+					tutorial.current_page--;
+					tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+					Mix_PlayChannel(-1, page_turn_sound, 0);
+				}
+			}
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+				tutorial.current_page = 0;
+				tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+				tutorial.visible = false;
+				game_paused = false;
+				Mix_PlayChannel(-1, menu_close_sound, 0);
+			}
+		}
+	}
 
     // space to start game
     if (screen.game_screen == game_screen_main_menu) {

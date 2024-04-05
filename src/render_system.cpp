@@ -529,6 +529,14 @@ void RenderSystem::draw() {
 				drawTexturedStaticMesh(helpScreen, projection_2D);
 			}
 		}
+
+		if (registry.tutorialSequence.size() > 0) {
+			TutorialSequence& tutorial = registry.tutorialSequence.components[0];
+			if (tutorial.visible) {
+				Entity tutorialWindow = registry.tutorialSequence.entities[0];
+					drawTexturedMesh(tutorialWindow, projection_2D);
+			}
+		}
        
     }
     else if (screen.game_screen == game_screen_game_over) {

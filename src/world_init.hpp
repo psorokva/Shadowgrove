@@ -37,6 +37,7 @@ Entity createSign();
 Entity createSign2();
 Entity createNight();
 Entity createHelp();
+Entity createTutorial();
 Entity createDog(vec2 position);
 Entity createLogo();
 
