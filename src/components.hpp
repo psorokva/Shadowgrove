@@ -242,6 +242,7 @@ struct ScreenState {
 
 struct HelpScreen {
     int help = 0;
+    int craftingList = 0;
 };
 
 // A struct to refer to debugging graphics in the ECS
@@ -251,7 +252,7 @@ struct DebugComponent {
 
 // A timer that will be associated to dying player
 struct DeathTimer {
-	float counter_ms = 3000;
+	float counter_ms = 1500;
 };
 
 // A timer that will switch from night to day
@@ -445,7 +446,8 @@ enum class TEXTURE_ASSET_ID {
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
 	CRAFTING = MIDNIGHT_01 + 1,
-	HELPNIGHT = CRAFTING + 1,
+    CRAFTINGLIST = CRAFTING + 1,
+	HELPNIGHT = CRAFTINGLIST + 1,
 	HELPTORCH = HELPNIGHT + 1,
     LOGO_00 = HELPTORCH + 1,
     LOGO_01 = LOGO_00 + 1,

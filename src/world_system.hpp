@@ -75,6 +75,7 @@ private:
 	float current_speed;
 	Entity player;
 	Entity help;
+    Entity craftingList;
 	Entity win_dance;
 	Immobile* compass_immobile;
     int inventory;

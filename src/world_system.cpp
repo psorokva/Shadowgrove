@@ -408,6 +408,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	help_immobile.position = help_pos;
 	help_immobile.camera_position = help_pos;
 
+    ///  put crafting list back
+    Motion& crafting_motion = registry.motions.get(craftingList);
+    Immobile& crafting_immobile = registry.immobiles.get(craftingList);
+    vec2 crafting_pos = vec2(window_width_px*0.5, window_height_px*0.5);
+    crafting_motion.position = crafting_pos;
+    crafting_motion.camera_position = crafting_pos;
+    crafting_immobile.position = crafting_pos;
+    crafting_immobile.camera_position = crafting_pos;
+
 	if ( screen.game_screen == game_screen_win) {
 		Motion& mot = registry.motions.get(win_dance);
 		mot.position = { 550.0, 550.0 + 1.0*(animation_cycle % 2) };
@@ -557,7 +566,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 
-    float min_counter_ms = 3000.f;
+    float min_counter_ms = 1500.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		// progress timer
 		DeathTimer& counter = registry.deathTimers.get(entity);
@@ -953,6 +962,7 @@ void WorldSystem::restart_game() {
 
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
+    craftingList = createCraftingList();
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -969,7 +979,7 @@ void WorldSystem::restart_game() {
     ScreenState &screen = registry.screenStates.components[0];
 
     if (screen.game_screen == game_screen_game_over) {
-//        printf("in game over screen\n");
+        createEnd();
 
         auto over = Entity();
         registry.textRenderRequests.insert(over,
@@ -1004,16 +1014,15 @@ void WorldSystem::restart_game() {
         player_motion.scale = { 2 * 60, 2 * 80 };
         printf("created player\n");
 
-        Entity day = createDay();
-        printf("day entity init %zu\n", day);
-
         if (screen.game_screen == game_screen_day) {
+            createDay();
             printf("in game day screen\n");
             createDog({ 0.85 * window_width_px, 0.75 * window_height_px });
 
             createSign();
             createSign2();
         } else {
+            createIntroScreen();
             printf("in game start screen\n");
             createDog({ 0.3 * window_width_px, 0.8 * window_height_px });
 
@@ -1084,8 +1093,7 @@ void WorldSystem::restart_game() {
         Mix_PlayMusic(day_music, -1);
         fprintf(stderr, "Loaded music\n");
 
-        Entity day = createDay();
-        printf("day entity init %zu\n", day);
+        createEnd();
 
 		win_dance = createWinDance(renderer, { 0.5 * window_width_px, 0.75 * window_height_px });
 
@@ -1182,19 +1190,13 @@ void WorldSystem::restart_game() {
         // Debugging for memory/component leaks
         //torchEntity = createShadowOverlay(renderer);
 
+        vec2 player_spawn = registry.get_empty_spawn_keeper_location();
+
+        registry.motions.get(player).position = player_spawn;
+
     }
 
-	if (screen.game_screen == game_screen_night)
-	{
-		vec2 player_spawn = registry.get_empty_spawn_keeper_location();
-
-		registry.motions.get(player).position = player_spawn;
-	}
-
-
-
 	registry.list_all_components();
-
 
 }
 
@@ -1614,20 +1616,57 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
 		if (registry.helpScreen.components.size() >0) {
 			HelpScreen& help_screen = registry.helpScreen.components[0];
+            HelpScreen& craft_screen = registry.helpScreen.components[1];
 			if (help_screen.help == 1) {
-				// printf("H key pressed, closing help screen\n");
 				help_screen.help = 0;
-				game_paused = false;
-			} else {
-				//printf("H key pressed, opening help screen\n");
-				help_screen.help = 1;
-				game_paused = true;
-				for (Motion& motion : registry.motions.components) {
-					motion.velocity = { 0, 0 };
-				}
-			}
-		}
 
+                // craft screen == 2 means its on standby for when help closes, so dont unpause
+                if (craft_screen.help == 2) {
+                    craft_screen.help = 1;
+                } else {
+                    game_paused = false;
+                }
+            } else {
+                help_screen.help = 1;
+                game_paused = true;
+                for (Motion& motion : registry.motions.components) {
+                    motion.velocity = { 0, 0 };
+                }
+
+                if (craft_screen.help == 1) {
+                    craft_screen.help = 2;
+                }
+            }
+		}
+    }
+
+    // Opening crafting screen at night
+    if (action == GLFW_RELEASE && key == GLFW_KEY_U && screen.game_screen == game_screen_night) {
+        if (registry.helpScreen.components.size() > 1) {
+            HelpScreen& help_screen = registry.helpScreen.components[0];
+            HelpScreen& craft_screen = registry.helpScreen.components[1];
+            if (craft_screen.craftingList == 1) {
+                craft_screen.craftingList = 0;
+
+                // help screen == 2 means its on standby for when crafting closes, so dont unpause
+                if (help_screen.help == 2) {
+                    help_screen.help = 1;
+                } else {
+                    game_paused = false;
+                }
+
+            } else {
+                craft_screen.craftingList = 1;
+                game_paused = true;
+                for (Motion& motion : registry.motions.components) {
+                    motion.velocity = { 0, 0 };
+                }
+
+                if (help_screen.help == 1) {
+                    help_screen.help = 2;
+                }
+            }
+        }
     }
 
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality

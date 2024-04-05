@@ -35,10 +35,13 @@ Entity createCraftingUI(vec2 position);
 Entity createShadowOverlay(RenderSystem* renderer);
 Entity createLine(vec2 position, vec2 size);
 Entity createDay();
+Entity createIntroScreen();
+Entity createEnd();
 Entity createSign();
 Entity createSign2();
 Entity createNight();
 Entity createHelp();
+Entity createCraftingList();
 Entity createDog(vec2 position);
 Entity createLogo();
 

@@ -314,6 +314,10 @@ void RenderSystem::drawToScreen() {
 		GLuint help = glGetUniformLocation(night_program, "help");
 		HelpScreen& help_screen = registry.helpScreen.components[0];
 		glUniform1i(help, help_screen.help);
+
+        GLuint crafting = glGetUniformLocation(night_program, "crafting");
+        HelpScreen& crafting_screen = registry.helpScreen.components[1];
+        glUniform1i(crafting, crafting_screen.craftingList);
 	}
 	GLuint torch_timer = glGetUniformLocation(night_program, "torch_timer");
 	glUniform1f(torch_timer, screen.torch_timer_ms);
@@ -476,17 +480,19 @@ void RenderSystem::draw() {
 			}
 		}
 
-		// render help screen
-		if (registry.helpScreen.size() > 0) {
-			HelpScreen& help = registry.helpScreen.components[0];
-			if (help.help == 1) {
-				//printf("got here");
-				for (Entity entity : registry.renderRequests.entities) {
-					if (registry.helpScreen.has(entity)) {
-						drawTexturedMesh(entity, projection_2D);
-					}
-				}
-			}
+		// render help + crafting screens
+		if (registry.helpScreen.size() > 1) {
+            Entity craft = registry.helpScreen.entities[1];
+            HelpScreen& craft_screen = registry.helpScreen.get(craft);
+            if (craft_screen.craftingList == 1) {
+                drawTexturedMesh(craft, projection_2D);
+            }
+
+            Entity help = registry.helpScreen.entities[0];
+            HelpScreen& help_screen = registry.helpScreen.get(help);
+            if (help_screen.help == 1) {
+                drawTexturedMesh(help, projection_2D);
+            }
 		}
 
     }
@@ -547,13 +553,16 @@ void RenderSystem::draw() {
        
     }
     else if (screen.game_screen == game_screen_game_over) {
+        Entity background = registry.daytimes.entities[0];
+        drawTexturedStaticMesh(background, projection_2D);
+
         for (Entity entity: registry.renderRequests.entities) {
             if (registry.enemies.has(entity)) {
                 Motion& keeper_motion = registry.motions.get(entity);
                 keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
                 keeper_motion.scale = {200, 400};
                 keeper_motion.velocity = {0,0};
-                 drawTexturedMesh(entity, projection_2D);
+                drawTexturedMesh(entity, projection_2D);
             }
         }
     }
