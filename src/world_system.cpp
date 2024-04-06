@@ -589,11 +589,35 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         if (orange_crafted && green_crafted && purple_crafted) {
             Player& player_component = registry.players.components[0];
             if (player_component.won == 0) {
-                createPlayerSparkle(renderer, { 0.85 * window_width_px, 0.75 * window_height_px });
-                Entity save = Entity();
-                registry.textRenderRequests.insert(save,{"Press space key to save Sparky", vec2(0.265 * window_width_px, 0.4 * window_height_px)});
-                registry.textRenderRequests.get(save).scale = 0.6;
+                // for dog
+                createSparkle(renderer, { 890, 590 });
+                createSparkle(renderer, { 950, 580 });
+                // for potions
+                createSparkle(renderer, {850, 660 });
+                createSparkle(renderer, {900, 660 });
+                createSparkle(renderer, {950, 660 });
+//                Entity save = Entity();
+//                registry.textRenderRequests.insert(save,{"Go to Sparky to save", {450, 50}});
+//                registry.textRenderRequests.get(save).scale = 0.5;
                 player_component.won = 1;
+            }
+            vec2 dog_pos = { 0.85 * window_width_px, 0.75 * window_height_px };
+            vec2 player_pos = registry.motions.get(player).position;
+            float dis = distance(player_pos, dog_pos);
+
+            if (dis < 250) {
+                for (Entity e : registry.sparkle_animation.entities) {
+                    registry.motions.get(e).scale = vec2({ 50*2.7, 50 * 2.7 });
+                }
+            }
+            if (dis > 250) {
+                for (Entity e : registry.sparkle_animation.entities) {
+                    registry.motions.get(e).scale = vec2({ 50*1.3, 50 * 1.3 });
+                }
+            }
+            if (dis < 50) {
+                screen.game_screen = cut_scene_win;
+                restart_game();
             }
 
         }
@@ -749,6 +773,42 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     registry.speechRenderRequests.insert(Entity(), {"make you an orange, green, and", player_line3});
                 } if (counter.timestamp == 4) {
                     registry.speechRenderRequests.insert(Entity(), {"purple potion", player_line4});
+                } if (counter.timestamp == 5) {
+                    registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
+                } if (counter.timestamp == 6) {
+                    vec2 purple_potion_pos = {625, 330};
+                    createConversationPotion(renderer, purple_potion_pos, 1);
+                }  if (counter.timestamp == 7) {
+                    vec2 green_potion_pos = {575, 330 };
+                    createConversationPotion(renderer, green_potion_pos, 0);
+                }  if (counter.timestamp == 8) {
+                    vec2 orange_potion_pos = {525, 330 };
+                    createConversationPotion(renderer, orange_potion_pos, 2);
+                }
+                registry.speechTimers.remove(entity);
+                return true;
+            }
+        }
+    }
+
+    if (screen.game_screen == cut_scene_win) {
+        float speech_counter_ms = 500.f;
+        for (Entity entity : registry.speechTimers.entities) {
+            SpeechTimer &counter = registry.speechTimers.get(entity);
+            counter.counter_ms -= elapsed_ms_since_last_update;
+
+            if (counter.counter_ms < speech_counter_ms) {
+                speech_counter_ms = counter.counter_ms;
+            }
+            if (counter.counter_ms < 0) {
+                if (counter.timestamp == 1) {
+                    registry.speechRenderRequests.insert(Entity(),{"I did it Sparky!!", player_line1});
+                } if (counter.timestamp == 2) {
+                    registry.speechRenderRequests.insert(Entity(), {"I made you an orange, green, and", player_line2});
+                } if (counter.timestamp == 3) {
+                    registry.speechRenderRequests.insert(Entity(), {"purple potion! Drink them and", player_line3});
+                } if (counter.timestamp == 4) {
+                    registry.speechRenderRequests.insert(Entity(), {"you'll be saved!", player_line4});
                 } if (counter.timestamp == 5) {
                     registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
                 } if (counter.timestamp == 6) {
@@ -942,8 +1002,8 @@ void WorldSystem::restart_game() {
 		i = registry.inventory.components[0];
 	}
 	else {
-        i.holding = { torch, nullval, nullval, nullval, nullval };
-//        i.holding = { magical_shell, red_lotus, magical_strawberry, white_lotus, magical_shell }; // orange
+//        i.holding = { torch, nullval, nullval, nullval, nullval };
+        i.holding = { magical_shell, red_lotus, magical_strawberry, white_lotus, magical_shell }; // orange
 //        i.holding = { torch, white_lotus, magical_shell, magical_muchroom, nullval }; // green
 //        i.holding = { torch, magical_carrot, magical_apple, magical_grapes, nullval }; // purple
 	}
@@ -1078,7 +1138,8 @@ void WorldSystem::restart_game() {
         }
 
     }
-    else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2 ) {
+    else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1
+            || screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_win ) {
         Entity day = createDay();
         registry.immobiles.get(day).scale = { 1.3 * window_width_px, 1.3 * window_height_px };
         //printf("day entity init %zu\n", day);
@@ -1117,7 +1178,7 @@ void WorldSystem::restart_game() {
         registry.textRenderRequests.insert(spaceKey,{"Press space key to continue!!", spaceKey_line});
         registry.textRenderRequests.get(spaceKey).scale = 0.5;
 
-        if (screen.game_screen == cut_scene_2 ) {
+        if (screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_win) {
             SpeechTimer& orange = registry.speechTimers.emplace(Entity());
             orange.timestamp = 6;
             orange.counter_ms = 3050;
@@ -2009,16 +2070,18 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
     // player activates victory screen
     if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE && orange_crafted && green_crafted && purple_crafted) {
-        screen.game_screen = game_screen_win;
-        orange_crafted = false;
-        green_crafted = false;
-        purple_crafted = false;
-        Player& player_component = registry.players.components[0];
-        player_component.won = 0;
-        while (registry.permanents.entities.size() > 0)
-            registry.remove_all_components_of(registry.permanents.entities.back());
+        if (screen.game_screen == cut_scene_win) {
+            screen.game_screen = game_screen_win;
+            orange_crafted = false;
+            green_crafted = false;
+            purple_crafted = false;
+            Player& player_component = registry.players.components[0];
+            player_component.won = 0;
+            while (registry.permanents.entities.size() > 0)
+                registry.remove_all_components_of(registry.permanents.entities.back());
 
-        restart_game();
+            restart_game();
+        }
     }
 	// Control the current speed with `<` `>`
 	//if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {

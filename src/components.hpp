@@ -238,7 +238,7 @@ enum Game_screens {
     cut_scene_0,
     cut_scene_1,
     cut_scene_2,
-	game_screen_introduction,
+    cut_scene_win,
 };
 
 // Sets the brightness of the screen
