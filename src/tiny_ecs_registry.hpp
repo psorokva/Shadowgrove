@@ -47,6 +47,7 @@ public:
 	ComponentContainer<UIComp> uicomps;
 	ComponentContainer<AnimatedFaceOject> face_animation;
 	ComponentContainer<AnimatedDogFace> dog_face_animation;
+	ComponentContainer<TutorialSequence> tutorialSequence;
 	ComponentContainer<AnimatedSparkle> sparkle_animation;
 	ComponentContainer<AnimatedPlayerSparkle> player_sparkle_animation;
 	ComponentContainer<AnimatedTorchOn> torch_on_animation;
@@ -89,6 +90,7 @@ public:
 		registry_list.push_back(&uicomps);
 		registry_list.push_back(&face_animation); 
 		registry_list.push_back(&dog_face_animation);
+		registry_list.push_back(&tutorialSequence);
 		registry_list.push_back(&sparkle_animation);
 		registry_list.push_back(&player_sparkle_animation);
 		registry_list.push_back(&torch_on_animation);
