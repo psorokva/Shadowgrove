@@ -3,7 +3,7 @@
 #include "world_init.hpp"
 #include "tiny_ecs.hpp"
 
-
+#include <ctime>
 // stlib
 #include <cassert>
 #include <sstream>
@@ -53,6 +53,7 @@ bool moving_y = false;
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
+	srand(time(0));
 }
 
 WorldSystem::~WorldSystem() {
@@ -1040,7 +1041,7 @@ void WorldSystem::restart_game() {
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
     craftingList = createCraftingList();
-	createTutorial();
+
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -1082,7 +1083,7 @@ void WorldSystem::restart_game() {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
        // fprintf(stderr, "Loaded music\n");
-
+		createTutorial();
 
         Motion& player_motion = registry.motions.get(player);
         player_motion.position = { 0.6 * window_width_px, 0.75 * window_height_px };
