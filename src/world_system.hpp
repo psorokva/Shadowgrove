@@ -90,8 +90,8 @@ private:
     Mix_Chunk* player_death_sound;
     Mix_Chunk* inventory_full_sound;
 	Mix_Chunk* player_hit_sound;
-  Mix_Chunk* rooster_sound;
-  Mix_Chunk* torch_sound;
+	Mix_Chunk* rooster_sound;
+	Mix_Chunk* torch_sound;
 	Mix_Chunk* page_turn_sound;
 	Mix_Chunk* menu_close_sound;
 
