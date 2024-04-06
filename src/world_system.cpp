@@ -428,6 +428,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	help_immobile.position = help_pos;
 	help_immobile.camera_position = help_pos;
 
+    ///  put crafting list back
+    Motion& crafting_motion = registry.motions.get(craftingList);
+    Immobile& crafting_immobile = registry.immobiles.get(craftingList);
+    vec2 crafting_pos = vec2(window_width_px*0.5, window_height_px*0.5);
+    crafting_motion.position = crafting_pos;
+    crafting_motion.camera_position = crafting_pos;
+    crafting_immobile.position = crafting_pos;
+    crafting_immobile.camera_position = crafting_pos;
+
 	if ( screen.game_screen == game_screen_win) {
 		Motion& mot = registry.motions.get(win_dance);
 		mot.position = { 550.0, 550.0 + 1.0*(animation_cycle % 2) };
@@ -440,21 +449,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 //    Entity p = registry.players.entities[0];
     Motion& p_motion = registry.motions.get(player);
 
+    // Displaying health bar
+    auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
+    registry.colors.insert(healthBG, { 0, 0, 0 });
+
+    auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
+    registry.colors.insert(healthBar, { 1, 0, 0 });
+
     if (screen.game_screen == game_screen_night) {
-        // Displaying health bar
-        auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
-        registry.colors.insert(healthBG, { 0, 0, 0 });
-
-        auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
-        registry.colors.insert(healthBar, { 1, 0, 0 });
-
         // inventory bar position on screen
         vec2 pos = {720, 60};
         createInventory(pos);
-
-//    Entity help = registry.helpScreen.entities[0];
-//    vec2 help_pos = registry.motions.get(help).camera_position;
-//    help_pos = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
 
         for (int i = 0; i < 5; i++) {
             Inventory& player_inv = registry.inventory.get(player);
@@ -582,7 +587,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 
 
-    float min_counter_ms = 3000.f;
+    float min_counter_ms = 1500.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		// progress timer
 		DeathTimer& counter = registry.deathTimers.get(entity);
@@ -764,7 +769,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     // check if out of bounds
                     registry.remove_all_components_of(entity);
                 } else {
-                    registry.textRenderRequests.get(entity).position.y += 2;
+                    registry.textRenderRequests.get(entity).position.y += 1;
                 }
             }
             // speech
@@ -774,7 +779,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     // check if out of bounds
                     registry.remove_all_components_of(entity);
                 } else {
-                    registry.speechRenderRequests.get(entity).position.y += 2;
+                    registry.speechRenderRequests.get(entity).position.y += 1;
                 }
             }
         }
@@ -946,8 +951,12 @@ void WorldSystem::restart_game() {
         registry.remove_all_components_of(registry.textTimers.entities.back());
 	while (registry.torches.entities.size() > 0)
 		registry.remove_all_components_of(registry.torches.entities.back());
-	while (registry.uicomps.entities.size() > 0)
-		registry.remove_all_components_of(registry.uicomps.entities.back());
+    for (Entity entity : registry.uicomps.entities)
+    {
+        if (!registry.permanents.has(entity)) {
+            registry.remove_all_components_of(entity);
+        }
+    }
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -959,9 +968,9 @@ void WorldSystem::restart_game() {
 	//registry.clear_all_components();
 	generator->clearMap();
 	//printf("AFTER CLEARED REGISTRY");
-	
+
 	//registry.list_all_components();
-	
+
 	// Create a new player
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
@@ -981,6 +990,7 @@ void WorldSystem::restart_game() {
 
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
+    craftingList = createCraftingList();
 	createTutorial();
 	//printf("MAP AND PLAYER CREATED\n");
 
@@ -998,7 +1008,8 @@ void WorldSystem::restart_game() {
     ScreenState &screen = registry.screenStates.components[0];
 
     if (screen.game_screen == game_screen_game_over) {
-//        printf("in game over screen\n");
+        createEnd();
+
         auto over = Entity();
         registry.textRenderRequests.insert(over,
                                            {"Game over", vec2(0.33 * window_width_px, 0.5 * window_height_px)});
@@ -1031,17 +1042,14 @@ void WorldSystem::restart_game() {
         player_motion.scale = { 2 * 60, 2 * 80 };
        // printf("created player\n");
 
-        Entity day = createDay();
-        //printf("day entity init %zu\n", day);
-
         if (screen.game_screen == game_screen_day) {
-           // printf("in game day screen\n");
+            createDay();
             createDog({ 0.85 * window_width_px, 0.75 * window_height_px });
 
             createSign();
             createSign2();
         } else {
-           /// printf("in game start screen\n");
+            createIntroScreen();
             createDog({ 0.3 * window_width_px, 0.8 * window_height_px });
 
             createLogo();
@@ -1091,7 +1099,7 @@ void WorldSystem::restart_game() {
         auto spaceKey = Entity();
         vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
 
-        registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
+        registry.textRenderRequests.insert(spaceKey,{"Press space key to continue!!", spaceKey_line});
         registry.textRenderRequests.get(spaceKey).scale = 0.5;
 
         if (screen.game_screen == cut_scene_2 ) {
@@ -1111,8 +1119,7 @@ void WorldSystem::restart_game() {
         Mix_PlayMusic(day_music, -1);
         //fprintf(stderr, "Loaded music\n");
 
-        Entity day = createDay();
-        //printf("day entity init %zu\n", day);
+        createEnd();
 
 		win_dance = createWinDance(renderer, { 0.5 * window_width_px, 0.75 * window_height_px });
 
@@ -1223,10 +1230,7 @@ void WorldSystem::restart_game() {
 		Entity spinner = createSunMoonSpinner(renderer, vec2(window_width_px*0.5, window_height_px));
 	}
 
-
-
 	registry.list_all_components();
-
 
 }
 
@@ -1646,20 +1650,57 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
 		if (registry.helpScreen.components.size() >0) {
 			HelpScreen& help_screen = registry.helpScreen.components[0];
+            HelpScreen& craft_screen = registry.helpScreen.components[1];
 			if (help_screen.help == 1) {
-				// printf("H key pressed, closing help screen\n");
 				help_screen.help = 0;
-				game_paused = false;
-			} else {
-				//printf("H key pressed, opening help screen\n");
-				help_screen.help = 1;
-				game_paused = true;
-				//for (Motion& motion : registry.motions.components) {
-				//	motion.velocity = { 0, 0 };
-				//}
-			}
-		}
 
+                // craft screen == 2 means its on standby for when help closes, so dont unpause
+                if (craft_screen.help == 2) {
+                    craft_screen.help = 1;
+                } else {
+                    game_paused = false;
+                }
+            } else {
+                help_screen.help = 1;
+                game_paused = true;
+//                for (Motion& motion : registry.motions.components) {
+//                    motion.velocity = { 0, 0 };
+//                }
+
+                if (craft_screen.help == 1) {
+                    craft_screen.help = 2;
+                }
+            }
+		}
+    }
+
+    // Opening crafting screen at night
+    if (action == GLFW_RELEASE && key == GLFW_KEY_U && screen.game_screen == game_screen_night) {
+        if (registry.helpScreen.components.size() > 1) {
+            HelpScreen& help_screen = registry.helpScreen.components[0];
+            HelpScreen& craft_screen = registry.helpScreen.components[1];
+            if (craft_screen.craftingList == 1) {
+                craft_screen.craftingList = 0;
+
+                // help screen == 2 means its on standby for when crafting closes, so dont unpause
+                if (help_screen.help == 2) {
+                    help_screen.help = 1;
+                } else {
+                    game_paused = false;
+                }
+
+            } else {
+                craft_screen.craftingList = 1;
+                game_paused = true;
+//                for (Motion& motion : registry.motions.components) {
+//                    motion.velocity = { 0, 0 };
+//                }
+
+                if (help_screen.help == 1) {
+                    help_screen.help = 2;
+                }
+            }
+        }
     }
 
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
@@ -1805,36 +1846,52 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // space to start game + cut scenes
     if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
         if (screen.game_screen == cut_scene_2) {
-            //printf("hi 2 \n");
-            screen.game_screen = game_screen_day;
-            while (registry.uicomps.entities.size() > 0)
-                registry.remove_all_components_of(registry.uicomps.entities.back());
-            restart_game();
-			registry.tutorialSequence.components[0].visible = true;
-			game_paused = true;
-			Mix_PlayChannel(-1, page_turn_sound, 0);
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = game_screen_day;
+                while (registry.uicomps.entities.size() > 0)
+                    registry.remove_all_components_of(registry.uicomps.entities.back());
+                restart_game();
+                registry.tutorialSequence.components[0].visible = true;
+                game_paused = true;
+                Mix_PlayChannel(-1, page_turn_sound, 0);
+            }
+
         }
         if (screen.game_screen == cut_scene_1) {
-            //printf("hi 1 \n");
-
-            screen.game_screen = cut_scene_2;
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_2;
+                restart_game();
+            }
         }
         if (screen.game_screen == cut_scene_0) {
-
-         //printf("hi 0 \n");
-
-            screen.game_screen = cut_scene_1;
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_1;
+                restart_game();
+            }
         }
         if (screen.game_screen == game_screen_main_menu) {
-            screen.game_screen = cut_scene_0;
-            //printf("hi \n");
-
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_0;
+                restart_game();
+            }
         }
     }
-
 
 	// Opening tutorial
 	if (registry.tutorialSequence.entities.size() > 0) {

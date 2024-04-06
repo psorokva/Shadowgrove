@@ -60,9 +60,9 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos) {
 }
 
 Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
-	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default 
-	
+	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default
 	auto entity = Entity();
+    registry.permanents.emplace(entity);
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
 	ui_comp.position = pos;
 	ui_comp.scale = vec2(50, 50.0);
@@ -78,7 +78,6 @@ Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
 	}
 	return entity;
 }
-
 
 Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
@@ -456,7 +455,6 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 	return entity;
 }
 
-
 Entity createSparkle(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 	Motion& motion = registry.motions.emplace(entity);
@@ -519,7 +517,6 @@ Entity createCraftingUI(vec2 position) {
 	return entity;
 }
 
-
 Entity createCheck(vec2 position) {
 	auto entity = Entity();
 
@@ -537,7 +534,6 @@ Entity createCheck(vec2 position) {
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CHECK, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
-
 
 Entity createInventoryPotion(Item& item, vec2 position) {
     auto entity = Entity();
@@ -648,7 +644,7 @@ Entity createDay() {
 	return entity;
 }
 
-Entity createIntroScreem() {
+Entity createIntroScreen() {
 	auto entity = Entity();
 
 	auto& day = registry.screenStates.emplace(entity);
@@ -741,6 +737,24 @@ Entity createHelp() {
     fixed.scale = {0.5 * window_width_px +2.0, 0.5 * window_height_px};
     // TEXTURE_COUNT indicates that no txture is needed
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::HELP_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}
+
+Entity createCraftingList() {
+    auto entity = Entity();
+
+    HelpScreen& help = registry.helpScreen.emplace(entity);
+
+    Motion& motion = registry.motions.emplace(entity);
+    motion.scale = {0.5 * window_width_px, 0.5 * window_height_px};
+    motion.camera_position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+
+    auto &fixed = registry.immobiles.emplace(entity);
+    fixed.position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+    fixed.scale = {0.5 * window_width_px +2.0, 0.5 * window_height_px};
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::CRAFTINGLIST, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
 }
