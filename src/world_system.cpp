@@ -164,7 +164,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
         player_death_sound == nullptr || inventory_full_sound == nullptr || rooster_sound == nullptr || torch_sound == nullptr
-|| page_turn_sound == nullptr || menu_close_sound == nullptr ) {
+		|| page_turn_sound == nullptr || menu_close_sound == nullptr ) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n %s \n make sure the data directory is present",
             audio_path("forest_night.wav").c_str(),
             audio_path("day.wav").c_str(),
