@@ -763,7 +763,8 @@ Entity createTutorial() {
 	auto entity = Entity();
 
 	Motion& tutorial_motion = registry.motions.emplace(entity);
-	tutorial_motion.scale = { 0.75 * window_width_px, 0.75 * window_height_px };
+	tutorial_motion.scale = vec2({ 600, 600 });
+	//tutorial_motion.scale = { 0.75 * window_width_px, 0.75 * window_height_px };
 	tutorial_motion.position = { window_width_px / 2, window_height_px / 2 };
 
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TUT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });

@@ -17,11 +17,6 @@
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
 
-//bool blockedNorth = false;
-//bool blockedSouth = false;
-//bool blockedEast = false;
-//bool blockedWest = false;
-
 Direction playerDirection;
 const uint NUM_POTIONS = 10;
 const float CHARACTER_SPEED = 300.0f;
@@ -42,15 +37,16 @@ bool morning_warning = false;
 bool game_paused = false;
 bool is_in_debug = false;
 
-bool go_up_key_released = true;
-bool go_down_key_released = true;
-bool go_right_key_released = true;
-bool go_left_key_released = true;
 bool moving_x = false;
 bool moving_y = false;
 bool orange_crafted = false;
 bool green_crafted = false;
 bool purple_crafted = false;
+
+bool go_up_key_pressed = false;
+bool go_down_key_pressed = false;
+bool go_right_key_pressed = false;
+bool go_left_key_pressed = false;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
@@ -1403,38 +1399,6 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 		// For now, we are only interested in collisions that involve the chicken
 		if (!game_paused && registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
-		
-			// Checking Player - Wall collisions <- this is handled by physics system now
-			//if (registry.impenetrables.has(entity_other)) {
-				//printf("colliding with a wall\n");
-				//Motion& motion_p = registry.motions.get(entity);
-				//Immobile& motion_w = registry.immobiles.get(entity_other);
-				// Can adjust this
-				//float offset = 10.0f;
-                // Mix_PlayChannel(-1, tree_collision_sound, 0);
-			
-				//if (playerDirection == UP) {
-				//	//printf("Collided with North wall");
-				//	blockedNorth = true;
-				//	// Offset player position to stop from going through
-				//	motion.position = motion.position - vec2(0, -offset);
-				//}
-				//if (playerDirection == DOWN) {
-				//	//printf("Collided with South wall");
-				//	blockedSouth = true;
-				//	motion.position = motion.position - vec2(0, offset);
-				//}
-				//if (playerDirection == LEFT) {
-				//	//printf("Collided with West wall");
-				//	blockedWest = true;
-				//	motion.position = motion.position - vec2(-offset, 0);
-				//}
-				//if (playerDirection == RIGHT) {
-				//	//printf("Collided with East wall");
-				//	blockedEast = true;
-				//	motion.position = motion.position - vec2(offset, 0);
-				//}
-			//}
 
 			// Checking Player - Enemy collisions
 			if (registry.enemies.has(entity_other)) {
@@ -1509,11 +1473,6 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
-	// Reset collision flags
-	/*blockedNorth = false;
-	blockedSouth = false;
-	blockedWest = false;
-	blockedEast = false;*/
 
     // handle boundaries during daytime
     ScreenState& screen = registry.screenStates.components[0];
@@ -1862,112 +1821,94 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (!game_paused && !registry.deathTimers.has(player)) {
 		auto& motion = registry.motions.get(player);
 
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) go_up_key_released = action == GLFW_RELEASE;
-		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) go_down_key_released = action == GLFW_RELEASE;
-		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) go_right_key_released = action == GLFW_RELEASE;
-		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) go_left_key_released = action == GLFW_RELEASE;
-
         ScreenState& screen = registry.screenStates.components[0];
-        if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day) {
-            // Character movement
-            // Move Up
+		if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day) {
+			
+			// Character movement
 			if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-				if (action == GLFW_RELEASE|| !go_down_key_released) // if both up and down are pressed
+				if (action == GLFW_PRESS) {
+					go_up_key_pressed = true;
+				}
+				else if (action == GLFW_RELEASE) {
+					go_up_key_pressed = false;
+				}
+			}
 
-				{
-					//printf("not up\n");
-					//registry.players.get(player).moving = false;
-					moving_y = false;
-					motion.velocity.y = 0.f;
+			if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
+				if (action == GLFW_PRESS) {
+					go_down_key_pressed = true;
 				}
-				else
-				{
-					//printf("up\n");
-					playerDirection = UP;
-					moving_y = true;
-					motion.velocity.y -= CHARACTER_SPEED;
-					//registry.players.get(player).moving = true;
+				else if (action == GLFW_RELEASE) {
+					go_down_key_pressed = false;
 				}
-            }
+			}
 
-            // Move Down
-            if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
-				if (action == GLFW_RELEASE || !go_up_key_released) // if both up and down are pressed
-				{
-					//printf("not down\n");
-					//registry.players.get(player).moving = false;
-					moving_y = false;
-					motion.velocity.y = 0.f;
+			if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+				if (action == GLFW_PRESS) {
+					go_right_key_pressed = true;
 				}
-				else
-				{
-					//printf("down\n");
-					playerDirection = DOWN;
-					moving_y = true;
-					//registry.players.get(player).moving = true;
-					motion.velocity.y += CHARACTER_SPEED;
+				else if (action == GLFW_RELEASE) {
+					go_right_key_pressed = false;
 				}
+			}
 
-            }
-
-            // Move Right
-            if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-				if (action == GLFW_RELEASE || !go_left_key_released) // if both right and left are pressed
-				{
-					//registry.players.get(player).moving = false;
-					moving_x = false;
-					motion.velocity.x = 0.f;
+			if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
+				if (action == GLFW_PRESS) {
+					go_left_key_pressed = true;
 				}
-				else
-				{
-					//registry.players.get(player).moving = true;
-					moving_x = true;
-					playerDirection = RIGHT;
-					motion.velocity.x += CHARACTER_SPEED;
+				else if (action == GLFW_RELEASE) {
+					go_left_key_pressed = false;
 				}
+			}
 
-                if (screen.game_screen == game_screen_day) {
-                    motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                } else {
-                    motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
-                }
-            }
 
-            // Move Left
-            if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
-				if (action == GLFW_RELEASE || !go_right_key_released) // if both right and left are pressed
-				{
-					//registry.players.get(player).moving = false;
-					moving_x = false;
-					motion.velocity.x = 0.f;
+			if (go_up_key_pressed && !go_down_key_pressed) {
+				playerDirection = UP;
+				moving_y = true;
+				motion.velocity.y -= CHARACTER_SPEED;
+			}
+			else if (!go_up_key_pressed && go_down_key_pressed) {
+				playerDirection = DOWN;
+				moving_y = true;
+				motion.velocity.y += CHARACTER_SPEED;
+			}
+			else {
+				moving_y = false;
+				motion.velocity.y = 0.f;
+			}
+
+
+			if (go_right_key_pressed && !go_left_key_pressed) {
+				playerDirection = RIGHT;
+				moving_x = true;
+				motion.velocity.x += CHARACTER_SPEED;
+				if (screen.game_screen == game_screen_day) {
+					motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
+				} else {
+					motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
 				}
-				else
-				{
-					//registry.players.get(player).moving = true
-					moving_x = true;
-					playerDirection = LEFT;
-					motion.velocity.x -= CHARACTER_SPEED;
+			}
+			else if (!go_right_key_pressed && go_left_key_pressed) {
+				playerDirection = LEFT;
+				moving_x = true;
+				motion.velocity.x -= CHARACTER_SPEED;
+				if (screen.game_screen == game_screen_day) {
+					motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
 				}
-
-                if (screen.game_screen == game_screen_day) 
-				{
-                    motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                } else 
-				{
-                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
-                }
-            }
+				else {
+					motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
+				}
+			}
+			else {
+				moving_x = false;
+				motion.velocity.x = 0.f;
+			}
+	
 			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
 			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
-        }
+		}
 
-		//// Stop moving when key is released
-		//if (go_right_key_released && go_left_key_released && go_up_key_released && go_down_key_released) {
-		//	registry.players.get(player).moving = false;
-		//	RenderRequest& r = registry.renderRequests.get(player);
-		//	r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1;
-		//}
-
+		// For animation
 		if (moving_x || moving_y) {
 			registry.players.get(player).moving = true;
 		}
