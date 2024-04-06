@@ -470,6 +470,12 @@ void RenderSystem::draw() {
 
 		drawTexturedMesh(player, projection_2D);
 
+		for (Entity entity : registry.renderRequests.entities) {
+			if (registry.uicomps.has(entity)) {
+				drawTexturedUIMesh(entity, projection_2D);
+			}
+		}
+
 		// render help screen
 		if (registry.helpScreen.size() > 0) {
 			HelpScreen& help = registry.helpScreen.components[0];
@@ -519,6 +525,15 @@ void RenderSystem::draw() {
                 if (registry.debugComponents.has(entity)) {
                     drawTexturedStaticMesh(entity, projection_2D);
                 }
+            }
+        }
+
+        // render dog potions
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.uicomps.has(entity)) {
+//                if (registry.daytimes.has(entity)) {
+                    drawTexturedUIMesh(entity, projection_2D);
+//                }
             }
         }
 
@@ -673,6 +688,11 @@ void RenderSystem::drawTexturedUIMesh(Entity entity, const mat3& projection) {
 	Transform transform;
 	transform.translate(ui_comp.position);
 	transform.scale(ui_comp.scale);
+	if (registry.rotators.has(entity)) {
+		Rotator& rotator = registry.rotators.get(entity);
+		transform.rotate(rotator.angle);
+	}
+
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);

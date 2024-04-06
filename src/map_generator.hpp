@@ -30,6 +30,11 @@ private:
 	std::vector< std::vector< std::vector<int> > > stitch_var_we;
 	std::vector< std::vector< std::vector<int> > > stitch_var_ns;
 
+	std::vector< std::vector< std::vector<int> > > path_var_only_n;
+	std::vector< std::vector< std::vector<int> > > path_var_only_w;
+	std::vector< std::vector< std::vector<int> > > path_var_only_s;
+	std::vector< std::vector< std::vector<int> > > path_var_only_e;
+
 public:
 	int** bignoise;
 	int** biome_filter;

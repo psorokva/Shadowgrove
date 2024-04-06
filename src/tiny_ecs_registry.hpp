@@ -48,7 +48,12 @@ public:
 	ComponentContainer<AnimatedFaceOject> face_animation;
 	ComponentContainer<AnimatedDogFace> dog_face_animation;
 	ComponentContainer<TutorialSequence> tutorialSequence;
-
+	ComponentContainer<AnimatedSparkle> sparkle_animation;
+	ComponentContainer<AnimatedPlayerSparkle> player_sparkle_animation;
+	ComponentContainer<AnimatedTorchOn> torch_on_animation;
+	ComponentContainer<AnimatedTorchOff> torch_off_animation;
+	ComponentContainer<Paired> pairs;
+	ComponentContainer<Rotator> rotators;
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
 	ECSRegistry() {
@@ -86,6 +91,12 @@ public:
 		registry_list.push_back(&face_animation); 
 		registry_list.push_back(&dog_face_animation);
 		registry_list.push_back(&tutorialSequence);
+		registry_list.push_back(&sparkle_animation);
+		registry_list.push_back(&player_sparkle_animation);
+		registry_list.push_back(&torch_on_animation);
+		registry_list.push_back(&torch_off_animation);
+		registry_list.push_back(&pairs);
+		registry_list.push_back(&rotators);
 	}
 
 	void clear_all_components() {
@@ -108,8 +119,19 @@ public:
 	}
 
 	void remove_all_components_of(Entity e) {
-		for (ContainerInterface* reg : registry_list)
-			reg->remove(e);
+		if (pairs.has(e)) {
+			Paired& pair = pairs.get(e);
+			Entity& other = pair.other;
+			//printf("Removing Pair");
+			for (ContainerInterface* reg : registry_list) {
+				reg->remove(e);
+				reg->remove(other);
+			}
+		} else {
+			for (ContainerInterface* reg : registry_list) {
+				reg->remove(e);
+			}
+		}
 	}
 
 	// 
@@ -147,15 +169,31 @@ public:
 	}
 
 	vec2 get_empty_spawn_keeper_location() {
+		Entity ent;
+		Chunk chunk;
 		vec2 location;
 		int num_chunks = chunks.size();
 		if (num_chunks < 1) {
 			return vec2(0.0, 0.0);
 		}
-		Entity& ent = chunks.entities[rand() % num_chunks];
+		bool notfound = true;
+		for (int c = 0; c < chunks.entities.size() && notfound; c++ ) {
+			Chunk& temp_chunk = chunks.components[c];
+			if (temp_chunk.keeper_spawned_here) {
+				temp_chunk.keeper_spawned_here = true;
+				notfound = false;
+				chunk = temp_chunk;
+			}
+		}
+		if (notfound) {
+			ent = chunks.entities[rand() % num_chunks];
+			chunk = chunks.get(ent);
+		}
+
+
 		// if (num_chunks == 1) { ent = chunks.entities[0]; } // no need for [0] because %1 == 0
 		int count = 0;
-		Chunk& chunk = chunks.get(ent);
+		//Chunk& chunk = chunks.get(ent);
 		int r = rand() % MAZE_SIZE;
 		int c = rand() % MAZE_SIZE;
 		bool location_found = false;
