@@ -60,8 +60,7 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos) {
 }
 
 Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
-	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default 
-	
+	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default
 	auto entity = Entity();
     registry.permanents.emplace(entity);
 	UIComp& ui_comp = registry.uicomps.emplace(entity);

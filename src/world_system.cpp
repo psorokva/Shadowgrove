@@ -1893,7 +1893,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
     }
 
-
 	// Opening tutorial
 	if (registry.tutorialSequence.entities.size() > 0) {
 		TutorialSequence& tutorial = registry.tutorialSequence.components[0];

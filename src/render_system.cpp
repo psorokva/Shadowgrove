@@ -542,7 +542,7 @@ void RenderSystem::draw() {
                 }
             }
         }
-
+        // render help screen
 		if (registry.helpScreen.size() > 0) {
 			HelpScreen& help = registry.helpScreen.components[0];
 			if (help.help == 1) {
