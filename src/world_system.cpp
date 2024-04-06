@@ -49,8 +49,8 @@ bool go_left_key_released = true;
 bool moving_x = false;
 bool moving_y = false;
 bool orange_crafted = false;
-bool green_crafted = true;
-bool purple_crafted = true;
+bool green_crafted = false;
+bool purple_crafted = false;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
@@ -1052,8 +1052,8 @@ void WorldSystem::restart_game() {
 		i = registry.inventory.components[0];
 	}
 	else {
-//        i.holding = { torch, nullval, nullval, nullval, nullval };
-        i.holding = { magical_shell, red_lotus, magical_strawberry, white_lotus, magical_shell }; // orange
+        i.holding = { torch, nullval, nullval, nullval, nullval };
+//        i.holding = { magical_shell, red_lotus, magical_strawberry, white_lotus, magical_shell }; // orange
 //        i.holding = { torch, white_lotus, magical_shell, magical_muchroom, nullval }; // green
 //        i.holding = { torch, magical_carrot, magical_apple, magical_grapes, nullval }; // purple
 	}
