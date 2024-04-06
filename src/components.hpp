@@ -205,10 +205,6 @@ struct Paired {
 	Entity other;
 };
 
-struct Permanent {
-
-};
-
 //std::vector<Item> inUI;
 
 // Stucture to store collision information

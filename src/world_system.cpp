@@ -545,7 +545,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         }
 
         if (registry.inventory.get(player).is_open == true) {
-			game_paused = true;
+//			game_paused = true;
             createCraftingUI({0.5 * window_width_px, 0.5 * window_height_px});
             for (int i = 0; i < registry.inventory.get(player).inUI.size(); i++) {
                 Item item = registry.inventory.get(player).inUI[i];
