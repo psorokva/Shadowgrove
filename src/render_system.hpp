@@ -245,6 +245,7 @@ public:
 
 	// Initialize fonts to output text to the screen
 	bool initializeFonts(unsigned int font_default_size);
+    bool initializeSpeech(unsigned int font_default_size);
 
 	// Print text to the screen
 	void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);

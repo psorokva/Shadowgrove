@@ -723,11 +723,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
     }
 
     // dialogue positons
-    vec2 player_line1 = vec2(0.18 * window_width_px, 0.7 * window_height_px);
-    vec2 player_line2 = vec2(0.18 * window_width_px, 0.66 * window_height_px);
-    vec2 player_line3 = vec2(0.18 * window_width_px, 0.62 * window_height_px);
-    vec2 player_line4 = vec2(0.18 * window_width_px, 0.58 * window_height_px);
-    vec2 dog_line1 = vec2(0.435 * window_width_px, 0.4 * window_height_px);
+    vec2 player_line1 = vec2(0.28 * window_width_px, 0.7 * window_height_px);
+    vec2 player_line2 = vec2(0.28 * window_width_px, 0.66 * window_height_px);
+    vec2 player_line3 = vec2(0.28 * window_width_px, 0.62 * window_height_px);
+    vec2 player_line4 = vec2(0.28 * window_width_px, 0.58 * window_height_px);
+    vec2 dog_line1 = vec2(0.52 * window_width_px, 0.4 * window_height_px);
 
     // moving dialogue in cutscenes 0-2
     if (screen.game_screen == cut_scene_0) {
@@ -765,9 +765,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
             if (counter.counter_ms < 0) {
                 if (counter.timestamp == 1) {
-                    registry.speechRenderRequests.insert(entity,{"You're lucky i know the ", player_line1});
+                    registry.speechRenderRequests.insert(entity,{"You're lucky i know the magical", player_line1});
                 } if (counter.timestamp == 2) {
-                    registry.speechRenderRequests.insert(entity, {"magical properties of Shadowgrove ", player_line2});
+                    registry.speechRenderRequests.insert(entity, {"properties of Shadowgrove ", player_line2});
                 } if (counter.timestamp == 3) {
                     registry.speechRenderRequests.insert(entity, {"forest so well... i'll be able to", player_line3});
                 } if (counter.timestamp == 4) {
@@ -1139,8 +1139,8 @@ void WorldSystem::restart_game() {
         createDogPortrait(renderer, vec2(900.0, 400.0));
 
         Entity player_bubble = createSpeechBubble(renderer, {525, 300}, 1);
-        Entity dog_bubble = createSpeechBubble(renderer, {685, 470}, 1);
-        registry.uicomps.get(dog_bubble).scale = {-250, -70};
+        Entity dog_bubble = createSpeechBubble(renderer, {680, 470}, 1);
+        registry.uicomps.get(dog_bubble).scale = {-260, -70};
 
         SpeechTimer& line1 = registry.speechTimers.emplace(Entity());
         line1.timestamp = 1;
