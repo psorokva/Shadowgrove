@@ -450,7 +450,7 @@ void RenderSystem::draw() {
             for (Entity entity: registry.renderRequests.entities) {
                 if (registry.motions.has(entity)) {
                     if (!registry.debugComponents.has(entity)) {
-                        if (!registry.helpScreen.has(entity)) {
+                        if (!registry.helpScreen.has(entity) && !registry.tutorialSequence.has(entity)) {
                             drawTexturedMesh(entity, projection_2D);
                         }
                     }
