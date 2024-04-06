@@ -3,7 +3,7 @@
 #include "world_init.hpp"
 #include "tiny_ecs.hpp"
 
-
+#include <ctime>
 // stlib
 #include <cassert>
 #include <sstream>
@@ -56,6 +56,7 @@ bool purple_crafted = true;
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
+	srand(time(0));
 }
 
 WorldSystem::~WorldSystem() {
@@ -522,6 +523,55 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			num_of_item_on_screen++;
 		}
 
+		if (registry.torches.entities.size() > 0) {
+			Entity torch_entity = registry.torches.entities[0];
+			float torch_x_offset = -30.0;
+			float torch_y_offset = -5.0;
+			float torch_x_base = window_width_px * 0.5;
+			float torch_y_base = window_height_px * 0.5;
+			// animate torch
+			Motion& player_motion = registry.motions.get(player);
+			UIComp& torch_ui = registry.uicomps.get(torch_entity);
+			RenderRequest& player_rr = registry.renderRequests.get(player);
+			RenderRequest& torch_rr = registry.renderRequests.get(torch_entity);
+			torch_rr.used_texture = (TEXTURE_ASSET_ID)((int)TEXTURE_ASSET_ID::TORCH_00 + (animation_cycle % 3));
+
+			if (player_rr.used_texture == TEXTURE_ASSET_ID::PLAYER_CHAR2) {
+				//torch_y_offset = 0.0; //+= 5.0;
+				torch_x_offset -= 5.0;
+			} else if (player_rr.used_texture == TEXTURE_ASSET_ID::PLAYER_CHAR3) {
+				torch_y_offset -= 10.0;
+				torch_x_offset -= 5.0;
+			} else if (player_rr.used_texture == TEXTURE_ASSET_ID::PLAYER_CHAR4) {
+				torch_y_offset -= 10.0;
+				//torch_x_offset += 5.0;
+			} else if (player_rr.used_texture == TEXTURE_ASSET_ID::PLAYER_CHAR5) {
+				torch_y_offset -= 15.0;
+				torch_x_offset -= 5.0;
+			} else {
+				torch_y_offset -= 2.0;
+				torch_x_offset += 2.0;
+			}
+
+			if (player_motion.scale.x > 0) {
+				// standard direction
+				torch_ui.position.x = torch_x_base + torch_x_offset;
+				torch_ui.position.y = torch_y_base + torch_y_offset;
+				if (torch_ui.scale.x < 0) {
+					torch_ui.scale.x *= -1.0;
+				}
+			} else {
+				// other direction
+				torch_x_offset *= -1;
+				torch_ui.position.x = torch_x_base + torch_x_offset;
+				torch_ui.position.y = torch_y_base + torch_y_offset;
+				if (torch_ui.scale.x > 0) {
+					torch_ui.scale.x *= -1.0;
+				}
+				
+			}
+
+		}
 
     }
 
@@ -662,10 +712,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 		if (counter.t_timer > 0) {
 			screen.torch_mode = 1;
-		}
-		else {
+		} else {
 			screen.torch_mode = 0;
-			registry.torches.remove(entity);
+			registry.remove_all_components_of(entity);
+			//registry.torches.remove(entity);
 		}
 
 
@@ -1066,7 +1116,7 @@ void WorldSystem::restart_game() {
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
     craftingList = createCraftingList();
-	createTutorial();
+
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -1108,7 +1158,7 @@ void WorldSystem::restart_game() {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
        // fprintf(stderr, "Loaded music\n");
-
+		createTutorial();
 
         Motion& player_motion = registry.motions.get(player);
         player_motion.position = { 0.6 * window_width_px, 0.75 * window_height_px };
@@ -1671,7 +1721,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				// do blue potion stuff
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
-				registry.torches.emplace(Entity());
+				Entity torch_entity = Entity();
+				registry.torches.emplace(torch_entity);
+				UIComp& torch_ui = registry.uicomps.emplace(torch_entity);
+				torch_ui.position = vec2(window_width_px*0.5,window_height_px*0.5);
+				torch_ui.scale = vec2(PLAYER_WIDTH * 0.5, PLAYER_WIDTH * 0.5);
+				RenderRequest& torch_rr = registry.renderRequests.insert(torch_entity, { TEXTURE_ASSET_ID::TORCH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+				
                 Mix_PlayChannel(-1, torch_sound, 0);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			}
