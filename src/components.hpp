@@ -190,6 +190,10 @@ struct UIComp {
 	vec2 scale = { 10, 10 };
 };
 
+struct Permanent {
+
+};
+
 struct Rotator {
 	float angle = 0;
 	//float speed = 360 LENGTH OF NIGHT_ms   
