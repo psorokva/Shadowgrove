@@ -760,6 +760,20 @@ Entity createCraftingList() {
     return entity;
 }
 
+Entity createTutorial() {
+	auto entity = Entity();
+
+	Motion& tutorial_motion = registry.motions.emplace(entity);
+	tutorial_motion.scale = { 0.75 * window_width_px, 0.75 * window_height_px };
+	tutorial_motion.position = { window_width_px / 2, window_height_px / 2 };
+
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TUT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	TutorialSequence& tutorial = registry.tutorialSequence.emplace(entity);
+
+	return entity;
+}
+
 Entity createShadowOverlay(RenderSystem* renderer) {
 	auto entity = Entity();
 	Motion& motion = registry.motions.emplace(entity);
