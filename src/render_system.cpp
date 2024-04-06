@@ -542,12 +542,20 @@ void RenderSystem::draw() {
                 }
             }
         }
-
+        // render help screen
 		if (registry.helpScreen.size() > 0) {
 			HelpScreen& help = registry.helpScreen.components[0];
 			if (help.help == 1) {
 				Entity helpScreen = registry.helpScreen.entities[0];
 				drawTexturedStaticMesh(helpScreen, projection_2D);
+			}
+		}
+
+		if (registry.tutorialSequence.size() > 0) {
+			TutorialSequence& tutorial = registry.tutorialSequence.components[0];
+			if (tutorial.visible) {
+				Entity tutorialWindow = registry.tutorialSequence.entities[0];
+					drawTexturedMesh(tutorialWindow, projection_2D);
 			}
 		}
        

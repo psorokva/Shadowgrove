@@ -60,8 +60,7 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos) {
 }
 
 Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
-	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default 
-	
+	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default
 	auto entity = Entity();
     registry.permanents.emplace(entity);
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
@@ -758,6 +757,20 @@ Entity createCraftingList() {
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::CRAFTINGLIST, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
+}
+
+Entity createTutorial() {
+	auto entity = Entity();
+
+	Motion& tutorial_motion = registry.motions.emplace(entity);
+	tutorial_motion.scale = { 0.75 * window_width_px, 0.75 * window_height_px };
+	tutorial_motion.position = { window_width_px / 2, window_height_px / 2 };
+
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TUT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	TutorialSequence& tutorial = registry.tutorialSequence.emplace(entity);
+
+	return entity;
 }
 
 Entity createShadowOverlay(RenderSystem* renderer) {
