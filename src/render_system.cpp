@@ -476,7 +476,9 @@ void RenderSystem::draw() {
 
 		for (Entity entity : registry.renderRequests.entities) {
 			if (registry.uicomps.has(entity)) {
-				drawTexturedUIMesh(entity, projection_2D);
+                if (!registry.permanents.has(entity)) {
+                    drawTexturedUIMesh(entity, projection_2D);
+                }
 			}
 		}
 
@@ -508,6 +510,13 @@ void RenderSystem::draw() {
         Entity sign2 = registry.daytimes.entities[3];
         drawTexturedStaticMesh(sign2, projection_2D);
 
+        // render dog potions
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.uicomps.has(entity)) {
+                drawTexturedUIMesh(entity, projection_2D);
+            }
+        }
+
         // render player 2nd last
         drawTexturedMesh(player, projection_2D);
 
@@ -531,15 +540,6 @@ void RenderSystem::draw() {
                 if (registry.debugComponents.has(entity)) {
                     drawTexturedStaticMesh(entity, projection_2D);
                 }
-            }
-        }
-
-        // render dog potions
-        for (Entity entity: registry.renderRequests.entities) {
-            if (registry.uicomps.has(entity)) {
-//                if (registry.daytimes.has(entity)) {
-                    drawTexturedUIMesh(entity, projection_2D);
-//                }
             }
         }
 

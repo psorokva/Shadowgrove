@@ -63,6 +63,7 @@ Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
 	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default 
 	
 	auto entity = Entity();
+    registry.permanents.emplace(entity);
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
 	ui_comp.position = pos;
 	ui_comp.scale = vec2(50, 50.0);
