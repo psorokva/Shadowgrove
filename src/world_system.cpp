@@ -128,11 +128,13 @@ GLFWwindow* WorldSystem::create_window() {
 	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_key(_0, _1, _2, _3); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_move({ _0, _1 }); };
 	auto mouse_click_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_click(_0, _1, _2); };
+	auto scroll_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_scroll(_0, _1); };
 
 	glfwSetKeyCallback(window, key_redirect);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 	glfwSetMouseButtonCallback(window, mouse_click_redirect);
+	glfwSetScrollCallback(window, scroll_redirect);
 
 	//////////////////////////////////////
 	// Loading music and sounds with SDL
@@ -255,6 +257,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 			screen.game_screen = game_screen_day;
 			screen.torch_mode = 0;
+
+			// save inventory when returning to day
+			save_state.saveInventory();
 
 			restart_game();
 			return true;
@@ -1312,6 +1317,9 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 						// player should stop moving when health is <= 0
 						registry.motions.get(player).velocity = { 0, 0 };
 						Mix_PlayChannel(-1, player_death_sound, 0);
+
+						// clear the save file if the player died
+						save_state.clearSave();
 					}
 				}
 			
@@ -1432,6 +1440,21 @@ bool WorldSystem::is_over() const {
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_F1)
+	{
+		save_state.saveInventory();
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_F2)
+	{
+		save_state.loadInventory(renderer);
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_F3)
+	{
+		save_state.clearSave();
+	}
 
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_L && is_in_debug) {
@@ -1784,6 +1807,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             while (registry.uicomps.entities.size() > 0)
                 registry.remove_all_components_of(registry.uicomps.entities.back());
             restart_game();
+			
+			// load in player state after opening cutscene is finished
+			save_state.loadInventory(renderer);
         }
         if (screen.game_screen == cut_scene_1) {
             printf("hi 1 \n");
@@ -1892,6 +1918,22 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 
 	}
 
+}
+
+void WorldSystem::on_scroll(double x_offset, double y_offset)
+{
+	std::cout << "in scroll function" << std::endl;
+	std::cout << "xoffset: " << x_offset << " yoffset: " << y_offset << std::endl;
+	Inventory& inventory = registry.inventory.get(registry.players.entities[0]);
+	if (y_offset == -1)
+	{
+		inventory.select_state = (inventory.select_state + 1) % inventory.holding.size();
+	}
+	else
+	{
+		inventory.select_state = ( (inventory.select_state + inventory.holding.size()) - 1) % inventory.holding.size();
+	}
+	
 }
 
 

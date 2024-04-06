@@ -1,11 +1,9 @@
-#include "save_state.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
 
-SaveState::SaveState() {
-    loaded = 0;
-}
+#include "world_init.hpp"
+#include "save_state.hpp"
 
 void SaveState::saveInventory() {
     // Open the file in output mode
@@ -19,6 +17,11 @@ void SaveState::saveInventory() {
             outputFile << static_cast<int>(item) << std::endl;
         }
 
+        for (const UIComp& ui : registry.uicomps.components)
+        {
+            outputFile << ui.potion_type;
+        }
+
         // Close the file
         outputFile.close();
 
@@ -29,10 +32,7 @@ void SaveState::saveInventory() {
     }
 }
 
-void SaveState::loadInventory() {
-    if (loaded >= 2) {
-        return;
-    }
+void SaveState::loadInventory(RenderSystem* renderer) {
     // Open the file in input mode
     std::ifstream inputFile(filePath);
 
@@ -40,16 +40,35 @@ void SaveState::loadInventory() {
     if (inputFile.is_open()) {
         int itemValue;
         Inventory& inventory = registry.inventory.components[0];
-        int i = 0;
+
         // Read and convert each integer value to enum
-        while (inputFile >> itemValue) {
-            // Cast the integer to enum and output its value
-            if (i >= inventory.holding.size()) {
-                break;
-            }
+        for (int i = 0; i < inventory.holding.size(); i++)
+        {
+            inputFile >> itemValue;
             Item item = static_cast<Item>(itemValue);
             inventory.holding[i] = item;
-            i++;
+        }
+
+        // TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default 
+        int potionType;
+        while (inputFile >> potionType) 
+        {
+            std::cout << "potionType: " << potionType << std::endl;
+            if (potionType == 2)
+            {
+                vec2 orange_potion_pos = { 850, 660 };
+                Entity orange = createConversationPotion(renderer, orange_potion_pos, 2);
+            }
+            else if (potionType == 0) 
+            {
+                vec2 green_potion_pos = { 900, 660 };
+                Entity green = createConversationPotion(renderer, green_potion_pos, 0);
+            }
+            else if (potionType == 1) 
+            {
+                vec2 purple_potion_pos = { 950, 660 };
+                Entity purple = createConversationPotion(renderer, purple_potion_pos, 1);
+            }
         }
 
         // Close the file
@@ -60,7 +79,24 @@ void SaveState::loadInventory() {
     else {
         std::cerr << "Unable to open the file for reading!" << std::endl;
     }
+}
 
-    loaded++;
+void SaveState::clearSave() {
+    // Open the file in output mode
+    std::ofstream outputFile(filePath, std::ofstream::out | std::ofstream::trunc);
 
+    // Check if the file is opened successfully
+    if (outputFile.is_open()) {
+        int inventory_size = registry.inventory.components[0].holding.size();
+
+        for (int i = 0; i < inventory_size; i++)
+        {
+            outputFile << Item::nullval << std::endl;
+        }
+
+        std::cout << "cleared file" << std::endl;
+    }
+    else {
+        std::cerr << "Unable to open the file for writing!" << std::endl;
+    }
 }

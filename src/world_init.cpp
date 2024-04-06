@@ -66,6 +66,7 @@ Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
 	ui_comp.position = pos;
 	ui_comp.scale = vec2(50, 50.0);
+	ui_comp.potion_type = type;
 	if (type == 0) {
 		// GREEN
 		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });

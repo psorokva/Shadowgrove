@@ -187,6 +187,7 @@ struct Immobile {
 struct UIComp {
 	vec2 position = { 0, 0 };
 	vec2 scale = { 10, 10 };
+	int potion_type = -1;
 };
 
 

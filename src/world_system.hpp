@@ -51,8 +51,10 @@ private:
 	void on_key(int key, int, int action, int mod);
 	void on_mouse_move(vec2 pos);
 	void on_mouse_click(int button, int action, int mods);
-	void draw_chunk_borders();
+	void on_scroll(double x_offset, double y_offset);
 
+	void draw_chunk_borders();
+	
 	// restart level
 	void restart_game();
 
