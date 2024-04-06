@@ -48,6 +48,9 @@ bool go_right_key_released = true;
 bool go_left_key_released = true;
 bool moving_x = false;
 bool moving_y = false;
+bool orange_crafted = false;
+bool green_crafted = true;
+bool purple_crafted = true;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
@@ -631,6 +634,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			//	registry.inventory.get(registry.players.entities[0]).crafted = {};
 			//	restart_game();
             //}
+        }
+
+        if (orange_crafted && green_crafted && purple_crafted) {
+            Player& player_component = registry.players.components[0];
+            if (player_component.won == 0) {
+                createPlayerSparkle(renderer, { 0.85 * window_width_px, 0.75 * window_height_px });
+                Entity save = Entity();
+                registry.textRenderRequests.insert(save,{"Press space key to save Sparky", vec2(0.265 * window_width_px, 0.4 * window_height_px)});
+                registry.textRenderRequests.get(save).scale = 0.6;
+                player_component.won = 1;
+            }
+
         }
     }
 
@@ -1682,16 +1697,19 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 orange_potion_pos = {850, 660 };
                 Entity orange = createConversationPotion(renderer, orange_potion_pos, 2);
+                orange_crafted = true;
 			} else if (craft.x == 5) {
 //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 green_potion_pos = {900, 660 };
                 Entity green = createConversationPotion(renderer, green_potion_pos, 0);
+                green_crafted = true;
 			} else if (craft.x == 6) {
 //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 purple_potion_pos = {950, 660};
                 Entity purple = createConversationPotion(renderer, purple_potion_pos, 1);
+                purple_crafted = true;
 			}
 		}
 		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
@@ -2034,10 +2052,30 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
    if (action == GLFW_RELEASE && key == GLFW_KEY_V && is_in_debug) {
        if (screen.game_screen != game_screen_night) {
            screen.game_screen = game_screen_win;
+           orange_crafted = false;
+           green_crafted = false;
+           purple_crafted = false;
+           Player& player_component = registry.players.components[0];
+           player_component.won = 0;
+           while (registry.permanents.entities.size() > 0)
+               registry.remove_all_components_of(registry.permanents.entities.back());
            restart_game();
        }
-    }
+   }
 
+    // player activates victory screen
+    if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE && orange_crafted && green_crafted && purple_crafted) {
+        screen.game_screen = game_screen_win;
+        orange_crafted = false;
+        green_crafted = false;
+        purple_crafted = false;
+        Player& player_component = registry.players.components[0];
+        player_component.won = 0;
+        while (registry.permanents.entities.size() > 0)
+            registry.remove_all_components_of(registry.permanents.entities.back());
+
+        restart_game();
+    }
 	// Control the current speed with `<` `>`
 	//if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
 	//	current_speed -= 0.1f;

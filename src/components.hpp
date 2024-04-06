@@ -79,6 +79,7 @@ struct Player {
     int alive = 1;
     int hit = 0;
 	bool moving = false;
+    int won = 0;
 };
 
 struct Daytime {
@@ -202,6 +203,10 @@ struct Rotator {
 
 struct Paired {
 	Entity other;
+};
+
+struct Permanent {
+
 };
 
 //std::vector<Item> inUI;
