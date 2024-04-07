@@ -238,6 +238,8 @@ enum Game_screens {
     cut_scene_0,
     cut_scene_1,
     cut_scene_2,
+    cut_scene_3,
+    cut_scene_4,
     cut_scene_win,
 };
 
@@ -531,7 +533,7 @@ struct TextRenderRequest {
 struct SpeechRenderRequest {
     std::string text = "";
     vec2 position = vec2(1.0f, 1.0f);
-    float scale = 0.5f;
+    float scale = 0.7f;
     vec3 color = vec3(0.0f, 0.0f, 0.0f); // default black
 };
 
