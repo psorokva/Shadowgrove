@@ -600,7 +600,8 @@ void RenderSystem::draw() {
 //		drawTexturedMesh(&win_dance, projection_2D);
     }
     else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1
-    || screen.game_screen == cut_scene_2 | screen.game_screen == cut_scene_win) {
+            || screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_3
+            || screen.game_screen == cut_scene_4 || screen.game_screen == cut_scene_win) {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
 
@@ -610,10 +611,10 @@ void RenderSystem::draw() {
         }
         if (registry.uicomps.entities.size() >0 ) {
             for (Entity entity : registry.uicomps.entities) {
-                if (!registry.permanents.has(entity)) {
+//                if (!registry.permanents.has(entity)) {
                     // UIComp& ui_comp = registry.uicomps.get(entity);
                     drawTexturedUIMesh(entity, projection_2D);
-                }
+//                }
             }
         }
 
