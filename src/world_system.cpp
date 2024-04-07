@@ -23,7 +23,7 @@ const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const int SPARKLE_SLOWDOWN_FPS = 1;
 int sparkle_slowdown = 0;
-float keeper_rate = 12.0;
+float keeper_rate = 8.0;
 float KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
@@ -36,6 +36,7 @@ bool morning_warning = false;
 
 bool game_paused = false;
 bool is_in_debug = false;
+bool already_paused = false;
 
 bool moving_x = false;
 bool moving_y = false;
@@ -738,6 +739,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             player_component.hit = 0;
             registry.invincibles.remove(entity);
             registry.hitTimers.remove(entity);
+            while (registry.player_sparkle_animation.entities.size() > 0)
+                registry.remove_all_components_of(registry.player_sparkle_animation.entities.back());
             return true;
         }
     }
@@ -1419,6 +1422,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
                         if (!registry.hitTimers.has(entity))
                         {
                             registry.hitTimers.emplace(entity);
+                            createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
                         }
 
 						// Move enemy slightly back after collision (so that player doesn't die instantly)
@@ -1546,12 +1550,13 @@ bool WorldSystem::is_over() const {
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
-
+    HelpScreen& help_screen = registry.helpScreen.components[0];
+    HelpScreen& craft_screen = registry.helpScreen.components[1];
+    ScreenState& screen = registry.screenStates.components[0];
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_L && is_in_debug) {
 		chunk_border = !chunk_border;
 	}
-
 
 	// remove items from slot on num key press
 	if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
@@ -1585,7 +1590,23 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		if (registry.inventory.components[0].is_open) {
 			registry.inventory.components[0].is_open = false;
 			game_paused = false;
-		}
+		} else if (help_screen.help == 1) {
+            help_screen.help = 0;
+            // craft screen == 2 means its on standby for when help closes, so dont unpause
+            if (craft_screen.help == 2) {
+                craft_screen.help = 1;
+            } else if (!already_paused) {
+                game_paused = false;
+            }
+        } else if (craft_screen.craftingList == 1) {
+            craft_screen.craftingList = 0;
+            // help screen == 2 means its on standby for when crafting closes, so dont unpause
+            if (help_screen.help == 2) {
+                help_screen.help = 1;
+            } else if (!already_paused) {
+                game_paused = false;
+            }
+        }
 		else if(!registry.tutorialSequence.components[0].visible) {
 			std::cout << "EXIT GAME" << std::endl;
 			if (registry.screenStates.components[0].game_screen == game_screen_day) {
@@ -1605,16 +1626,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Pausing game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_P) {
-
 		if (!game_paused) {
+            already_paused = true;
 			pause_game();
 		}
 		else {
+            already_paused = false;
 			resume_game();
 		}
 	}
 
-	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_N && is_in_debug) {
         // printf("N key pressed, switching screen");
@@ -1743,23 +1764,23 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // Opening help screen
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
 		if (registry.helpScreen.components.size() >0) {
-			HelpScreen& help_screen = registry.helpScreen.components[0];
-            HelpScreen& craft_screen = registry.helpScreen.components[1];
+
 			if (help_screen.help == 1) {
 				help_screen.help = 0;
 
                 // craft screen == 2 means its on standby for when help closes, so dont unpause
                 if (craft_screen.help == 2) {
                     craft_screen.help = 1;
-                } else {
+                } else if (!already_paused) {
                     game_paused = false;
                 }
-            } else {
+            }
+            else if (!already_paused) {
                 help_screen.help = 1;
                 game_paused = true;
-//                for (Motion& motion : registry.motions.components) {
-//                    motion.velocity = { 0, 0 };
-//                }
+                for (Motion& motion : registry.motions.components) {
+                    motion.velocity = { 0, 0 };
+                }
 
                 if (craft_screen.help == 1) {
                     craft_screen.help = 2;
@@ -1771,25 +1792,21 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // Opening crafting screen at night
     if (action == GLFW_RELEASE && key == GLFW_KEY_U && screen.game_screen == game_screen_night) {
         if (registry.helpScreen.components.size() > 1) {
-            HelpScreen& help_screen = registry.helpScreen.components[0];
-            HelpScreen& craft_screen = registry.helpScreen.components[1];
             if (craft_screen.craftingList == 1) {
                 craft_screen.craftingList = 0;
 
                 // help screen == 2 means its on standby for when crafting closes, so dont unpause
                 if (help_screen.help == 2) {
                     help_screen.help = 1;
-                } else {
+                } else if (!already_paused) {
                     game_paused = false;
                 }
-
-            } else {
+            } else if (!already_paused) {
                 craft_screen.craftingList = 1;
                 game_paused = true;
-//                for (Motion& motion : registry.motions.components) {
-//                    motion.velocity = { 0, 0 };
-//                }
-
+                for (Motion& motion : registry.motions.components) {
+                    motion.velocity = { 0, 0 };
+                }
                 if (help_screen.help == 1) {
                     help_screen.help = 2;
                 }
@@ -1919,6 +1936,53 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 	}
 
+	// Opening tutorial
+	if (registry.tutorialSequence.entities.size() > 0) {
+		TutorialSequence& tutorial = registry.tutorialSequence.components[0];
+
+		if (action == GLFW_RELEASE && key == GLFW_KEY_T && registry.screenStates.components[0].game_screen == game_screen_day) {
+			if (!tutorial.visible) {
+				printf("T key pressed, opening tutorial screen\n");
+				tutorial.visible = true;
+				game_paused = true;
+				Mix_PlayChannel(-1, page_turn_sound, 0);
+			}
+			else {
+				printf("T key pressed, closing tutorial screen\n");
+				tutorial.visible = false;
+				game_paused = false;
+				Mix_PlayChannel(-1, menu_close_sound, 0);
+			}
+		}
+		if (tutorial.visible && registry.screenStates.components[0].game_screen == game_screen_day) {
+			RenderRequest& tut_rr = registry.renderRequests.get(registry.tutorialSequence.entities[0]);
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_RIGHT) {
+				if (tutorial.current_page < tutorial.size - 1) {
+					tutorial.current_page++;
+					tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+					Mix_PlayChannel(-1, page_turn_sound, 0);
+				}
+			}
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_LEFT) {
+				if (tutorial.current_page > 0) {
+					tutorial.current_page--;
+					tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+					Mix_PlayChannel(-1, page_turn_sound, 0);
+				}
+			}
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+				tutorial.current_page = 0;
+				tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+				tutorial.visible = false;
+				game_paused = false;
+				Mix_PlayChannel(-1, menu_close_sound, 0);
+			}
+		}
+	}
+
     // space to start game + cut scenes
     if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
         if (screen.game_screen == cut_scene_2) {
@@ -1967,67 +2031,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 restart_game();
             }
         }
-    }
-
-	// Opening tutorial
-	if (registry.tutorialSequence.entities.size() > 0) {
-		TutorialSequence& tutorial = registry.tutorialSequence.components[0];
-
-		if (action == GLFW_RELEASE && key == GLFW_KEY_T && registry.screenStates.components[0].game_screen == game_screen_day) {
-			if (!tutorial.visible) {
-				printf("T key pressed, opening tutorial screen\n");
-				tutorial.visible = true;
-				game_paused = true;
-				Mix_PlayChannel(-1, page_turn_sound, 0);
-			}
-			else {
-				printf("T key pressed, closing tutorial screen\n");
-				tutorial.visible = false;
-				game_paused = false;
-				Mix_PlayChannel(-1, menu_close_sound, 0);
-			}
-		}
-		if (tutorial.visible && registry.screenStates.components[0].game_screen == game_screen_day) {
-			RenderRequest& tut_rr = registry.renderRequests.get(registry.tutorialSequence.entities[0]);
-
-			if (action == GLFW_RELEASE && key == GLFW_KEY_RIGHT) {
-				if (tutorial.current_page < tutorial.size - 1) {
-					tutorial.current_page++;
-					tut_rr.used_texture = tutorial.pages[tutorial.current_page];
-					Mix_PlayChannel(-1, page_turn_sound, 0);
-				}
-			}
-
-			if (action == GLFW_RELEASE && key == GLFW_KEY_LEFT) {
-				if (tutorial.current_page > 0) {
-					tutorial.current_page--;
-					tut_rr.used_texture = tutorial.pages[tutorial.current_page];
-					Mix_PlayChannel(-1, page_turn_sound, 0);
-				}
-			}
-
-			if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
-				tutorial.current_page = 0;
-				tut_rr.used_texture = tutorial.pages[tutorial.current_page];
-				tutorial.visible = false;
-				game_paused = false;
-				Mix_PlayChannel(-1, menu_close_sound, 0);
-			}
-		}
-	}
-
-    // space to start game
-    if (screen.game_screen == game_screen_main_menu) {
-        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-            screen.game_screen = cut_scene_0;
-            restart_game();
-        }
-    }
-
-    // space to restart
-    if (screen.game_screen == game_screen_game_over) {
-        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-           // printf("in game over screen on key \n");
+        if (screen.game_screen == game_screen_game_over) {
             screen.game_screen = game_screen_main_menu;
             screen.torch_mode = 0;
             screen.night_counter_ms = 0;
@@ -2036,16 +2040,24 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             registry.nightTimer.clear();
             restart_game();
         }
-    }
-
-    // space to restart
-    if (screen.game_screen == game_screen_win) {
-        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-            //printf("in game win screen on key \n");
+        if (screen.game_screen == game_screen_win) {
             screen.game_screen = game_screen_main_menu;
 //            screen.torch_mode = 0;
             screen.night_counter_ms = 0;
             registry.nightTimer.clear();
+            restart_game();
+
+        }
+        if (screen.game_screen == cut_scene_win && orange_crafted && green_crafted && purple_crafted) {
+            screen.game_screen = game_screen_win;
+            orange_crafted = false;
+            green_crafted = false;
+            purple_crafted = false;
+            Player& player_component = registry.players.components[0];
+            player_component.won = 0;
+            while (registry.permanents.entities.size() > 0)
+                registry.remove_all_components_of(registry.permanents.entities.back());
+
             restart_game();
         }
     }
@@ -2065,22 +2077,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
        }
    }
 
-    // player activates victory screen
-    if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE && orange_crafted && green_crafted && purple_crafted) {
-        if (screen.game_screen == cut_scene_win) {
-            screen.game_screen = game_screen_win;
-            orange_crafted = false;
-            green_crafted = false;
-            purple_crafted = false;
-            Player& player_component = registry.players.components[0];
-            player_component.won = 0;
-            while (registry.permanents.entities.size() > 0)
-                registry.remove_all_components_of(registry.permanents.entities.back());
-
-            restart_game();
-        }
-    }
-	// Control the current speed with `<` `>`
+    // Control the current speed with `<` `>`
 	//if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
 	//	current_speed -= 0.1f;
 		//printf("Current speed = %f\n", current_speed);
