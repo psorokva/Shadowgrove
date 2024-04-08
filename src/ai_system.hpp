@@ -31,6 +31,8 @@ private:
 	const int frames_till_update = 30;
 	const int chase_distance = 300;
 
+	const int max_astar_steps = 100;
+
 	std::unordered_map<Direction, vec2> direction_to_velocity = {
 		{LEFT, {-enemy_velocity_multipler, 0} },
 		{RIGHT, {enemy_velocity_multipler, 0} },
@@ -55,7 +57,6 @@ private:
 		{NONE, NONE}
 	};
 
-	int max_astar_steps = 100;
 	struct AStarNode {
 		MazeLocation maze_loc;
 		float fScore;

@@ -107,7 +107,7 @@ int compute_heuristic(MazeLocation start, MazeLocation end)
 Direction AISystem::AStar(vec2 player_location, vec2 keeper_location)
 {
 	// max step amount ?
-	//int steps = 0;
+	int steps = 0;
 	std::priority_queue<AStarNode, std::vector<AStarNode>, std::greater<AStarNode>> pq;
 	//std::set<AStarNode> openSet;
 	std::map<MazeLocation, int> gScore;
@@ -126,6 +126,11 @@ Direction AISystem::AStar(vec2 player_location, vec2 keeper_location)
 
 	while (pq.size() > 0)
 	{
+		steps++;
+		if (steps > max_astar_steps)
+		{
+			return Direction::NONE;
+		}
 		AStarNode current = pq.top();
 
 		if (current.maze_loc == player_loc)
