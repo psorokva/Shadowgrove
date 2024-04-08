@@ -189,7 +189,29 @@ struct Immobile {
 	vec2 scale = { 10, 10 };
 	vec2 camera_position = { 0, 0 };
 	bool on_screen = true;
+	float angle = 0;
 };
+
+struct Oscilation {
+	//bool rotates = false;
+	//bool stretches = false;
+	float base = 0.0;
+	float max = 5.0;
+	float min = -3.0;
+	float amount = 0.02;
+	float current = 0.0;
+	float direction = 1.0;
+};
+
+struct Dance {
+	float base = 0.0;
+	float max = 0.03;
+	float min = -0.04;
+	float amount = 0.0004;
+	float current = 0.0;
+	float direction = 1.0;
+};
+
 
 struct UIComp {
 	vec2 position = { 0, 0 };
@@ -545,7 +567,7 @@ struct TextRenderRequest {
 struct SpeechRenderRequest {
     std::string text = "";
     vec2 position = vec2(1.0f, 1.0f);
-    float scale = 0.7f;
+    float scale = 0.6f;
     vec3 color = vec3(0.0f, 0.0f, 0.0f); // default black
 };
 

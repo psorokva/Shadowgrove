@@ -55,6 +55,8 @@ public:
 	ComponentContainer<Paired> pairs;
 	ComponentContainer<Rotator> rotators;
     ComponentContainer<Permanent> permanents;
+	ComponentContainer<Oscilation> oscilations;
+	ComponentContainer<Dance> dances;
 	ComponentContainer<FloatingEnemy> floating_enemies;
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -99,6 +101,8 @@ public:
 		registry_list.push_back(&torch_off_animation);
 		registry_list.push_back(&pairs);
 		registry_list.push_back(&rotators);
+		registry_list.push_back(&oscilations);
+		registry_list.push_back(&dances);
         registry_list.push_back(&permanents);
 		registry_list.push_back(&floating_enemies);
 	}
