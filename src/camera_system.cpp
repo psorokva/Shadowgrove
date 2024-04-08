@@ -35,11 +35,43 @@ void CameraSystem::step() {
 			&& fixed.camera_position.y < (window_height_px + on_screen_buffer))
 		{
 			fixed.on_screen = true;
+			// oscilate if on screen
+			if (registry.oscilations.has(entity)) {
+				Oscilation& osc = registry.oscilations.get(entity);
+				osc.current += osc.amount * osc.direction;
+				if (osc.current > osc.max ) {
+					osc.direction *= -1.0;
+					osc.current = osc.max;
+				} else if( osc.current < osc.min) {
+					osc.direction *= -1.0;
+					osc.current = osc.min;
+				}
+				fixed.scale.y = osc.base + osc.current;
+				fixed.camera_position.y -= osc.current * 0.5;
+			}
+
+			if (registry.dances.has(entity)) {
+				Dance& dance = registry.dances.get(entity);
+				dance.current += dance.amount * dance.direction;
+				if (dance.current > dance.max) {
+					dance.direction *= -1.0;
+					dance.current = dance.max;
+				} else if (dance.current < dance.min) {
+					dance.direction *= -1.0;
+					dance.current = dance.min;
+				}
+				fixed.angle = dance.base + dance.current;
+				
+			}
+
 		}
 		else
 		{
 			fixed.on_screen = false;
 		}
+
+		
+
 	}
 
 	auto& chunks = registry.chunks;

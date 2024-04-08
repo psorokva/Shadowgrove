@@ -138,6 +138,9 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
         transform.translate(immobile.position);
     }
 	transform.scale(immobile.scale);
+	
+	transform.rotate(immobile.angle);
+
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);

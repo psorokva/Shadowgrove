@@ -123,6 +123,17 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 	fixed.position = position;
 	fixed.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
 	
+	Oscilation& osc = registry.oscilations.emplace(entity);
+	osc.base = fixed.scale.y;
+	//osc.y = fixed.y;
+	osc.max += (float)(rand() % 6);
+	osc.min -= (float)(rand() % 5);
+
+	Dance& dance = registry.dances.emplace(entity);
+	dance.base = fixed.angle;
+	dance.max += 0.01 * (float)(rand() % 4);
+	dance.min -= 0.01 * (float)(rand() % 4);
+
 	auto& wall = registry.impenetrables.emplace(entity);
 	wall.position = position;
 	wall.scale = fixed.scale;
@@ -806,6 +817,10 @@ Entity createDog(vec2 position) {
     immobile.position = position;
     immobile.scale = vec2({ 1.6 * 135, 1.6 * 60 });
     immobile.camera_position = { window_width_px / 4, window_height_px / 4 };
+
+	Oscilation& osc = registry.oscilations.emplace(entity);
+	osc.base = immobile.scale.y;
+
 
     Daytime& dog = registry.daytimes.emplace(entity);
 

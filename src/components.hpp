@@ -184,7 +184,29 @@ struct Immobile {
 	vec2 scale = { 10, 10 };
 	vec2 camera_position = { 0, 0 };
 	bool on_screen = true;
+	float angle = 0;
 };
+
+struct Oscilation {
+	//bool rotates = false;
+	//bool stretches = false;
+	float base = 0.0;
+	float max = 5.0;
+	float min = -3.0;
+	float amount = 0.02;
+	float current = 0.0;
+	float direction = 1.0;
+};
+
+struct Dance {
+	float base = 0.0;
+	float max = 0.03;
+	float min = -0.04;
+	float amount = 0.0004;
+	float current = 0.0;
+	float direction = 1.0;
+};
+
 
 struct UIComp {
 	vec2 position = { 0, 0 };
