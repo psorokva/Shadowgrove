@@ -55,6 +55,7 @@ public:
 	ComponentContainer<Paired> pairs;
 	ComponentContainer<Rotator> rotators;
     ComponentContainer<Permanent> permanents;
+	ComponentContainer<FloatingEnemy> floating_enemies;
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
 	ECSRegistry() {
@@ -99,6 +100,7 @@ public:
 		registry_list.push_back(&pairs);
 		registry_list.push_back(&rotators);
         registry_list.push_back(&permanents);
+		registry_list.push_back(&floating_enemies);
 	}
 
 	void clear_all_components() {

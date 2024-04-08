@@ -99,6 +99,11 @@ struct Enemy {
 	Entity e_id;
 };
 
+// Floating Enemy component
+struct FloatingEnemy {
+	unsigned int attack = 10;
+};
+
 enum Item {
 	magical_apple,
 	magical_strawberry,

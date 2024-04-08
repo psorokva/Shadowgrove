@@ -176,6 +176,36 @@ Direction AISystem::AStar(vec2 player_location, vec2 keeper_location)
 
 void AISystem::step() 
 {
+	enemy_step();
+	floating_enemy_step();
+}
+
+
+void AISystem::floating_enemy_step()
+{
+	auto& enemy_registry = registry.floating_enemies;
+	auto& player = registry.players.entities[0];
+	Motion player_position = registry.motions.get(player);
+	for (uint i = 0; i < enemy_registry.size(); i++)
+	{
+		// !!! TODO A1: update motion.position based on step_seconds and motion.velocity
+		FloatingEnemy& enemy = enemy_registry.components[i];
+		Entity entity = enemy_registry.entities[i];
+		Motion& enemy_motion = registry.motions.get(entity);
+		float xDiff = player_position.position[0] - enemy_motion.position[0];
+		float yDiff = player_position.position[1] - enemy_motion.position[1];
+		float distance = std::sqrt(pow(xDiff, 2) + pow(yDiff, 2));
+
+		float normalized_xDiff = (xDiff) / distance;
+		float normalized_yDiff = (yDiff) / distance;
+
+		enemy_motion.velocity = { normalized_xDiff * floating_enemy_velocity_multiplier, normalized_yDiff * floating_enemy_velocity_multiplier };
+	}
+}
+
+
+void AISystem::enemy_step()
+{
 	ComponentContainer<Enemy>& enemies_container = registry.enemies;
 	ComponentContainer<Motion>& motion_container = registry.motions;
 	Entity player = registry.players.entities[0];
@@ -244,7 +274,7 @@ void AISystem::step()
 		// shuffle for randomness
 		std::shuffle(std::begin(directions), std::end(directions), rng);
 
-		
+
 		Direction new_keeper_direction;
 		// we could potentially have a scenario in which no direction is valid and then we crash? so adding check here...
 		if ((int)directions.size() == 0)

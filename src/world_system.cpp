@@ -30,6 +30,7 @@ int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
+const int max_level = 9;
 bool morning_warning = false;
 //const float TORCH_LENGTH = 25 * 1000.0;
 //float torch_timer_ms = TORCH_LENGTH;
@@ -403,7 +404,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (keeper_spawn_time > KEEPER_SPAWN_FREQ && screen.game_screen == game_screen_night) {
 		keeper_spawn_time = 0.0;
 		vec2 spawn_pos = registry.get_empty_spawn_keeper_location();
-		createKeeper(renderer, spawn_pos);
+
+		// between 0 and 1
+		float rand_num = uniform_dist(rng);
+		if (rand_num > (level / max_level) * 0.5)
+		{
+			createKeeper(renderer, spawn_pos);
+		}
+		else
+		{
+			createFloatingKeeper(renderer, spawn_pos);
+		}
 	}
 	
 	if ( registry.rotators.size() > 0) {
@@ -1721,6 +1732,45 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				}
 			
 			}
+			// Checking Player - Enemy collisions
+			else if (registry.floating_enemies.has(entity_other)) {
+				FloatingEnemy& e = registry.floating_enemies.get(entity_other);
+				// initiate death unless already dying
+				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && player_component.alive == 1) {
+					Motion& enemy_motion = registry.motions.get(entity_other);
+					p.health = p.health - e.attack;
+					if (p.health > 0) {
+						//p.health = p.health - e.attack;
+						p.hit = 1;
+						// make player temporarily invincible
+						if (!registry.invincibles.has(entity))
+						{
+							registry.invincibles.emplace(entity);
+						}
+
+						if (!registry.hitTimers.has(entity))
+						{
+							registry.hitTimers.emplace(entity);
+							createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
+						}
+
+						// Move enemy slightly back after collision (so that player doesn't die instantly)
+						enemy_motion.position = enemy_motion.position + (enemy_motion.velocity * vec2(-0.5, -0.5));
+						Mix_PlayChannel(-1, player_hit_sound, 0);
+					}
+					else {
+						p.health = 0;
+						registry.deathTimers.emplace(entity);
+						// player should stop moving when health is <= 0
+						registry.motions.get(player).velocity = { 0, 0 };
+						Mix_PlayChannel(-1, player_death_sound, 0);
+
+						// clear the save file if the player died
+						save_state.clearSave();
+					}
+				}
+
+			}
 			// Checking Player - Eatable collisions
 			else if (registry.healers.has(entity_other)) {
 				Inventory& player_inv = registry.inventory.get(entity);
@@ -2483,7 +2533,7 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 //		vec2 spawn_pos = registry.get_empty_spawn_location();
 //		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
 //		createPotion(renderer, camera.adjust_to_player(spawn_pos));
-		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		createFloatingKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//if (points <= 5) {
 		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//}

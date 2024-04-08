@@ -81,6 +81,7 @@ Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
 }
 
 Entity createKeeper(RenderSystem* renderer, vec2 pos) {
+	std::cout << "creating normal keeper" << std::endl;
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
@@ -103,6 +104,36 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	enemy.attack = rand() % (upper_bound_damage - lower_bound_damage + 1) + lower_bound_damage;
 
 	enemy.e_id = entity;
+	registry.deadlys.emplace(entity); // Do we still need this?
+	// TEXTURE_COUNT indicates that no texture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createFloatingKeeper(RenderSystem* renderer, vec2 pos) {
+	std::cout << "creating floating keeper" << std::endl;
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	// Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	// registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ KEEPER_WIDTH, KEEPER_HEIGHT * 2 });
+
+	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
+	auto& enemy = registry.floating_enemies.emplace(entity);
+
+	// adjust these as needed for game balance
+	unsigned int lower_bound_damage = 5;
+	unsigned int upper_bound_damage = 10;
+	enemy.attack = rand() % (upper_bound_damage - lower_bound_damage + 1) + lower_bound_damage;
+
 	registry.deadlys.emplace(entity); // Do we still need this?
 	// TEXTURE_COUNT indicates that no texture is needed
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
