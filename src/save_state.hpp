@@ -6,10 +6,25 @@
 #include "common.hpp"
 #include "render_system.hpp"
 
-class SaveState {
+
+const int inventory_size = 5;
+const int potions_size = 3;
+const int levels_size = 1;
+
+struct GameState 
+{
+	std::vector<Item> player_inventory = { Item::nullval, Item::nullval, Item::nullval, Item::nullval, Item::nullval };
+	bool orange_crafted = false;
+	bool green_crafted = false;
+	bool purple_crafted = false;
+	int level = 0;
+};
+
+class SaveState 
+{
 public:
-	void saveInventory();
-	void loadInventory(RenderSystem* renderer);
+	void saveGame(GameState state);
+	GameState loadGame();
 	void clearSave();
 
 private:

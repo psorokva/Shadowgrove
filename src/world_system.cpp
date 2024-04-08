@@ -40,6 +40,7 @@ bool already_paused = false;
 
 bool moving_x = false;
 bool moving_y = false;
+
 bool orange_crafted = false;
 bool green_crafted = false;
 bool purple_crafted = false;
@@ -278,7 +279,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			screen.torch_mode = 0;
 
 			// save inventory when returning to day
-			save_state.saveInventory();
+			GameState state = {
+				registry.inventory.get(registry.players.entities[0]).holding,
+				orange_crafted,
+				green_crafted,
+				purple_crafted,
+				level
+			};
+			save_state.saveGame(state);
 
 			restart_game();
 			return true;
@@ -1364,9 +1372,6 @@ void WorldSystem::restart_game() {
 	registry.inventory.emplace(player);
 	registry.inventory.get(player) = i;
 
-    //save_state.loadInventory();
-	//save_state.loadInventory();
-
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
     craftingList = createCraftingList();
@@ -1514,6 +1519,9 @@ void WorldSystem::restart_game() {
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
         //fprintf(stderr, "Loaded music\n");
+
+		// clear save data after we win
+		save_state.clearSave();
 
         createEnd();
 
@@ -1828,6 +1836,30 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     HelpScreen& craft_screen = registry.helpScreen.components[1];
     ScreenState& screen = registry.screenStates.components[0];
 
+	if (action == GLFW_RELEASE && key == GLFW_KEY_F1) {
+		GameState state = {
+			registry.inventory.get(registry.players.entities[0]).holding,
+			orange_crafted,
+			green_crafted,
+			purple_crafted,
+			level
+		};
+		save_state.saveGame(state);
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_F2) {
+		GameState state = save_state.loadGame();
+		registry.inventory.get(registry.players.entities[0]).holding = state.player_inventory;
+		orange_crafted = state.orange_crafted;
+		green_crafted = state.green_crafted;
+		purple_crafted = state.purple_crafted;
+		level = state.level;
+	}
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_F3) {
+		save_state.clearSave();
+	}
+
 	if (action == GLFW_RELEASE && key == GLFW_KEY_L && is_in_debug) {
 		chunk_border = !chunk_border;
 	}
@@ -1883,9 +1915,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         }
 		else if(!registry.tutorialSequence.components[0].visible) {
 			std::cout << "EXIT GAME" << std::endl;
-			if (registry.screenStates.components[0].game_screen == game_screen_day) {
-				//save_state.saveInventory();
-			}
 			glfwSetWindowShouldClose(window, true);
 		}
 	}
@@ -2296,11 +2325,19 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 }
             } else {
                 screen.game_screen = game_screen_day;
+
+				// load in save data after opening cutscene
+				GameState state = save_state.loadGame();
+				registry.inventory.get(registry.players.entities[0]).holding = state.player_inventory;
+				orange_crafted = state.orange_crafted;
+				green_crafted = state.green_crafted;
+				purple_crafted = state.purple_crafted;
+				level = state.level;
+
                 restart_game();
                 registry.tutorialSequence.components[0].visible = true;
                 game_paused = true;
                 Mix_PlayChannel(-1, page_turn_sound, 0);
-				save_state.loadInventory(renderer);
             }
 
         }
