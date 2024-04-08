@@ -14,10 +14,10 @@
 #include <sstream>
 
 // setup fonts
-//std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
-std::string font_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
-//std::string speech_filename = "..//..//..//data//fonts//Kenney_Future_Narrow.ttf";
-std::string speech_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Future_Narrow.ttf";
+std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+//std::string font_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
+std::string speech_filename = "..//..//..//data//fonts//Kenney_Future_Narrow.ttf";
+//std::string speech_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Future_Narrow.ttf";
 
 
 

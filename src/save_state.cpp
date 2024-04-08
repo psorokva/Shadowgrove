@@ -19,7 +19,10 @@ void SaveState::saveInventory() {
 
         for (const UIComp& ui : registry.uicomps.components)
         {
-            outputFile << ui.potion_type;
+            if (ui.potion_type != -1)
+            {
+                outputFile << ui.potion_type;
+            }
         }
 
         // Close the file
