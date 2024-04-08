@@ -34,6 +34,10 @@ int level = 0;
 const float TORCH_LENGTH = 25 * 1000.0;
 float torch_timer_ms = TORCH_LENGTH;
 
+bool orange_crafted = false;
+bool green_crafted = false;
+bool purple_crafted = false;
+
 bool game_paused = false;
 bool is_in_debug = false;
 
@@ -163,7 +167,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, MapGen* generator_arg, Physic
 //	fprintf(stderr, "Loaded music\n");
 
     // Set all states to default
-    restart_game();
+    restart_game(true);
 }
 
 void WorldSystem::createInventory(vec2 pos) {
@@ -230,7 +234,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			screen.game_screen = game_screen_day;
 			screen.torch_mode = 0;
 
-			restart_game();
+			restart_game(false);
 			return true;
 		}
 		screen.night_counter_ms = night_counter.counter_ms;
@@ -327,12 +331,25 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
             Entity localItem = createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
             if (player_inv.select_state == i) {
-                registry.motions.get(localItem).scale = { 100, 100 };
+                registry.motions.get(localItem).scale = { 60, 60 };
             }
             else {
                 registry.motions.get(localItem).scale = { 50, 50 };
             }
         }
+
+		if (registry.inventory.components[0].select_state == 0) {
+			createBorder({ pos.x - 120, pos.y });
+		} else if (registry.inventory.components[0].select_state == 1) {
+			createBorder({ pos.x - 60, pos.y });
+		} else if (registry.inventory.components[0].select_state == 2) {
+			createBorder({ pos.x, pos.y });
+		} else if (registry.inventory.components[0].select_state == 3) {
+			createBorder({ pos.x + 60, pos.y });
+		} else if (registry.inventory.components[0].select_state == 4) {
+			createBorder({ pos.x + 120, pos.y });
+		}
+		
     }
 
 
@@ -346,15 +363,40 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
             Entity localItem = createInventoryPotion(item, {pos.x - 120 + (60.0 * i), pos.y});
             if (player_inv.select_state == i) {
-                registry.immobiles.get(localItem).scale = { 100, 100 };
+                registry.immobiles.get(localItem).scale = { 60, 60 };
             }
             else {
                 registry.immobiles.get(localItem).scale = { 50, 50 };
             }
         }
 
+		if (registry.inventory.components[0].select_state == 0) {
+			createBorder({ pos.x - 120, pos.y });
+		}
+		else if (registry.inventory.components[0].select_state == 1) {
+			createBorder({ pos.x - 60, pos.y });
+		}
+		else if (registry.inventory.components[0].select_state == 2) {
+			createBorder({ pos.x, pos.y });
+		}
+		else if (registry.inventory.components[0].select_state == 3) {
+			createBorder({ pos.x + 60, pos.y });
+		}
+		else if (registry.inventory.components[0].select_state == 4) {
+			createBorder({ pos.x + 120, pos.y });
+		}
+
         if (registry.inventory.get(player).is_open == true) {
             createCraftingUI({0.5 * window_width_px, 0.5 * window_height_px});
+			if (orange_crafted) {
+				createOC({ pos.x - 410, pos.y + 450 });
+			}
+			if (green_crafted) {
+				createGC({ pos.x - 410, pos.y + 527 });
+			}
+			if (purple_crafted) {
+				createPC({ pos.x - 410, pos.y + 590 });
+			}
             for (int i = 0; i < registry.inventory.get(player).inUI.size(); i++) {
                 Item item = registry.inventory.get(player).inUI[i];
                 Entity e = createInventoryPotion(item, { pos.x - 492 + (137 * i), pos.y + 137});
@@ -461,7 +503,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.inventory.components[0].index = {};
 			registry.inventory.components[0].holding = {};
             player_component.alive = 0;
-            restart_game();
+            restart_game(false);
 			return true;
 		}
 	}
@@ -477,6 +519,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			screen.torch_mode = 0;
 			registry.torches.remove(entity);
 		}
+	}
+
+	for (Entity e : registry.invincibility.entities) {
+		Invincibility& inv = registry.invincibility.get(e);
+		inv.i_timer -= elapsed_ms_since_last_update;
+		if (inv.i_timer > 0) {
+			registry.players.components[0].health = 100;
+		}
+		else if (screen.game_screen == game_screen_day) {
+			registry.invincibility.remove(e);
+		}
+		else {
+			registry.invincibility.remove(e);
+		}
+
 	}
 
 	// reduce window brightness if any of the present is dying
@@ -503,6 +560,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             return true;
         }
     }
+
+	
 
 	return true;
 }
@@ -580,10 +639,11 @@ void WorldSystem::checkCrafted() {
 			cc[2] = 3;
 		}
 	}
-	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3 && !orange_crafted) {
 		registry.inventory.get(registry.players.entities[0]).crafted = { 4, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
+		orange_crafted = true;
 		return;
 	}
 	cc = { -1, -1, -1 };
@@ -600,10 +660,11 @@ void WorldSystem::checkCrafted() {
 			cc[2] = 3;
 		}
 	}
-	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3 && !green_crafted) {
 		registry.inventory.get(registry.players.entities[0]).crafted = { 5, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
+		green_crafted = true;
 		return;
 	}
 	cc = { -1, -1, -1 };
@@ -620,10 +681,11 @@ void WorldSystem::checkCrafted() {
 			cc[2] = 3;
 		}
 	}
-	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3) {
+	if (cc[0] == 1 && cc[1] == 2 && cc[2] == 3 && !purple_crafted) {
 		registry.inventory.get(registry.players.entities[0]).crafted = { 6, registry.inventory.get(registry.players.entities[0]).index[0] };
 		registry.inventory.get(registry.players.entities[0]).inUI = {};
 		registry.inventory.get(registry.players.entities[0]).index = {};
+		purple_crafted = true;
 		return;
 	}
 	cc = { -1, -1, -1 };
@@ -631,9 +693,17 @@ void WorldSystem::checkCrafted() {
 }
 
 // Reset the world state to its initial state
-void WorldSystem::restart_game() {
+void WorldSystem::restart_game(bool from_init) {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
+
+	unsigned localHealth = 100;
+	if (registry.players.components.size() > 0) {
+		localHealth = registry.players.components[0].health;
+	}
+	if (localHealth <= 0) {
+		localHealth = 100;
+	}
 
 	printf("Restarting\n");
 
@@ -689,17 +759,21 @@ void WorldSystem::restart_game() {
 	//player = createPlayer(renderer, player_starting_location);
 
 	player = createPlayer(renderer, vec2{0,0}); // TODO: update this after
-	
+
+	registry.players.get(player).health = localHealth;
 
 	// vec2(start_x, start_y);
 	//if (level > 1) {
 	//	registry.inventory.insert(player,tempInventory);
 	//} else {
 	registry.inventory.emplace(player);
-
 	registry.inventory.get(player) = i;
-
-    save_state.loadInventory();
+	if (from_init) {
+		printf("HERE GOT I HERE _____ BIG BIG\n");
+		registry.inventory.get(player).holding = { torch, nullval, nullval, nullval, nullval };
+	}
+	
+    //save_state.loadInventory();
 
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
@@ -1106,7 +1180,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 			}
 			registry.inventory.get(registry.players.entities[0]).index = {};
 			registry.inventory.get(registry.players.entities[0]).inUI = {};
-            restart_game();
+            restart_game(false);
         }
         // check bottom
         else if (y_pos > bottom) {
@@ -1162,6 +1236,33 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Exiting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+		if (registry.inventory.get(registry.players.entities[0]).is_open) {
+			vec2 craft = registry.inventory.get(registry.players.entities[0]).crafted;
+			if (craft.x == 1) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = red_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			}
+			else if (craft.x == 2) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = yellow_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			}
+			else if (craft.x == 3) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = blue_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			}
+			else if (craft.x == 4) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = orange_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			}
+			else if (craft.x == 5) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			}
+			else if (craft.x == 6) {
+				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
+				registry.inventory.get(registry.players.entities[0]).crafted = {};
+			}
+		}
 		if (registry.inventory.components[0].is_open) {
 			registry.inventory.components[0].is_open = false;
 		}
@@ -1179,7 +1280,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
 		resume_game(); // this removed paused text
-        restart_game();
+        restart_game(false);
 	}
 
 	// Pausing game
@@ -1211,10 +1312,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         } else {
             screen.game_screen = game_screen_night;
         }
-         restart_game();
+         restart_game(false);
     }
 
-	if (action == GLFW_RELEASE && key == GLFW_KEY_X) {
+	if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
 		int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
 		if (registry.inventory.get(registry.players.entities[0]).is_open == false) {
 			if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_mushroom) {
@@ -1226,37 +1327,37 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_shell) {
-				int new_health = registry.players.get(registry.players.entities[0]).health + 10;
+				int new_health = registry.players.get(registry.players.entities[0]).health + 5;
 				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == red_lotus) {
-				int new_health = registry.players.get(registry.players.entities[0]).health + 10;
+				int new_health = registry.players.get(registry.players.entities[0]).health + 5;
 				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_strawberry) {
-				int new_health = registry.players.get(registry.players.entities[0]).health + 15;
+				int new_health = registry.players.get(registry.players.entities[0]).health + 10;
 				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == white_lotus) {
-				int new_health = registry.players.get(registry.players.entities[0]).health + 15;
+				int new_health = registry.players.get(registry.players.entities[0]).health + 10;
 				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_grapes) {
-				int new_health = registry.players.get(registry.players.entities[0]).health + 20;
+				int new_health = registry.players.get(registry.players.entities[0]).health + 15;
 				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_carrot) {
-				int new_health = registry.players.get(registry.players.entities[0]).health + 20;
+				int new_health = registry.players.get(registry.players.entities[0]).health + 15;
 				registry.players.get(registry.players.entities[0]).health = min(new_health, 100);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == red_potion) {
 				registry.players.get(registry.players.entities[0]).health = 100;
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == yellow_potion) {
-				// do yellowpotion stuff
+				screen.torch_mode = 1;
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == blue_potion) {
-				// do blue potion stuff
+				registry.interactables.emplace(player);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
 				registry.torches.emplace(Entity());
@@ -1440,13 +1541,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     if (screen.game_screen == game_screen_main_menu) {
         if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
             screen.game_screen = game_screen_day;
-            restart_game();
+            restart_game(false);
         }
     }
 
     // space to restart
     if (screen.game_screen == game_screen_game_over) {
         if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+			orange_crafted = false;
+			green_crafted = false;
+			purple_crafted = false;
             printf("in game over screen on key \n");
             screen.game_screen = game_screen_main_menu;
             screen.torch_mode = 0;
@@ -1454,19 +1558,29 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             NightTimer& night_counter = registry.nightTimer.components[0];
             night_counter.counter_ms = 0;
             registry.nightTimer.clear();
-            restart_game();
+            restart_game(false);
         }
     }
+
+	if (action == GLFW_RELEASE && key == GLFW_KEY_COMMA) {
+		registry.inventory.get(registry.players.entities[0]).select_state += 1;
+		if (registry.inventory.get(registry.players.entities[0]).select_state > 4) {
+			registry.inventory.get(registry.players.entities[0]).select_state = 0;
+		}
+	}
 
     // space to restart
     if (screen.game_screen == game_screen_win) {
         if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+			orange_crafted = false;
+			green_crafted = false;
+			purple_crafted = false;
             printf("in game win screen on key \n");
             screen.game_screen = game_screen_main_menu;
 //            screen.torch_mode = 0;
             screen.night_counter_ms = 0;
             registry.nightTimer.clear();
-            restart_game();
+            restart_game(false);
         }
     }
 
@@ -1474,9 +1588,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
    if (action == GLFW_RELEASE && key == GLFW_KEY_V && is_in_debug) {
        if (screen.game_screen != game_screen_night) {
            screen.game_screen = game_screen_win;
-           restart_game();
+           restart_game(false);
        }
     }
+
 
 	// Control the current speed with `<` `>`
 	//if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {

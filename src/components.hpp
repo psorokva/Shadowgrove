@@ -131,6 +131,10 @@ struct Torches {
 	float t_timer = 20000.0;
 };
 
+struct Invincibility {
+	float i_timer = 60000.0;
+};
+
 struct Deadly {
 
 };
@@ -419,7 +423,11 @@ enum class TEXTURE_ASSET_ID {
 	WIN0 = LOGO_01 + 1,
 	WIN1 = WIN0 + 1,
 	CHECK = WIN1 + 1,
-	TEXTURE_COUNT = CHECK + 1
+	BORDER = CHECK + 1,
+	OC = BORDER + 1,
+	GC = OC + 1,
+	PC = GC + 1,
+	TEXTURE_COUNT = PC + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

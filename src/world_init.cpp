@@ -445,6 +445,85 @@ Entity createCheck(vec2 position) {
 	return entity;
 }
 
+Entity createBorder(vec2 position) {
+	auto entity = Entity();
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE + 10});
+
+	Immobile& fixed = registry.immobiles.emplace(entity);
+	fixed.position = position;
+	fixed.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE + 10});
+
+	registry.debugComponents.emplace(entity);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BORDER, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createOC(vec2 position) {
+	auto entity = Entity();
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE + 10 });
+
+	Immobile& fixed = registry.immobiles.emplace(entity);
+	fixed.position = position;
+	fixed.scale = vec2({ MUSHROOM_SIZE * 6.5, MUSHROOM_SIZE * 1.1 });
+
+	registry.debugComponents.emplace(entity);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::OC, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+
+}
+
+Entity createGC(vec2 position) {
+	auto entity = Entity();
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE + 10 });
+
+	Immobile& fixed = registry.immobiles.emplace(entity);
+	fixed.position = position;
+	fixed.scale = vec2({ MUSHROOM_SIZE * 6.2, MUSHROOM_SIZE * 1.1 });
+
+	registry.debugComponents.emplace(entity);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::GC, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+
+}
+
+Entity createPC(vec2 position) {
+	auto entity = Entity();
+
+	Motion& motion = registry.motions.emplace(entity);
+	motion.camera_position = position;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE + 10 });
+
+	Immobile& fixed = registry.immobiles.emplace(entity);
+	fixed.position = position;
+	fixed.scale = vec2({ MUSHROOM_SIZE * 6.2, MUSHROOM_SIZE * 1.1 });
+
+	registry.debugComponents.emplace(entity);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PC, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+
+}
+
 
 Entity createInventoryPotion(Item& item, vec2 position) {
     auto entity = Entity();

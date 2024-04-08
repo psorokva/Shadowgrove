@@ -34,5 +34,9 @@ Entity createNight();
 Entity createHelp();
 Entity createDog(vec2 position);
 Entity createLogo();
+Entity createBorder(vec2 position);
+Entity createOC(vec2 position);
+Entity createGC(vec2 position);
+Entity createPC(vec2 position);
 
 

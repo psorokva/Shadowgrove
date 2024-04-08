@@ -41,6 +41,7 @@ public:
     ComponentContainer<Daytime> daytimes;
 	ComponentContainer<Torches> torches;
     ComponentContainer<Pause> pauses;
+	ComponentContainer<Invincibility> invincibility;
 
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
@@ -72,6 +73,7 @@ public:
         registry_list.push_back(&daytimes);
 		registry_list.push_back(&torches);
         registry_list.push_back(&pauses);
+		registry_list.push_back(&invincibility);
 	}
 
 	void clear_all_components() {
