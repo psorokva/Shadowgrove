@@ -193,7 +193,7 @@ struct UIComp {
 };
 
 struct Permanent {
-
+    float counter_ms = 200;
 };
 
 struct Rotator {
@@ -241,7 +241,13 @@ enum Game_screens {
     cut_scene_2,
     cut_scene_3,
     cut_scene_4,
-    cut_scene_win,
+    cut_scene_warning,
+    cut_scene_too_late,
+    cut_scene_win0,
+    cut_scene_win1,
+    cut_scene_orange,
+    cut_scene_green,
+    cut_scene_purple,
 };
 
 // Sets the brightness of the screen
