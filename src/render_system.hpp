@@ -170,6 +170,7 @@ class RenderSystem {
 			textures_path("MidnightOverlay_00.png"),
 			textures_path("MidnightOverlay_01.png"),
 			textures_path("CRAFTING2.png"),
+            textures_path("craftingList.png"),
 			textures_path("NightHelpOverlay.png"),
 			textures_path("NightHelpTorchlight.png"),
             textures_path("logo_00.png"),
@@ -177,6 +178,11 @@ class RenderSystem {
 			textures_path("win0.png"),
 			textures_path("win1.png"),
 			textures_path("f1CHECKO.png"),
+			textures_path("tutorial_page1.png"),
+			textures_path("tutorial_page2.png"),
+			textures_path("tutorial_page3.png"),
+			textures_path("tutorial_page4.png"),
+			textures_path("tutorial_page5.png"),
 			textures_path("spark_00.png"),
 			textures_path("spark_01.png"),
 			textures_path("spark_02.png"),
@@ -199,6 +205,8 @@ class RenderSystem {
 			textures_path("torch_00.png"),
 			textures_path("torch_01.png"),
 			textures_path("torch_02.png"),
+			textures_path("daynight0.png"),
+			textures_path("daynight1.png"),
 
 	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
 
@@ -237,6 +245,7 @@ public:
 
 	// Initialize fonts to output text to the screen
 	bool initializeFonts(unsigned int font_default_size);
+    bool initializeSpeech(unsigned int font_default_size);
 
 	// Print text to the screen
 	void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);

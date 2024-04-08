@@ -77,6 +77,7 @@ private:
 	float current_speed;
 	Entity player;
 	Entity help;
+    Entity craftingList;
 	Entity win_dance;
 	Immobile* compass_immobile;
     int inventory;
@@ -93,7 +94,9 @@ private:
     Mix_Chunk* inventory_full_sound;
 	Mix_Chunk* player_hit_sound;
 	Mix_Chunk* rooster_sound;
-    Mix_Chunk* torch_sound;
+	Mix_Chunk* torch_sound;
+	Mix_Chunk* page_turn_sound;
+	Mix_Chunk* menu_close_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;

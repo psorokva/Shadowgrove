@@ -60,9 +60,9 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos) {
 }
 
 Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
-	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default 
-	
+	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default
 	auto entity = Entity();
+    registry.permanents.emplace(entity);
 	UIComp& ui_comp = registry.uicomps.emplace(entity);
 	ui_comp.position = pos;
 	ui_comp.scale = vec2(50, 50.0);
@@ -79,7 +79,6 @@ Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
 	}
 	return entity;
 }
-
 
 Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
@@ -457,7 +456,6 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 	return entity;
 }
 
-
 Entity createSparkle(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 	Motion& motion = registry.motions.emplace(entity);
@@ -480,6 +478,20 @@ Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createSunMoonSpinner(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	auto entityBG = Entity();
+	UIComp& motion = registry.uicomps.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_HEIGHT * 2., PLAYER_HEIGHT * 2.0 });
+	Rotator& rot = registry.rotators.emplace(entity);
+	UIComp& uibg = registry.uicomps.emplace(entityBG);
+	uibg.position = pos;
+	uibg.scale = vec2({ PLAYER_HEIGHT * 2., PLAYER_HEIGHT * 2.0 });
+	registry.renderRequests.insert(entityBG, { TEXTURE_ASSET_ID::DAYNIGHT0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::DAYNIGHT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
 
 // just an invisible marker to calculate where player is in relation to
 Entity createCompass(vec2 position) {
@@ -506,7 +518,6 @@ Entity createCraftingUI(vec2 position) {
 	return entity;
 }
 
-
 Entity createCheck(vec2 position) {
 	auto entity = Entity();
 
@@ -524,7 +535,6 @@ Entity createCheck(vec2 position) {
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CHECK, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
-
 
 Entity createInventoryPotion(Item& item, vec2 position) {
     auto entity = Entity();
@@ -635,7 +645,7 @@ Entity createDay() {
 	return entity;
 }
 
-Entity createIntroScreem() {
+Entity createIntroScreen() {
 	auto entity = Entity();
 
 	auto& day = registry.screenStates.emplace(entity);
@@ -730,6 +740,39 @@ Entity createHelp() {
     registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::HELP_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
+}
+
+Entity createCraftingList() {
+    auto entity = Entity();
+
+    HelpScreen& help = registry.helpScreen.emplace(entity);
+
+    Motion& motion = registry.motions.emplace(entity);
+    motion.scale = {0.5 * window_width_px, 0.5 * window_height_px};
+    motion.camera_position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+
+    auto &fixed = registry.immobiles.emplace(entity);
+    fixed.position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+    fixed.scale = {0.5 * window_width_px +2.0, 0.5 * window_height_px};
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::CRAFTINGLIST, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}
+
+Entity createTutorial() {
+	auto entity = Entity();
+
+	Motion& tutorial_motion = registry.motions.emplace(entity);
+	tutorial_motion.scale = vec2({ 600, 600 });
+	//tutorial_motion.scale = { 0.75 * window_width_px, 0.75 * window_height_px };
+	tutorial_motion.position = { window_width_px / 2, window_height_px / 2 };
+
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TUT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	TutorialSequence& tutorial = registry.tutorialSequence.emplace(entity);
+
+	return entity;
 }
 
 Entity createShadowOverlay(RenderSystem* renderer) {

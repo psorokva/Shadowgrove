@@ -3,7 +3,7 @@
 #include "world_init.hpp"
 #include "tiny_ecs.hpp"
 
-
+#include <ctime>
 // stlib
 #include <cassert>
 #include <sstream>
@@ -17,41 +17,43 @@
 const int MAZE_WIDTH = MAZE_SIZE;
 const int MAZE_HEIGHT = MAZE_SIZE;
 
-//bool blockedNorth = false;
-//bool blockedSouth = false;
-//bool blockedEast = false;
-//bool blockedWest = false;
-
 Direction playerDirection;
 const uint NUM_POTIONS = 10;
 const float CHARACTER_SPEED = 300.0f;
 const float ANIMATION_SPEED = 1000.0 / 16.0;
 const int SPARKLE_SLOWDOWN_FPS = 1;
 int sparkle_slowdown = 0;
-float keeper_rate = 12.0;
+float keeper_rate = 8.0;
 float KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 float keeper_spawn_time = 0.0f;
 int num_of_item_on_screen = 0;
 uint animation_cycle = 0;
 float animation_elpased_ms = 0.0f;
 int level = 0;
+bool morning_warning = false;
 //const float TORCH_LENGTH = 25 * 1000.0;
 //float torch_timer_ms = TORCH_LENGTH;
 
 bool game_paused = false;
 bool is_in_debug = false;
+bool already_paused = false;
 
-bool go_up_key_released = true;
-bool go_down_key_released = true;
-bool go_right_key_released = true;
-bool go_left_key_released = true;
 bool moving_x = false;
 bool moving_y = false;
+bool orange_crafted = false;
+bool green_crafted = false;
+bool purple_crafted = false;
+
+bool go_up_key_pressed = false;
+bool go_down_key_pressed = false;
+bool go_right_key_pressed = false;
+bool go_left_key_pressed = false;
 
 // Create the bug world
 WorldSystem::WorldSystem() : points(0), chunk_border(false) {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
+	srand(time(0));
 }
 
 WorldSystem::~WorldSystem() {
@@ -70,6 +72,10 @@ WorldSystem::~WorldSystem() {
         Mix_FreeChunk(inventory_full_sound);
 	if (player_hit_sound != nullptr)
 		Mix_FreeChunk(player_hit_sound);
+	if (page_turn_sound != nullptr)
+		Mix_FreeChunk(page_turn_sound);
+	if (menu_close_sound != nullptr)
+		Mix_FreeChunk(menu_close_sound);
 	if (rooster_sound != nullptr)
 		Mix_FreeChunk(rooster_sound);
     if (torch_sound != nullptr)
@@ -153,22 +159,27 @@ GLFWwindow* WorldSystem::create_window() {
     mushroom_sound = Mix_LoadWAV(audio_path("mushroom.wav").c_str());
     player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
     inventory_full_sound = Mix_LoadWAV(audio_path("inventory_full.wav").c_str());
-	player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
-	rooster_sound = Mix_LoadWAV(audio_path("rooster.wav").c_str());
+	  player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
+  	rooster_sound = Mix_LoadWAV(audio_path("rooster.wav").c_str());
     torch_sound = Mix_LoadWAV(audio_path("torch.wav").c_str());
+	  page_turn_sound = Mix_LoadWAV(audio_path("page_turn.wav").c_str());
+	  menu_close_sound = Mix_LoadWAV(audio_path("menu_close.wav").c_str());
 
 	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
-        player_death_sound == nullptr || inventory_full_sound == nullptr || rooster_sound == nullptr || torch_sound == nullptr) {
-		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n %s\n %s %s \n make sure the data directory is present",
-			audio_path("forest_night.wav").c_str(),
-			audio_path("day.wav").c_str(),
-			audio_path("bird_noises.wav").c_str(),
-			audio_path("mushroom.wav").c_str(),
-			audio_path("player_death.wav").c_str(),
-			audio_path("inventory_full.wav").c_str(),
+        player_death_sound == nullptr || inventory_full_sound == nullptr || rooster_sound == nullptr || torch_sound == nullptr
+		|| page_turn_sound == nullptr || menu_close_sound == nullptr ) {
+		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n %s\n %s\n %s\n %s \n make sure the data directory is present",
+            audio_path("forest_night.wav").c_str(),
+            audio_path("day.wav").c_str(),
+            audio_path("bird_noises.wav").c_str(),
+            audio_path("mushroom.wav").c_str(),
+            audio_path("player_death.wav").c_str(),
+            audio_path("inventory_full.wav").c_str(),
 			audio_path("player_hit.wav").c_str(),
-			audio_path("rooster.wav").c_str(),
-            audio_path("torch.wav").c_str());
+      audio_path("rooster.wav").c_str(),
+      audio_path("torch.wav").c_str(),
+			audio_path("page_turn.wav").c_str(),
+			audio_path("menu_close.wav").c_str());
 
 		return nullptr;
 	}
@@ -255,7 +266,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (night_counter.counter_ms < 0) {
 			registry.nightTimer.clear();
 
-			screen.game_screen = game_screen_day;
+            if (level == 1) {
+                screen.game_screen = cut_scene_3;
+            } else {
+                screen.game_screen = game_screen_day;
+            }
 			screen.torch_mode = 0;
 
 			// save inventory when returning to day
@@ -335,7 +350,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 		// DO INTRO STUFF LIKE ANIMATION
 
-		if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2 ) { // || screen.game_screen == game_screen_day
+		if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1
+            || screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_3
+            || screen.game_screen == cut_scene_4 || screen.game_screen == cut_scene_win) { // || screen.game_screen == game_screen_day
 			if (registry.face_animation.entities.size() > 0) {
 				for (Entity& animated_entity : registry.face_animation.entities) {
 					AnimatedFaceOject& face = registry.face_animation.get(animated_entity);
@@ -374,7 +391,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		createKeeper(renderer, spawn_pos);
 	}
 	
-
+	if ( registry.rotators.size() > 0) {
+		//const float degrees = 360.0;
+		const float full_spin = M_PI * 2.0;
+		Rotator& rotation = registry.rotators.components[0];
+		rotation.angle += (elapsed_ms_since_last_update / NIGHT_DURATION) * full_spin;
+		if (!morning_warning && registry.nightTimer.size() > 0 && registry.nightTimer.components[0].counter_ms < 2000.0) {
+			morning_warning = true;
+			Entity morning = Entity();
+			registry.textRenderRequests.insert(morning, { "Good Morning!", vec2(0.32 * window_width_px, 0.64 * window_height_px) });
+		}
+	}
 
 
 	// Updating window title with points
@@ -413,6 +440,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	help_immobile.position = help_pos;
 	help_immobile.camera_position = help_pos;
 
+    ///  put crafting list back
+    Motion& crafting_motion = registry.motions.get(craftingList);
+    Immobile& crafting_immobile = registry.immobiles.get(craftingList);
+    vec2 crafting_pos = vec2(window_width_px*0.5, window_height_px*0.5);
+    crafting_motion.position = crafting_pos;
+    crafting_motion.camera_position = crafting_pos;
+    crafting_immobile.position = crafting_pos;
+    crafting_immobile.camera_position = crafting_pos;
+
 	if ( screen.game_screen == game_screen_win) {
 		Motion& mot = registry.motions.get(win_dance);
 		mot.position = { 550.0, 550.0 + 1.0*(animation_cycle % 2) };
@@ -425,23 +461,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 //    Entity p = registry.players.entities[0];
     Motion& p_motion = registry.motions.get(player);
 
-//   createHelp();
+    // Displaying health bar
+    auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
+    registry.colors.insert(healthBG, { 0, 0, 0 });
+
+    auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
+    registry.colors.insert(healthBar, { 1, 0, 0 });
+
     if (screen.game_screen == game_screen_night) {
-        // Displaying health bar
-        auto healthBG = createLine(vec2(250, 60), vec2(408, 48));
-        registry.colors.insert(healthBG, { 0, 0, 0 });
-
-        auto healthBar = createLine(vec2(50 + 2 * player_component.health, 60), vec2(4*player_component.health, 40));
-        registry.colors.insert(healthBar, { 1, 0, 0 });
-
         // inventory bar position on screen
         vec2 pos = {720, 60};
         createInventory(pos);
-
-//    createHelp();
-//    Entity help = registry.helpScreen.entities[0];
-//    vec2 help_pos = registry.motions.get(help).camera_position;
-//    help_pos = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
 
         for (int i = 0; i < 5; i++) {
             Inventory& player_inv = registry.inventory.get(player);
@@ -455,7 +485,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                 registry.motions.get(localItem).scale = { 50, 50 };
             }
         }
-
 		//createShadowOverlay(renderer);
 
 		if (num_of_item_on_screen < NUM_POTIONS) {
@@ -501,10 +530,57 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			num_of_item_on_screen++;
 		}
 
+		if (registry.torches.entities.size() > 0) {
+			Entity torch_entity = registry.torches.entities[0];
+			float torch_x_offset = -30.0;
+			float torch_y_offset = -5.0;
+			float torch_x_base = window_width_px * 0.5;
+			float torch_y_base = window_height_px * 0.5;
+			// animate torch
+			Motion& player_motion = registry.motions.get(player);
+			UIComp& torch_ui = registry.uicomps.get(torch_entity);
+			RenderRequest& player_rr = registry.renderRequests.get(player);
+			RenderRequest& torch_rr = registry.renderRequests.get(torch_entity);
+			torch_rr.used_texture = (TEXTURE_ASSET_ID)((int)TEXTURE_ASSET_ID::TORCH_00 + (animation_cycle % 3));
+
+			if (player_rr.used_texture == TEXTURE_ASSET_ID::PLAYER_CHAR2) {
+				//torch_y_offset = 0.0; //+= 5.0;
+				torch_x_offset -= 5.0;
+			} else if (player_rr.used_texture == TEXTURE_ASSET_ID::PLAYER_CHAR3) {
+				torch_y_offset -= 10.0;
+				torch_x_offset -= 5.0;
+			} else if (player_rr.used_texture == TEXTURE_ASSET_ID::PLAYER_CHAR4) {
+				torch_y_offset -= 10.0;
+				//torch_x_offset += 5.0;
+			} else if (player_rr.used_texture == TEXTURE_ASSET_ID::PLAYER_CHAR5) {
+				torch_y_offset -= 15.0;
+				torch_x_offset -= 5.0;
+			} else {
+				torch_y_offset -= 2.0;
+				torch_x_offset += 2.0;
+			}
+
+			if (player_motion.scale.x > 0) {
+				// standard direction
+				torch_ui.position.x = torch_x_base + torch_x_offset;
+				torch_ui.position.y = torch_y_base + torch_y_offset;
+				if (torch_ui.scale.x < 0) {
+					torch_ui.scale.x *= -1.0;
+				}
+			} else {
+				// other direction
+				torch_x_offset *= -1;
+				torch_ui.position.x = torch_x_base + torch_x_offset;
+				torch_ui.position.y = torch_y_base + torch_y_offset;
+				if (torch_ui.scale.x > 0) {
+					torch_ui.scale.x *= -1.0;
+				}
+				
+			}
+
+		}
 
     }
-
-
 
     if (screen.game_screen == game_screen_day) {
         vec2 pos = {820, 60};
@@ -524,6 +600,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
         }
 
         if (registry.inventory.get(player).is_open == true) {
+//			game_paused = true;
             createCraftingUI({0.5 * window_width_px, 0.5 * window_height_px});
             for (int i = 0; i < registry.inventory.get(player).inUI.size(); i++) {
                 Item item = registry.inventory.get(player).inUI[i];
@@ -563,12 +640,45 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			//	restart_game();
             //}
         }
+
+        if (orange_crafted && green_crafted && purple_crafted) {
+            Player& player_component = registry.players.components[0];
+            if (player_component.won == 0) {
+                // for dog
+                createSparkle(renderer, { 890, 590 });
+                createSparkle(renderer, { 950, 580 });
+                // for potions
+                createSparkle(renderer, {850, 660 });
+                createSparkle(renderer, {900, 660 });
+                createSparkle(renderer, {950, 660 });
+//                Entity save = Entity();
+//                registry.textRenderRequests.insert(save,{"Go to Sparky to save", {450, 50}});
+//                registry.textRenderRequests.get(save).scale = 0.5;
+                player_component.won = 1;
+            }
+            vec2 dog_pos = { 0.85 * window_width_px, 0.75 * window_height_px };
+            vec2 player_pos = registry.motions.get(player).position;
+            float dis = distance(player_pos, dog_pos);
+
+            if (dis < 250) {
+                for (Entity e : registry.sparkle_animation.entities) {
+                    registry.motions.get(e).scale = vec2({ 50*2.7, 50 * 2.7 });
+                }
+            }
+            if (dis > 250) {
+                for (Entity e : registry.sparkle_animation.entities) {
+                    registry.motions.get(e).scale = vec2({ 50*1.3, 50 * 1.3 });
+                }
+            }
+            if (dis < 50) {
+                screen.game_screen = cut_scene_win;
+                restart_game();
+            }
+
+        }
     }
 
-
-
-
-    float min_counter_ms = 3000.f;
+    float min_counter_ms = 1500.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		// progress timer
 		DeathTimer& counter = registry.deathTimers.get(entity);
@@ -604,10 +714,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 		if (counter.t_timer > 0) {
 			screen.torch_mode = 1;
-		}
-		else {
+		} else {
 			screen.torch_mode = 0;
-			registry.torches.remove(entity);
+			registry.remove_all_components_of(entity);
+			//registry.torches.remove(entity);
 		}
 
 
@@ -634,16 +744,17 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             player_component.hit = 0;
             registry.invincibles.remove(entity);
             registry.hitTimers.remove(entity);
+            while (registry.player_sparkle_animation.entities.size() > 0)
+                registry.remove_all_components_of(registry.player_sparkle_animation.entities.back());
             return true;
         }
     }
 
     // dialogue positons
-    vec2 player_line1 = vec2(0.18 * window_width_px, 0.7 * window_height_px);
-    vec2 player_line2 = vec2(0.18 * window_width_px, 0.66 * window_height_px);
-    vec2 player_line3 = vec2(0.18 * window_width_px, 0.62 * window_height_px);
-    vec2 player_line4 = vec2(0.18 * window_width_px, 0.58 * window_height_px);
-    vec2 dog_line1 = vec2(0.435 * window_width_px, 0.4 * window_height_px);
+    vec2 player_line1 = vec2(0.28 * window_width_px, 0.69 * window_height_px);
+    vec2 player_line2 = vec2(0.28 * window_width_px, 0.64 * window_height_px);
+    vec2 player_line3 = vec2(0.28 * window_width_px, 0.59 * window_height_px);
+    vec2 dog_line1 = vec2(0.52 * window_width_px, 0.4 * window_height_px);
 
     // moving dialogue in cutscenes 0-2
     if (screen.game_screen == cut_scene_0) {
@@ -657,12 +768,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
             if (counter.counter_ms < 0) {
                 if (counter.timestamp == 1) {
-                    registry.speechRenderRequests.insert(entity, {"Oh Sparky, did you eat a forest", player_line1});
+                    registry.speechRenderRequests.insert(entity, {"Oh no Sparky,", player_line1});
                 } if (counter.timestamp == 2) {
-                    registry.speechRenderRequests.insert(entity, {"Keeper again?", player_line2});
+                    registry.speechRenderRequests.insert(entity, {"you're sick!", player_line2});
                 } if (counter.timestamp == 3) {
-                    registry.speechRenderRequests.insert(entity, {"You must be feeling so sick... ", player_line3});
-                } if (counter.timestamp == 4) {
                     registry.speechRenderRequests.insert(entity, {"woof! woof!", dog_line1});
                 }
                 registry.speechTimers.remove(entity);
@@ -681,14 +790,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
             if (counter.counter_ms < 0) {
                 if (counter.timestamp == 1) {
-                    registry.speechRenderRequests.insert(entity,{"You're lucky i know the ", player_line1});
+                    registry.speechRenderRequests.insert(entity,{"I’ll search the forest", player_line1});
                 } if (counter.timestamp == 2) {
-                    registry.speechRenderRequests.insert(entity, {"magical properties of Shadowgrove ", player_line2});
+                    registry.speechRenderRequests.insert(entity, {"for ingredients for", player_line2});
                 } if (counter.timestamp == 3) {
-                    registry.speechRenderRequests.insert(entity, {"forest so well... i'll be able to", player_line3});
+                    registry.speechRenderRequests.insert(entity, {"some healing potions!", player_line3});
                 } if (counter.timestamp == 4) {
-                    registry.speechRenderRequests.insert(entity, {"craft a healing potion for you ", player_line4});
-                } if (counter.timestamp == 5) {
                     registry.speechRenderRequests.insert(entity, {"woof!", dog_line1});
                 }
                 registry.speechTimers.remove(entity);
@@ -708,22 +815,101 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
             if (counter.counter_ms < 0) {
                 if (counter.timestamp == 1) {
-                    registry.speechRenderRequests.insert(Entity(),{"i'll search every night until i", player_line1});
+                    registry.speechRenderRequests.insert(Entity(),{"An orange, green, and", player_line1});
                 } if (counter.timestamp == 2) {
-                    registry.speechRenderRequests.insert(Entity(), {"find the right ingredients to", player_line2});
+                    registry.speechRenderRequests.insert(Entity(), {"purple potion should", player_line2});
                 } if (counter.timestamp == 3) {
-                    registry.speechRenderRequests.insert(Entity(), {"make you an orange, green, and", player_line3});
+                    registry.speechRenderRequests.insert(Entity(), {"do the trick!", player_line3});
                 } if (counter.timestamp == 4) {
-                    registry.speechRenderRequests.insert(Entity(), {"purple potion", player_line4});
+                    registry.speechRenderRequests.insert(Entity(), {"woof woof!", dog_line1});
                 } if (counter.timestamp == 5) {
-                    registry.speechRenderRequests.insert(Entity(), {"woof woof woof!", dog_line1});
-                } if (counter.timestamp == 6) {
+                    vec2 purple_potion_pos = {675, 330};
+                    createConversationPotion(renderer, purple_potion_pos, 1);
+                }  if (counter.timestamp == 6) {
+                    vec2 green_potion_pos = {625, 330 };
+                    createConversationPotion(renderer, green_potion_pos, 0);
+                }  if (counter.timestamp == 7) {
+                    vec2 orange_potion_pos = {575, 330 };
+                    createConversationPotion(renderer, orange_potion_pos, 2);
+                }
+                registry.speechTimers.remove(entity);
+                return true;
+            }
+        }
+    }
+    if (screen.game_screen == cut_scene_3) {
+        float speech_counter_ms = 500.f;
+        for (Entity entity : registry.speechTimers.entities) {
+            SpeechTimer &counter = registry.speechTimers.get(entity);
+            counter.counter_ms -= elapsed_ms_since_last_update;
+
+            if (counter.counter_ms < speech_counter_ms) {
+                speech_counter_ms = counter.counter_ms;
+            }
+            if (counter.counter_ms < 0) {
+                if (counter.timestamp == 1) {
+                    registry.speechRenderRequests.insert(Entity(),{"The sun came up!", player_line1});
+                } if (counter.timestamp == 2) {
+                    registry.speechRenderRequests.insert(Entity(), {"Items are only visible", player_line2});
+                } if (counter.timestamp == 3) {
+                    registry.speechRenderRequests.insert(Entity(), {"in the moonlight!", player_line3});
+                } if (counter.timestamp == 4) {
+                    registry.speechRenderRequests.insert(Entity(), {"woof", dog_line1});
+                }
+                registry.speechTimers.remove(entity);
+                return true;
+            }
+        }
+    }
+    if (screen.game_screen == cut_scene_4) {
+        float speech_counter_ms = 500.f;
+        for (Entity entity : registry.speechTimers.entities) {
+            SpeechTimer &counter = registry.speechTimers.get(entity);
+            counter.counter_ms -= elapsed_ms_since_last_update;
+
+            if (counter.counter_ms < speech_counter_ms) {
+                speech_counter_ms = counter.counter_ms;
+            }
+            if (counter.counter_ms < 0) {
+                if (counter.timestamp == 1) {
+                    registry.speechRenderRequests.insert(Entity(),{"I don't have everything", player_line1});
+                } if (counter.timestamp == 2) {
+                    registry.speechRenderRequests.insert(Entity(), {"I need yet. I'll have", player_line2});
+                } if (counter.timestamp == 3) {
+                    registry.speechRenderRequests.insert(Entity(), {"to go back in", player_line3});
+                } if (counter.timestamp == 4) {
+                    registry.speechRenderRequests.insert(Entity(), {"woof woof", dog_line1});
+                }
+                registry.speechTimers.remove(entity);
+                return true;
+            }
+        }
+    }
+    if (screen.game_screen == cut_scene_win) {
+        float speech_counter_ms = 500.f;
+        for (Entity entity : registry.speechTimers.entities) {
+            SpeechTimer &counter = registry.speechTimers.get(entity);
+            counter.counter_ms -= elapsed_ms_since_last_update;
+
+            if (counter.counter_ms < speech_counter_ms) {
+                speech_counter_ms = counter.counter_ms;
+            }
+            if (counter.counter_ms < 0) {
+                if (counter.timestamp == 1) {
+                    registry.speechRenderRequests.insert(Entity(),{"I did it Sparky!! I ", player_line1});
+                } if (counter.timestamp == 2) {
+                    registry.speechRenderRequests.insert(Entity(), {"made you an orange, green,", player_line2});
+                } if (counter.timestamp == 3) {
+                    registry.speechRenderRequests.insert(Entity(), {"and purple potion!", player_line3});
+                } if (counter.timestamp == 4) {
+                    registry.speechRenderRequests.insert(Entity(), {"woof woof!", dog_line1});
+                } if (counter.timestamp == 5) {
                     vec2 purple_potion_pos = {625, 330};
                     createConversationPotion(renderer, purple_potion_pos, 1);
-                }  if (counter.timestamp == 7) {
+                }  if (counter.timestamp == 6) {
                     vec2 green_potion_pos = {575, 330 };
                     createConversationPotion(renderer, green_potion_pos, 0);
-                }  if (counter.timestamp == 8) {
+                }  if (counter.timestamp == 7) {
                     vec2 orange_potion_pos = {525, 330 };
                     createConversationPotion(renderer, orange_potion_pos, 2);
                 }
@@ -750,7 +936,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     // check if out of bounds
                     registry.remove_all_components_of(entity);
                 } else {
-                    registry.textRenderRequests.get(entity).position.y += 2;
+                    registry.textRenderRequests.get(entity).position.y += 1;
                 }
             }
             // speech
@@ -760,7 +946,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     // check if out of bounds
                     registry.remove_all_components_of(entity);
                 } else {
-                    registry.speechRenderRequests.get(entity).position.y += 2;
+                    registry.speechRenderRequests.get(entity).position.y += 1;
                 }
             }
         }
@@ -895,10 +1081,10 @@ void WorldSystem::checkCrafted() {
 // Reset the world state to its initial state
 void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
-	registry.list_all_components();
+	//registry.list_all_components();
 
 	printf("Restarting\n");
-
+	morning_warning = false;
     game_paused = false;
 	// Reset the game speed
 	current_speed = 1.f;
@@ -932,6 +1118,12 @@ void WorldSystem::restart_game() {
         registry.remove_all_components_of(registry.textTimers.entities.back());
 	while (registry.torches.entities.size() > 0)
 		registry.remove_all_components_of(registry.torches.entities.back());
+    for (Entity entity : registry.uicomps.entities)
+    {
+        if (!registry.permanents.has(entity)) {
+            registry.remove_all_components_of(entity);
+        }
+    }
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -943,7 +1135,9 @@ void WorldSystem::restart_game() {
 	//registry.clear_all_components();
 	generator->clearMap();
 	//printf("AFTER CLEARED REGISTRY");
-	registry.list_all_components();
+
+	//registry.list_all_components();
+
 	// Create a new player
 	float start_x = MAZE_SIZE * TILE_SIZE * 1.5;
 	float start_y = MAZE_SIZE * TILE_SIZE * 1.5;
@@ -959,11 +1153,12 @@ void WorldSystem::restart_game() {
 	registry.inventory.get(player) = i;
 
     //save_state.loadInventory();
-
-//    save_state.loadInventory();
+	//save_state.loadInventory();
 
 	//registry.inventory.get(player).holding = { nullval, red_lotus, magical_strawberry, magical_carrot, nullval, nullval };
     help = createHelp();
+    craftingList = createCraftingList();
+
 	//printf("MAP AND PLAYER CREATED\n");
 
 	// create a compass to calc player movement
@@ -980,7 +1175,7 @@ void WorldSystem::restart_game() {
     ScreenState &screen = registry.screenStates.components[0];
 
     if (screen.game_screen == game_screen_game_over) {
-//        printf("in game over screen\n");
+        createEnd();
 
         auto over = Entity();
         registry.textRenderRequests.insert(over,
@@ -1004,28 +1199,24 @@ void WorldSystem::restart_game() {
     else if (screen.game_screen == game_screen_day || screen.game_screen == game_screen_main_menu) {
         // Playing background music indefinitely
         Mix_PlayMusic(day_music, -1);
-        fprintf(stderr, "Loaded music\n");
-        printf("here\n");
-
+       // fprintf(stderr, "Loaded music\n");
+		createTutorial();
 
         Motion& player_motion = registry.motions.get(player);
         player_motion.position = { 0.6 * window_width_px, 0.75 * window_height_px };
         // put player alive again
         player_component.alive = 1;
         player_motion.scale = { 2 * 60, 2 * 80 };
-        printf("created player\n");
-
-        Entity day = createDay();
-        printf("day entity init %zu\n", day);
+       // printf("created player\n");
 
         if (screen.game_screen == game_screen_day) {
-            printf("in game day screen\n");
+            createDay();
             createDog({ 0.85 * window_width_px, 0.75 * window_height_px });
 
             createSign();
             createSign2();
         } else {
-            printf("in game start screen\n");
+            createIntroScreen();
             createDog({ 0.3 * window_width_px, 0.8 * window_height_px });
 
             createLogo();
@@ -1039,10 +1230,12 @@ void WorldSystem::restart_game() {
         }
 
     }
-    else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2 ) {
+    else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1
+            || screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_3
+            || screen.game_screen == cut_scene_4 || screen.game_screen == cut_scene_win ) {
         Entity day = createDay();
         registry.immobiles.get(day).scale = { 1.3 * window_width_px, 1.3 * window_height_px };
-        printf("day entity init %zu\n", day);
+        //printf("day entity init %zu\n", day);
 
         // TODO: move to game_screen_intro
         /// ADD ANIMATED FACE !!
@@ -1050,8 +1243,8 @@ void WorldSystem::restart_game() {
         createDogPortrait(renderer, vec2(900.0, 400.0));
 
         Entity player_bubble = createSpeechBubble(renderer, {525, 300}, 1);
-        Entity dog_bubble = createSpeechBubble(renderer, {685, 470}, 1);
-        registry.uicomps.get(dog_bubble).scale = {-250, -70};
+        Entity dog_bubble = createSpeechBubble(renderer, {680, 470}, 1);
+        registry.uicomps.get(dog_bubble).scale = {-260, -70};
 
         SpeechTimer& line1 = registry.speechTimers.emplace(Entity());
         line1.timestamp = 1;
@@ -1068,35 +1261,30 @@ void WorldSystem::restart_game() {
         line4.timestamp = 4;
         line4.counter_ms = 2200;
 
-        SpeechTimer& line5 = registry.speechTimers.emplace(Entity());
-        line5.timestamp = 5;
-        line5.counter_ms = 3000;
-
         auto spaceKey = Entity();
         vec2 spaceKey_line = vec2(0.3 * window_width_px, 0.2 * window_height_px);
 
-        registry.textRenderRequests.insert(spaceKey,{"Press space key to continue", spaceKey_line});
+        registry.textRenderRequests.insert(spaceKey,{"Press space key to continue!!", spaceKey_line});
         registry.textRenderRequests.get(spaceKey).scale = 0.5;
 
-        if (screen.game_screen == cut_scene_2 ) {
+        if (screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_win) {
             SpeechTimer& orange = registry.speechTimers.emplace(Entity());
-            orange.timestamp = 6;
-            orange.counter_ms = 3050;
+            orange.timestamp = 5;
+            orange.counter_ms = 2300;
             SpeechTimer& green = registry.speechTimers.emplace(Entity());
-            green.timestamp = 7;
-            green.counter_ms = 3050;
+            green.timestamp = 6;
+            green.counter_ms = 2300;
             SpeechTimer& purple = registry.speechTimers.emplace(Entity());
-            purple.timestamp = 8;
-            purple.counter_ms = 3050;
+            purple.timestamp = 7;
+            purple.counter_ms = 2300;
         }
     }
     else if (screen.game_screen == game_screen_win) {
         //  change music to victory music
         Mix_PlayMusic(day_music, -1);
-        fprintf(stderr, "Loaded music\n");
+        //fprintf(stderr, "Loaded music\n");
 
-        Entity day = createDay();
-        printf("day entity init %zu\n", day);
+        createEnd();
 
 		win_dance = createWinDance(renderer, { 0.5 * window_width_px, 0.75 * window_height_px });
 
@@ -1135,28 +1323,18 @@ void WorldSystem::restart_game() {
         registry.speechRenderRequests.insert(credit7, {"thanks for playing!", vec2(305, -500)});
     }
     else if (screen.game_screen == game_screen_night) {
-        printf("in game night screen\n");
+        //printf("in game night screen\n");
         // Playing background music indefinitely
         createNight();
 
         Mix_PlayMusic(night_music, -1);
-        fprintf(stderr, "Loaded music\n");
+        //fprintf(stderr, "Loaded music\n");
         generator->makeNoise(level);
         generator->createWorldMap();
         Motion& p_motion = registry.motions.get(player);
         p_motion.position = registry.get_empty_spawn_keeper_location();
-        if (level < 9) {
-            level++;
-            keeper_rate-= 0.8;
-            KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
-        }
-        for (int k = 0; k < level +2; k++) {
-            vec2 spawn_point = registry.get_empty_spawn_keeper_location();
-            createKeeper(renderer, spawn_point);
-        }
-        for (int num_keepers = 0; num_keepers < level; num_keepers++) {
-            createKeeper(renderer, registry.get_empty_spawn_location());
-        }
+
+
 
         // Create empty "path" maze
         std::vector<std::vector<Tile>> maze(MAZE_HEIGHT*3, std::vector<Tile>(MAZE_WIDTH*3, Tile(0)));
@@ -1192,27 +1370,38 @@ void WorldSystem::restart_game() {
         // wait();
         // Debugging for memory/component leaks
         //torchEntity = createShadowOverlay(renderer);
-
+		if (level < 9) {
+			level++;
+			keeper_rate -= 0.8;
+			KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
+		}
+		for (int k = 0; k < level + 2; k++) {
+			vec2 spawn_point = registry.get_empty_spawn_keeper_location();
+			printf("KeeperSpawn at %f, %f\n", spawn_point.x, spawn_point.y);
+			createKeeper(renderer, spawn_point);
+		}
+		for (int num_keepers = 0; num_keepers < level; num_keepers++) {
+			createKeeper(renderer, registry.get_empty_spawn_location());
+		}
+		for (Entity& e : registry.enemies.entities) {
+			Motion& spawn_point = registry.motions.get(e);
+			printf("Keeperat %f, %f\n", spawn_point.position.x, spawn_point.position.y);
+		}
     }
 
-	if (screen.game_screen == game_screen_night)
-	{
+	if (screen.game_screen == game_screen_night) 	{
 		vec2 player_spawn = registry.get_empty_spawn_keeper_location();
-
 		registry.motions.get(player).position = player_spawn;
+		Entity spinner = createSunMoonSpinner(renderer, vec2(window_width_px*0.5, window_height_px));
 	}
 
-
-
 	registry.list_all_components();
-
 
 }
 
 void WorldSystem::pause_game() {
 
 	game_paused = true;
-	//printf("Game paused \n");
 
 	auto entity = Entity();
     registry.pauses.emplace(entity);
@@ -1253,38 +1442,6 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 		// For now, we are only interested in collisions that involve the chicken
 		if (!game_paused && registry.players.has(entity)) {
 			Player& p = registry.players.get(entity);
-		
-			// Checking Player - Wall collisions <- this is handled by physics system now
-			//if (registry.impenetrables.has(entity_other)) {
-				//printf("colliding with a wall\n");
-				//Motion& motion_p = registry.motions.get(entity);
-				//Immobile& motion_w = registry.immobiles.get(entity_other);
-				// Can adjust this
-				//float offset = 10.0f;
-                // Mix_PlayChannel(-1, tree_collision_sound, 0);
-			
-				//if (playerDirection == UP) {
-				//	//printf("Collided with North wall");
-				//	blockedNorth = true;
-				//	// Offset player position to stop from going through
-				//	motion.position = motion.position - vec2(0, -offset);
-				//}
-				//if (playerDirection == DOWN) {
-				//	//printf("Collided with South wall");
-				//	blockedSouth = true;
-				//	motion.position = motion.position - vec2(0, offset);
-				//}
-				//if (playerDirection == LEFT) {
-				//	//printf("Collided with West wall");
-				//	blockedWest = true;
-				//	motion.position = motion.position - vec2(-offset, 0);
-				//}
-				//if (playerDirection == RIGHT) {
-				//	//printf("Collided with East wall");
-				//	blockedEast = true;
-				//	motion.position = motion.position - vec2(offset, 0);
-				//}
-			//}
 
 			// Checking Player - Enemy collisions
 			if (registry.enemies.has(entity_other)) {
@@ -1292,9 +1449,9 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 				// initiate death unless already dying
 				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && player_component.alive == 1) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
-
-					if ((p.health - e.attack) > 0) {
-						p.health = p.health - e.attack;
+					p.health = p.health - e.attack;
+					if (p.health > 0) {
+						//p.health = p.health - e.attack;
                         p.hit = 1;
                         // make player temporarily invincible
                         if (!registry.invincibles.has(entity))
@@ -1305,6 +1462,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
                         if (!registry.hitTimers.has(entity))
                         {
                             registry.hitTimers.emplace(entity);
+                            createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
                         }
 
 						// Move enemy slightly back after collision (so that player doesn't die instantly)
@@ -1362,16 +1520,11 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
-	// Reset collision flags
-	/*blockedNorth = false;
-	blockedSouth = false;
-	blockedWest = false;
-	blockedEast = false;*/
 
     // handle boundaries during daytime
     ScreenState& screen = registry.screenStates.components[0];
     if (screen.game_screen == game_screen_day) {
-		resume_game();
+		//resume_game();  // ?? what was this for?
         Motion& player_motion = registry.motions.get(player);
         float x_pos = player_motion.position.x;
         float y_pos = player_motion.position.y;
@@ -1440,27 +1593,13 @@ bool WorldSystem::is_over() const {
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	// key is of 'type' GLFW_KEY_
 	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
-
-	if (action == GLFW_RELEASE && key == GLFW_KEY_F1)
-	{
-		save_state.saveInventory();
-	}
-
-	if (action == GLFW_RELEASE && key == GLFW_KEY_F2)
-	{
-		save_state.loadInventory(renderer);
-	}
-
-	if (action == GLFW_RELEASE && key == GLFW_KEY_F3)
-	{
-		save_state.clearSave();
-	}
-
+    HelpScreen& help_screen = registry.helpScreen.components[0];
+    HelpScreen& craft_screen = registry.helpScreen.components[1];
+    ScreenState& screen = registry.screenStates.components[0];
 
 	if (action == GLFW_RELEASE && key == GLFW_KEY_L && is_in_debug) {
 		chunk_border = !chunk_border;
 	}
-
 
 	// remove items from slot on num key press
 	if (action == GLFW_RELEASE && key == GLFW_KEY_1) {
@@ -1493,8 +1632,25 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
 		if (registry.inventory.components[0].is_open) {
 			registry.inventory.components[0].is_open = false;
-		}
-		else {
+			game_paused = false;
+		} else if (help_screen.help == 1) {
+            help_screen.help = 0;
+            // craft screen == 2 means its on standby for when help closes, so dont unpause
+            if (craft_screen.help == 2) {
+                craft_screen.help = 1;
+            } else if (!already_paused) {
+                game_paused = false;
+            }
+        } else if (craft_screen.craftingList == 1) {
+            craft_screen.craftingList = 0;
+            // help screen == 2 means its on standby for when crafting closes, so dont unpause
+            if (help_screen.help == 2) {
+                help_screen.help = 1;
+            } else if (!already_paused) {
+                game_paused = false;
+            }
+        }
+		else if(!registry.tutorialSequence.components[0].visible) {
 			std::cout << "EXIT GAME" << std::endl;
 			if (registry.screenStates.components[0].game_screen == game_screen_day) {
 				//save_state.saveInventory();
@@ -1513,19 +1669,19 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// Pausing game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_P) {
-
 		if (!game_paused) {
+            already_paused = true;
 			pause_game();
 		}
 		else {
+            already_paused = false;
 			resume_game();
 		}
 	}
 
-	ScreenState& screen = registry.screenStates.components[0];
     // Changing game scene to day
     if (action == GLFW_RELEASE && key == GLFW_KEY_N && is_in_debug) {
-        printf("N key pressed, switching screen");
+        // printf("N key pressed, switching screen");
 		for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
 			registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
 		}
@@ -1588,7 +1744,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				// do blue potion stuff
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			} else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
-				registry.torches.emplace(Entity());
+				Entity torch_entity = Entity();
+				registry.torches.emplace(torch_entity);
+				UIComp& torch_ui = registry.uicomps.emplace(torch_entity);
+				torch_ui.position = vec2(window_width_px*0.5,window_height_px*0.5);
+				torch_ui.scale = vec2(PLAYER_WIDTH * 0.5, PLAYER_WIDTH * 0.5);
+				RenderRequest& torch_rr = registry.renderRequests.insert(torch_entity, { TEXTURE_ASSET_ID::TORCH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+				
                 Mix_PlayChannel(-1, torch_sound, 0);
 				registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
 			}
@@ -1619,16 +1781,19 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 orange_potion_pos = {850, 660 };
                 Entity orange = createConversationPotion(renderer, orange_potion_pos, 2);
+                orange_crafted = true;
 			} else if (craft.x == 5) {
 //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 green_potion_pos = {900, 660 };
                 Entity green = createConversationPotion(renderer, green_potion_pos, 0);
+                green_crafted = true;
 			} else if (craft.x == 6) {
 //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
 				registry.inventory.get(registry.players.entities[0]).crafted = {};
                 vec2 purple_potion_pos = {950, 660};
                 Entity purple = createConversationPotion(renderer, purple_potion_pos, 1);
+                purple_crafted = true;
 			}
 		}
 		registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(registry.players.entities[0]).is_open;
@@ -1642,21 +1807,54 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // Opening help screen
     if (action == GLFW_RELEASE && key == GLFW_KEY_H) {
 		if (registry.helpScreen.components.size() >0) {
-			HelpScreen& help_screen = registry.helpScreen.components[0];
-			if (help_screen.help == 1) {
-				// printf("H key pressed, closing help screen\n");
-				help_screen.help = 0;
-				game_paused = false;
-			} else {
-				//printf("H key pressed, opening help screen\n");
-				help_screen.help = 1;
-				game_paused = true;
-				for (Motion& motion : registry.motions.components) {
-					motion.velocity = { 0, 0 };
-				}
-			}
-		}
 
+			if (help_screen.help == 1) {
+				help_screen.help = 0;
+
+                // craft screen == 2 means its on standby for when help closes, so dont unpause
+                if (craft_screen.help == 2) {
+                    craft_screen.help = 1;
+                } else if (!already_paused) {
+                    game_paused = false;
+                }
+            }
+            else if (!already_paused) {
+                help_screen.help = 1;
+                game_paused = true;
+                for (Motion& motion : registry.motions.components) {
+                    motion.velocity = { 0, 0 };
+                }
+
+                if (craft_screen.help == 1) {
+                    craft_screen.help = 2;
+                }
+            }
+		}
+    }
+
+    // Opening crafting screen at night
+    if (action == GLFW_RELEASE && key == GLFW_KEY_U && screen.game_screen == game_screen_night) {
+        if (registry.helpScreen.components.size() > 1) {
+            if (craft_screen.craftingList == 1) {
+                craft_screen.craftingList = 0;
+
+                // help screen == 2 means its on standby for when crafting closes, so dont unpause
+                if (help_screen.help == 2) {
+                    help_screen.help = 1;
+                } else if (!already_paused) {
+                    game_paused = false;
+                }
+            } else if (!already_paused) {
+                craft_screen.craftingList = 1;
+                game_paused = true;
+                for (Motion& motion : registry.motions.components) {
+                    motion.velocity = { 0, 0 };
+                }
+                if (help_screen.help == 1) {
+                    help_screen.help = 2;
+                }
+            }
+        }
     }
 
 	// Torch Chnage this to %3 if adding new type of torch or need alternate night shader functionality
@@ -1683,112 +1881,94 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (!game_paused && !registry.deathTimers.has(player)) {
 		auto& motion = registry.motions.get(player);
 
-		if (key == GLFW_KEY_UP || key == GLFW_KEY_W) go_up_key_released = action == GLFW_RELEASE;
-		if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) go_down_key_released = action == GLFW_RELEASE;
-		if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) go_right_key_released = action == GLFW_RELEASE;
-		if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) go_left_key_released = action == GLFW_RELEASE;
-
         ScreenState& screen = registry.screenStates.components[0];
-        if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day) {
-            // Character movement
-            // Move Up
+		if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day) {
+			
+			// Character movement
 			if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
-				if (action == GLFW_RELEASE|| !go_down_key_released) // if both up and down are pressed
+				if (action == GLFW_PRESS) {
+					go_up_key_pressed = true;
+				}
+				else if (action == GLFW_RELEASE) {
+					go_up_key_pressed = false;
+				}
+			}
 
-				{
-					//printf("not up\n");
-					//registry.players.get(player).moving = false;
-					moving_y = false;
-					motion.velocity.y = 0.f;
+			if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
+				if (action == GLFW_PRESS) {
+					go_down_key_pressed = true;
 				}
-				else
-				{
-					//printf("up\n");
-					playerDirection = UP;
-					moving_y = true;
-					motion.velocity.y -= CHARACTER_SPEED;
-					//registry.players.get(player).moving = true;
+				else if (action == GLFW_RELEASE) {
+					go_down_key_pressed = false;
 				}
-            }
+			}
 
-            // Move Down
-            if (key == GLFW_KEY_DOWN || key == GLFW_KEY_S) {
-				if (action == GLFW_RELEASE || !go_up_key_released) // if both up and down are pressed
-				{
-					//printf("not down\n");
-					//registry.players.get(player).moving = false;
-					moving_y = false;
-					motion.velocity.y = 0.f;
+			if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+				if (action == GLFW_PRESS) {
+					go_right_key_pressed = true;
 				}
-				else
-				{
-					//printf("down\n");
-					playerDirection = DOWN;
-					moving_y = true;
-					//registry.players.get(player).moving = true;
-					motion.velocity.y += CHARACTER_SPEED;
+				else if (action == GLFW_RELEASE) {
+					go_right_key_pressed = false;
 				}
+			}
 
-            }
-
-            // Move Right
-            if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
-				if (action == GLFW_RELEASE || !go_left_key_released) // if both right and left are pressed
-				{
-					//registry.players.get(player).moving = false;
-					moving_x = false;
-					motion.velocity.x = 0.f;
+			if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
+				if (action == GLFW_PRESS) {
+					go_left_key_pressed = true;
 				}
-				else
-				{
-					//registry.players.get(player).moving = true;
-					moving_x = true;
-					playerDirection = RIGHT;
-					motion.velocity.x += CHARACTER_SPEED;
+				else if (action == GLFW_RELEASE) {
+					go_left_key_pressed = false;
 				}
+			}
 
-                if (screen.game_screen == game_screen_day) {
-                    motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                } else {
-                    motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
-                }
-            }
 
-            // Move Left
-            if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
-				if (action == GLFW_RELEASE || !go_right_key_released) // if both right and left are pressed
-				{
-					//registry.players.get(player).moving = false;
-					moving_x = false;
-					motion.velocity.x = 0.f;
+			if (go_up_key_pressed && !go_down_key_pressed) {
+				playerDirection = UP;
+				moving_y = true;
+				motion.velocity.y -= CHARACTER_SPEED;
+			}
+			else if (!go_up_key_pressed && go_down_key_pressed) {
+				playerDirection = DOWN;
+				moving_y = true;
+				motion.velocity.y += CHARACTER_SPEED;
+			}
+			else {
+				moving_y = false;
+				motion.velocity.y = 0.f;
+			}
+
+
+			if (go_right_key_pressed && !go_left_key_pressed) {
+				playerDirection = RIGHT;
+				moving_x = true;
+				motion.velocity.x += CHARACTER_SPEED;
+				if (screen.game_screen == game_screen_day) {
+					motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
+				} else {
+					motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
 				}
-				else
-				{
-					//registry.players.get(player).moving = true
-					moving_x = true;
-					playerDirection = LEFT;
-					motion.velocity.x -= CHARACTER_SPEED;
+			}
+			else if (!go_right_key_pressed && go_left_key_pressed) {
+				playerDirection = LEFT;
+				moving_x = true;
+				motion.velocity.x -= CHARACTER_SPEED;
+				if (screen.game_screen == game_screen_day) {
+					motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
 				}
-
-                if (screen.game_screen == game_screen_day) 
-				{
-                    motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-                } else 
-				{
-                    motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
-                }
-            }
+				else {
+					motion.scale = vec2(PLAYER_WIDTH, PLAYER_HEIGHT);
+				}
+			}
+			else {
+				moving_x = false;
+				motion.velocity.x = 0.f;
+			}
+	
 			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
 			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
-        }
+		}
 
-		//// Stop moving when key is released
-		//if (go_right_key_released && go_left_key_released && go_up_key_released && go_down_key_released) {
-		//	registry.players.get(player).moving = false;
-		//	RenderRequest& r = registry.renderRequests.get(player);
-		//	r.used_texture = TEXTURE_ASSET_ID::PLAYER_CHAR1;
-		//}
-
+		// For animation
 		if (moving_x || moving_y) {
 			registry.players.get(player).moving = true;
 		}
@@ -1799,68 +1979,159 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 	}
 
+	// Opening tutorial
+	if (registry.tutorialSequence.entities.size() > 0) {
+		TutorialSequence& tutorial = registry.tutorialSequence.components[0];
+
+		if (action == GLFW_RELEASE && key == GLFW_KEY_T && registry.screenStates.components[0].game_screen == game_screen_day) {
+			if (!tutorial.visible) {
+				printf("T key pressed, opening tutorial screen\n");
+				tutorial.visible = true;
+				game_paused = true;
+				Mix_PlayChannel(-1, page_turn_sound, 0);
+			}
+			else {
+				printf("T key pressed, closing tutorial screen\n");
+				tutorial.visible = false;
+				game_paused = false;
+				Mix_PlayChannel(-1, menu_close_sound, 0);
+			}
+		}
+		if (tutorial.visible && registry.screenStates.components[0].game_screen == game_screen_day) {
+			RenderRequest& tut_rr = registry.renderRequests.get(registry.tutorialSequence.entities[0]);
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_RIGHT) {
+				if (tutorial.current_page < tutorial.size - 1) {
+					tutorial.current_page++;
+					tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+					Mix_PlayChannel(-1, page_turn_sound, 0);
+				}
+			}
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_LEFT) {
+				if (tutorial.current_page > 0) {
+					tutorial.current_page--;
+					tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+					Mix_PlayChannel(-1, page_turn_sound, 0);
+				}
+			}
+
+			if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+				tutorial.current_page = 0;
+				tut_rr.used_texture = tutorial.pages[tutorial.current_page];
+				tutorial.visible = false;
+				game_paused = false;
+				Mix_PlayChannel(-1, menu_close_sound, 0);
+			}
+		}
+	}
+
     // space to start game + cut scenes
     if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+        if (screen.game_screen == cut_scene_4) {
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = game_screen_day;
+                while (registry.uicomps.entities.size() > 0)
+                    registry.remove_all_components_of(registry.uicomps.entities.back());
+                restart_game();
+            }
+
+        }
+        if (screen.game_screen == cut_scene_3) {
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_4;
+                while (registry.uicomps.entities.size() > 0)
+                    registry.remove_all_components_of(registry.uicomps.entities.back());
+                restart_game();
+            }
+
+        }
         if (screen.game_screen == cut_scene_2) {
-            printf("hi 2 \n");
-            screen.game_screen = game_screen_day;
-            while (registry.uicomps.entities.size() > 0)
-                registry.remove_all_components_of(registry.uicomps.entities.back());
-            restart_game();
-			
-			// load in player state after opening cutscene is finished
-			save_state.loadInventory(renderer);
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = game_screen_day;
+                while (registry.uicomps.entities.size() > 0)
+                    registry.remove_all_components_of(registry.uicomps.entities.back());
+                restart_game();
+                registry.tutorialSequence.components[0].visible = true;
+                game_paused = true;
+                Mix_PlayChannel(-1, page_turn_sound, 0);
+				save_state.loadInventory(renderer);
+            }
+
         }
         if (screen.game_screen == cut_scene_1) {
-            printf("hi 1 \n");
-
-            screen.game_screen = cut_scene_2;
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_2;
+                restart_game();
+            }
         }
         if (screen.game_screen == cut_scene_0) {
-            printf("hi 0 \n");
-
-            screen.game_screen = cut_scene_1;
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_1;
+                restart_game();
+            }
         }
         if (screen.game_screen == game_screen_main_menu) {
-            screen.game_screen = cut_scene_0;
-            printf("hi \n");
-
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_0;
+                restart_game();
+            }
         }
-    }
-
-//    // space to start game
-//    if (screen.game_screen == game_screen_main_menu) {
-//        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-//            screen.game_screen = cut_scene_0;
-//            restart_game();
-//        }
-//    }
-
-    // space to restart
-    if (screen.game_screen == game_screen_game_over) {
-        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-            printf("in game over screen on key \n");
+        if (screen.game_screen == game_screen_game_over) {
             screen.game_screen = game_screen_main_menu;
             screen.torch_mode = 0;
             screen.night_counter_ms = 0;
             NightTimer& night_counter = registry.nightTimer.components[0];
             night_counter.counter_ms = 0;
             registry.nightTimer.clear();
+            while (registry.renderRequests.entities.size() > 0)
+                registry.remove_all_components_of(registry.renderRequests.entities.back());
             restart_game();
         }
-    }
-
-    // space to restart
-    if (screen.game_screen == game_screen_win) {
-        if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
-            printf("in game win screen on key \n");
+        if (screen.game_screen == game_screen_win) {
             screen.game_screen = game_screen_main_menu;
 //            screen.torch_mode = 0;
             screen.night_counter_ms = 0;
             registry.nightTimer.clear();
+            while (registry.renderRequests.entities.size() > 0)
+                registry.remove_all_components_of(registry.renderRequests.entities.back());
+            restart_game();
+
+        }
+        if (screen.game_screen == cut_scene_win && orange_crafted && green_crafted && purple_crafted) {
+            screen.game_screen = game_screen_win;
+            orange_crafted = false;
+            green_crafted = false;
+            purple_crafted = false;
+            Player& player_component = registry.players.components[0];
+            player_component.won = 0;
+            while (registry.permanents.entities.size() > 0)
+                registry.remove_all_components_of(registry.permanents.entities.back());
+
             restart_game();
         }
     }
@@ -1868,12 +2139,19 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     // v to victory screen
    if (action == GLFW_RELEASE && key == GLFW_KEY_V && is_in_debug) {
        if (screen.game_screen != game_screen_night) {
-           screen.game_screen = game_screen_win;
+           screen.game_screen = cut_scene_win;
+           orange_crafted = false;
+           green_crafted = false;
+           purple_crafted = false;
+           Player& player_component = registry.players.components[0];
+           player_component.won = 0;
+           while (registry.permanents.entities.size() > 0)
+               registry.remove_all_components_of(registry.permanents.entities.back());
            restart_game();
        }
-    }
+   }
 
-	// Control the current speed with `<` `>`
+    // Control the current speed with `<` `>`
 	//if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
 	//	current_speed -= 0.1f;
 		//printf("Current speed = %f\n", current_speed);

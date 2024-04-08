@@ -26,7 +26,7 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos);
 Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type);
 Entity createSparkle(RenderSystem* renderer, vec2 pos);
 Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos);
-
+Entity createSunMoonSpinner(RenderSystem* renderer, vec2 pos);
 //Entity createMapChunk(vec2 position);
 Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 });
 Entity createInventoryPotion(Item& item, vec2 position);
@@ -35,10 +35,14 @@ Entity createCraftingUI(vec2 position);
 Entity createShadowOverlay(RenderSystem* renderer);
 Entity createLine(vec2 position, vec2 size);
 Entity createDay();
+Entity createIntroScreen();
+Entity createEnd();
 Entity createSign();
 Entity createSign2();
 Entity createNight();
 Entity createHelp();
+Entity createCraftingList();
+Entity createTutorial();
 Entity createDog(vec2 position);
 Entity createLogo();
 

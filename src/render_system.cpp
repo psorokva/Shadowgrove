@@ -314,6 +314,10 @@ void RenderSystem::drawToScreen() {
 		GLuint help = glGetUniformLocation(night_program, "help");
 		HelpScreen& help_screen = registry.helpScreen.components[0];
 		glUniform1i(help, help_screen.help);
+
+        GLuint crafting = glGetUniformLocation(night_program, "crafting");
+        HelpScreen& crafting_screen = registry.helpScreen.components[1];
+        glUniform1i(crafting, crafting_screen.craftingList);
 	}
 	GLuint torch_timer = glGetUniformLocation(night_program, "torch_timer");
 	glUniform1f(torch_timer, screen.torch_timer_ms);
@@ -446,7 +450,7 @@ void RenderSystem::draw() {
             for (Entity entity: registry.renderRequests.entities) {
                 if (registry.motions.has(entity)) {
                     if (!registry.debugComponents.has(entity)) {
-                        if (!registry.helpScreen.has(entity)) {
+                        if (!registry.helpScreen.has(entity) && !registry.tutorialSequence.has(entity)) {
                             drawTexturedMesh(entity, projection_2D);
                         }
                     }
@@ -472,21 +476,25 @@ void RenderSystem::draw() {
 
 		for (Entity entity : registry.renderRequests.entities) {
 			if (registry.uicomps.has(entity)) {
-				drawTexturedUIMesh(entity, projection_2D);
+                if (!registry.permanents.has(entity)) {
+                    drawTexturedUIMesh(entity, projection_2D);
+                }
 			}
 		}
 
-		// render help screen
-		if (registry.helpScreen.size() > 0) {
-			HelpScreen& help = registry.helpScreen.components[0];
-			if (help.help == 1) {
-				//printf("got here");
-				for (Entity entity : registry.renderRequests.entities) {
-					if (registry.helpScreen.has(entity)) {
-						drawTexturedMesh(entity, projection_2D);
-					}
-				}
-			}
+		// render help + crafting screens
+		if (registry.helpScreen.size() > 1) {
+            Entity craft = registry.helpScreen.entities[1];
+            HelpScreen& craft_screen = registry.helpScreen.get(craft);
+            if (craft_screen.craftingList == 1) {
+                drawTexturedMesh(craft, projection_2D);
+            }
+
+            Entity help = registry.helpScreen.entities[0];
+            HelpScreen& help_screen = registry.helpScreen.get(help);
+            if (help_screen.help == 1) {
+                drawTexturedMesh(help, projection_2D);
+            }
 		}
 
     }
@@ -501,6 +509,19 @@ void RenderSystem::draw() {
         // render danger sign 3rd
         Entity sign2 = registry.daytimes.entities[3];
         drawTexturedStaticMesh(sign2, projection_2D);
+
+        // render dog potions
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.uicomps.has(entity)) {
+                drawTexturedUIMesh(entity, projection_2D);
+            }
+        }
+        // dog potion sparkles
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.sparkle_animation.has(entity)) {
+                drawTexturedMesh(entity, projection_2D);
+            }
+        }
 
         // render player 2nd last
         drawTexturedMesh(player, projection_2D);
@@ -527,16 +548,7 @@ void RenderSystem::draw() {
                 }
             }
         }
-
-        // render dog potions
-        for (Entity entity: registry.renderRequests.entities) {
-            if (registry.uicomps.has(entity)) {
-//                if (registry.daytimes.has(entity)) {
-                    drawTexturedUIMesh(entity, projection_2D);
-//                }
-            }
-        }
-
+        // render help screen
 		if (registry.helpScreen.size() > 0) {
 			HelpScreen& help = registry.helpScreen.components[0];
 			if (help.help == 1) {
@@ -544,16 +556,27 @@ void RenderSystem::draw() {
 				drawTexturedStaticMesh(helpScreen, projection_2D);
 			}
 		}
+
+		if (registry.tutorialSequence.size() > 0) {
+			TutorialSequence& tutorial = registry.tutorialSequence.components[0];
+			if (tutorial.visible) {
+				Entity tutorialWindow = registry.tutorialSequence.entities[0];
+					drawTexturedMesh(tutorialWindow, projection_2D);
+			}
+		}
        
     }
     else if (screen.game_screen == game_screen_game_over) {
+        Entity background = registry.daytimes.entities[0];
+        drawTexturedStaticMesh(background, projection_2D);
+
         for (Entity entity: registry.renderRequests.entities) {
             if (registry.enemies.has(entity)) {
                 Motion& keeper_motion = registry.motions.get(entity);
                 keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
                 keeper_motion.scale = {200, 400};
                 keeper_motion.velocity = {0,0};
-                 drawTexturedMesh(entity, projection_2D);
+                drawTexturedMesh(entity, projection_2D);
             }
         }
     }
@@ -576,7 +599,9 @@ void RenderSystem::draw() {
 
 //		drawTexturedMesh(&win_dance, projection_2D);
     }
-    else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1 || screen.game_screen == cut_scene_2) {
+    else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1
+            || screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_3
+            || screen.game_screen == cut_scene_4 || screen.game_screen == cut_scene_win) {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
 
@@ -586,22 +611,16 @@ void RenderSystem::draw() {
         }
         if (registry.uicomps.entities.size() >0 ) {
             for (Entity entity : registry.uicomps.entities) {
-                // UIComp& ui_comp = registry.uicomps.get(entity);
-                drawTexturedUIMesh(entity, projection_2D);
+//                if (!registry.permanents.has(entity)) {
+                    // UIComp& ui_comp = registry.uicomps.get(entity);
+                    drawTexturedUIMesh(entity, projection_2D);
+//                }
             }
         }
-
-//        glm::mat4 trans = glm::mat4(1.0f);
-        float timeBetweenLines = 10000.0f;
-        float elapsedTime = 0.0f;
 
         for (Entity entity : registry.speechRenderRequests.entities)
         {
             SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
-            if (elapsedTime <= timeBetweenLines) {
-                elapsedTime += 0.001;
-            }
-            elapsedTime = 0.0f;
             renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
 
         }
@@ -680,6 +699,11 @@ void RenderSystem::drawTexturedUIMesh(Entity entity, const mat3& projection) {
 	Transform transform;
 	transform.translate(ui_comp.position);
 	transform.scale(ui_comp.scale);
+	if (registry.rotators.has(entity)) {
+		Rotator& rotator = registry.rotators.get(entity);
+		transform.rotate(rotator.angle);
+	}
+
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);

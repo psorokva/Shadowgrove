@@ -12,6 +12,7 @@ struct Chunk {
 	float offset_y = 0;
 	float campos_x = 0;
 	float campos_y = 0;
+	bool keeper_spawned_here = false;
 	int grid[MAZE_SIZE][MAZE_SIZE] = {
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -78,6 +79,7 @@ struct Player {
     int alive = 1;
     int hit = 0;
 	bool moving = false;
+    int won = 0;
 };
 
 struct Daytime {
@@ -190,6 +192,15 @@ struct UIComp {
 	int potion_type = -1;
 };
 
+struct Permanent {
+
+};
+
+struct Rotator {
+	float angle = 0;
+	//float speed = 360 LENGTH OF NIGHT_ms   
+};
+
 
 struct Paired {
 	Entity other;
@@ -228,7 +239,9 @@ enum Game_screens {
     cut_scene_0,
     cut_scene_1,
     cut_scene_2,
-	game_screen_introduction,
+    cut_scene_3,
+    cut_scene_4,
+    cut_scene_win,
 };
 
 // Sets the brightness of the screen
@@ -243,6 +256,7 @@ struct ScreenState {
 
 struct HelpScreen {
     int help = 0;
+    int craftingList = 0;
 };
 
 // A struct to refer to debugging graphics in the ECS
@@ -252,7 +266,7 @@ struct DebugComponent {
 
 // A timer that will be associated to dying player
 struct DeathTimer {
-	float counter_ms = 3000;
+	float counter_ms = 1500;
 };
 
 // A timer that will switch from night to day
@@ -446,14 +460,20 @@ enum class TEXTURE_ASSET_ID {
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
 	CRAFTING = MIDNIGHT_01 + 1,
-	HELPNIGHT = CRAFTING + 1,
+    CRAFTINGLIST = CRAFTING + 1,
+	HELPNIGHT = CRAFTINGLIST + 1,
 	HELPTORCH = HELPNIGHT + 1,
     LOGO_00 = HELPTORCH + 1,
     LOGO_01 = LOGO_00 + 1,
 	WIN0 = LOGO_01 + 1,
 	WIN1 = WIN0 + 1,
 	CHECK = WIN1 + 1,
-	SPARK0 = CHECK + 1,
+	TUT1 = CHECK + 1,
+	TUT2 = TUT1 + 1,
+	TUT3 = TUT2 + 1,
+	TUT4 = TUT3 + 1,
+	TUT5 = TUT4 + 1,
+	SPARK0 = TUT5 + 1,
 	SPARK1 = SPARK0 + 1,
 	SPARK2 = SPARK1 + 1,
 	SPARK3 = SPARK2 + 1,
@@ -475,7 +495,9 @@ enum class TEXTURE_ASSET_ID {
 	TORCH_00 = TORCH_OFF2 + 1,
 	TORCH_01 = TORCH_00 + 1,
 	TORCH_02 = TORCH_01 + 1,
-	TEXTURE_COUNT = TORCH_02 + 1,
+	DAYNIGHT0 = TORCH_02 + 1,
+	DAYNIGHT1 = DAYNIGHT0 + 1,
+	TEXTURE_COUNT = DAYNIGHT1 + 1,
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -512,7 +534,7 @@ struct TextRenderRequest {
 struct SpeechRenderRequest {
     std::string text = "";
     vec2 position = vec2(1.0f, 1.0f);
-    float scale = 0.3f;
+    float scale = 0.7f;
     vec3 color = vec3(0.0f, 0.0f, 0.0f); // default black
 };
 
@@ -595,6 +617,15 @@ struct AnimatedDogFace {
 		TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT0,
 		TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT0,
 		TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT1,
+	};
+};
+
+struct TutorialSequence {
+	bool visible = false;
+	uint size = 5;
+	uint current_page = 0;
+	TEXTURE_ASSET_ID pages[5] = {
+		TEXTURE_ASSET_ID::TUT1, TEXTURE_ASSET_ID::TUT2, TEXTURE_ASSET_ID::TUT3, TEXTURE_ASSET_ID::TUT4, TEXTURE_ASSET_ID::TUT5,
 	};
 };
 

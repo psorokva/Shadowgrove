@@ -30,6 +30,7 @@ uniform int alive;
 uniform int help;
 uniform int hit;
 uniform int active_torches;
+uniform int crafting;
 
 in vec2 texcoord;
 in float dist_to_player;
@@ -62,7 +63,7 @@ void main() {
 
     if (alive == 1) {
         /// Help Screen
-        if (help == 1){
+        if (help == 1 || crafting == 1){
             light_color = texture(helptorch, texcoord);
             shad_color = texture(helpnight, texcoord);
             shad1_color = texture(helpnight, texcoord);
