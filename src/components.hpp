@@ -539,7 +539,7 @@ struct TextRenderRequest {
 struct SpeechRenderRequest {
     std::string text = "";
     vec2 position = vec2(1.0f, 1.0f);
-    float scale = 0.7f;
+    float scale = 0.6f;
     vec3 color = vec3(0.0f, 0.0f, 0.0f); // default black
 };
 
