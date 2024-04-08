@@ -19,10 +19,6 @@
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods
 
-extern bool orange_crafted;
-extern bool green_crafted;
-extern bool purple_crafted;
-
 
 class WorldSystem {
 public:
