@@ -601,7 +601,10 @@ void RenderSystem::draw() {
     }
     else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1
             || screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_3
-            || screen.game_screen == cut_scene_4 || screen.game_screen == cut_scene_win) {
+            || screen.game_screen == cut_scene_4 || screen.game_screen == cut_scene_orange
+            || screen.game_screen == cut_scene_green || screen.game_screen == cut_scene_purple
+            || screen.game_screen == cut_scene_warning || screen.game_screen == cut_scene_too_late
+            || screen.game_screen == cut_scene_win0 || screen.game_screen == cut_scene_win1) {
         Entity background = registry.daytimes.entities[0];
         drawTexturedStaticMesh(background, projection_2D);
 
