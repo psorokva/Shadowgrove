@@ -192,7 +192,7 @@ struct UIComp {
 };
 
 struct Permanent {
-    float counter_ms = 2000;
+    float counter_ms = 200;
 };
 
 struct Rotator {

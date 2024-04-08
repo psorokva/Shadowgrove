@@ -662,21 +662,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             vec2 player_pos = registry.motions.get(player).position;
             float dis = distance(player_pos, dog_pos);
 
-            if (dis < 250) {
-                for (Entity e : registry.sparkle_animation.entities) {
-                    registry.motions.get(e).scale = vec2({ 50*2.7, 50 * 2.7 });
-                }
-            }
-            if (dis > 250) {
-                for (Entity e : registry.sparkle_animation.entities) {
-                    registry.motions.get(e).scale = vec2({ 50*1.3, 50 * 1.3 });
-                }
-            }
-            if (dis < 50) {
+            if (dis < 60) {
                 screen.game_screen = cut_scene_win0;
                 restart_game();
             }
-
+            if (dis < 500) {
+                float multiplier = 500 / dis;
+                for (Entity e : registry.sparkle_animation.entities) {
+                    registry.motions.get(e).scale = vec2({ 50*multiplier, 50 * multiplier });
+                }
+            }
+            if (dis > 500) {
+                for (Entity e : registry.sparkle_animation.entities) {
+                    registry.motions.get(e).scale = vec2({ 50, 50 });
+                }
+            }
         }
     }
 
@@ -904,7 +904,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                     } else if (!purple_crafted) {
                         registry.speechRenderRequests.insert(Entity(), {"potion! Only the purple", player_line2});
                     } else {
-                        registry.speechRenderRequests.insert(Entity(), {"potion! That's all of them", player_line2});
+                        registry.speechRenderRequests.insert(Entity(), {"potion! That's all", player_line2});
                     }
                 } if (counter.timestamp == 3) {
                     if (!green_crafted && !purple_crafted) {
@@ -913,6 +913,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                         registry.speechRenderRequests.insert(Entity(), {"left to go!", player_line3});
                     } else if (green_crafted && !purple_crafted) {
                         registry.speechRenderRequests.insert(Entity(), {"left to go!", player_line3});
+                    } else {
+                        registry.speechRenderRequests.insert(Entity(), {"of them!", player_line3});
                     }
                 } if (counter.timestamp == 4) {
                     registry.speechRenderRequests.insert(Entity(), {"woof woof", dog_line1});
@@ -1053,21 +1055,21 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
             if (counter.counter_ms < 0) {
                 if (counter.timestamp == 1) {
-                    registry.speechRenderRequests.insert(Entity(),{"I did it Sparky!! I ", player_line1});
+                    registry.speechRenderRequests.insert(Entity(),{"I did it Sparky!! I made", player_line1});
                 } if (counter.timestamp == 2) {
-                    registry.speechRenderRequests.insert(Entity(), {"made you an orange, green,", player_line2});
+                    registry.speechRenderRequests.insert(Entity(), {"you an orange, green,", player_line2});
                 } if (counter.timestamp == 3) {
                     registry.speechRenderRequests.insert(Entity(), {"and purple potion!", player_line3});
                 } if (counter.timestamp == 4) {
                     registry.speechRenderRequests.insert(Entity(), {"woof woof!", dog_line1});
                 } if (counter.timestamp == 5) {
-                    vec2 purple_potion_pos = {625, 330};
+                    vec2 purple_potion_pos = {375, 425};
                     createConversationPotion(renderer, purple_potion_pos, 1);
                 }  if (counter.timestamp == 6) {
-                    vec2 green_potion_pos = {575, 330 };
+                    vec2 green_potion_pos = {350, 425 };
                     createConversationPotion(renderer, green_potion_pos, 0);
                 }  if (counter.timestamp == 7) {
-                    vec2 orange_potion_pos = {525, 330 };
+                    vec2 orange_potion_pos = {325, 425 };
                     createConversationPotion(renderer, orange_potion_pos, 2);
                 }
                 registry.speechTimers.remove(entity);
@@ -1093,17 +1095,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
                 }
                 if (counter.timestamp == 3) {
                     registry.speechRenderRequests.insert(Entity(), {"woof woof!", dog_line1});
-                }
-                if (counter.timestamp == 4) {
-                    vec2 purple_potion_pos = {625, 330};
+                } if (counter.timestamp == 5) {
+                    vec2 purple_potion_pos = {375, 425};
                     createConversationPotion(renderer, purple_potion_pos, 1);
-                }
-                if (counter.timestamp == 5) {
-                    vec2 green_potion_pos = {575, 330};
+                }  if (counter.timestamp == 6) {
+                    vec2 green_potion_pos = {350, 425 };
                     createConversationPotion(renderer, green_potion_pos, 0);
-                }
-                if (counter.timestamp == 6) {
-                    vec2 orange_potion_pos = {525, 330};
+                }  if (counter.timestamp == 7) {
+                    vec2 orange_potion_pos = {325, 425 };
                     createConversationPotion(renderer, orange_potion_pos, 2);
                 }
                 registry.speechTimers.remove(entity);
@@ -1111,7 +1110,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
         }
         // rolling potions
-        float potion_counter_ms = 2000.f;
+        float potion_counter_ms = 200.f;
         for (Entity entity: registry.permanents.entities) {
             Permanent &counter = registry.permanents.get(entity);
             counter.counter_ms -= elapsed_ms_since_last_update;
@@ -1121,10 +1120,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
             if (counter.counter_ms < 0) {
                 float x_pos = registry.uicomps.get(entity).position.x;
-                if (x_pos < 950) {
+                if (x_pos < 900) {
+                    registry.uicomps.get(entity).position.x += 2;
+                }
+                if (x_pos >= 900) {
                     registry.remove_all_components_of(entity);
-                } else {
-                    registry.uicomps.get(entity).position.x += 1;
                 }
             }
         }
@@ -1492,16 +1492,17 @@ void WorldSystem::restart_game() {
         registry.textRenderRequests.insert(spaceKey,{"Press space key to continue!!", spaceKey_line});
         registry.textRenderRequests.get(spaceKey).scale = 0.5;
 
-        if (screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_win0) {
+        if (screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_win0 ||
+            screen.game_screen == cut_scene_win1) {
             SpeechTimer& orange = registry.speechTimers.emplace(Entity());
             orange.timestamp = 5;
-            orange.counter_ms = 2300;
+            orange.counter_ms = 1500;
             SpeechTimer& green = registry.speechTimers.emplace(Entity());
             green.timestamp = 6;
-            green.counter_ms = 2300;
+            green.counter_ms = 1500;
             SpeechTimer& purple = registry.speechTimers.emplace(Entity());
             purple.timestamp = 7;
-            purple.counter_ms = 2300;
+            purple.counter_ms = 1500;
         }
     }
     else if (screen.game_screen == game_screen_win) {
@@ -2351,40 +2352,49 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 //            screen.torch_mode = 0;
             screen.night_counter_ms = 0;
             registry.nightTimer.clear();
+            orange_crafted = false;
+            green_crafted = false;
+            purple_crafted = false;
+            Player& player_component = registry.players.components[0];
+            player_component.won = 0;
             while (registry.renderRequests.entities.size() > 0)
                 registry.remove_all_components_of(registry.renderRequests.entities.back());
             restart_game();
 
         }
         if (screen.game_screen == cut_scene_win1) {
-            screen.game_screen = game_screen_win;
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = game_screen_win;
+                restart_game();
+            }
         }
         if (screen.game_screen == cut_scene_win0 && orange_crafted && green_crafted && purple_crafted) {
-            screen.game_screen = cut_scene_win1;
-            orange_crafted = false;
-            green_crafted = false;
-            purple_crafted = false;
-            Player& player_component = registry.players.components[0];
-            player_component.won = 0;
-            while (registry.permanents.entities.size() > 0)
-                registry.remove_all_components_of(registry.permanents.entities.back());
-
-            restart_game();
+            if (registry.speechTimers.size() > 0) {
+                for (SpeechTimer& s: registry.speechTimers.components) {
+                    s.counter_ms = 0;
+                }
+            } else {
+                screen.game_screen = cut_scene_win1;
+                restart_game();
+            }
         }
     }
 
     // v to victory screen
    if (action == GLFW_RELEASE && key == GLFW_KEY_V && is_in_debug) {
        if (screen.game_screen != game_screen_night) {
-           screen.game_screen = cut_scene_win0;
-           orange_crafted = false;
-           green_crafted = false;
-           purple_crafted = false;
-           Player& player_component = registry.players.components[0];
-           player_component.won = 0;
-           while (registry.permanents.entities.size() > 0)
-               registry.remove_all_components_of(registry.permanents.entities.back());
+           screen.game_screen = game_screen_day;
+           orange_crafted = true;
+           green_crafted = true;
+           purple_crafted = true;
+//           Player& player_component = registry.players.components[0];
+//           player_component.won = 0;
+//           while (registry.permanents.entities.size() > 0)
+//               registry.remove_all_components_of(registry.permanents.entities.back());
            restart_game();
        }
    }

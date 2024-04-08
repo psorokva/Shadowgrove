@@ -614,10 +614,7 @@ void RenderSystem::draw() {
         }
         if (registry.uicomps.entities.size() >0 ) {
             for (Entity entity : registry.uicomps.entities) {
-//                if (!registry.permanents.has(entity)) {
-                    // UIComp& ui_comp = registry.uicomps.get(entity);
-                    drawTexturedUIMesh(entity, projection_2D);
-//                }
+                drawTexturedUIMesh(entity, projection_2D);
             }
         }
 
