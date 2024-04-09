@@ -13,7 +13,7 @@ const int levels_size = 1;
 
 struct GameState 
 {
-	std::vector<Item> player_inventory = { Item::nullval, Item::nullval, Item::nullval, Item::nullval, Item::nullval };
+	std::vector<Item> player_inventory = { Item::torch, Item::nullval, Item::nullval, Item::nullval, Item::nullval };
 	bool orange_crafted = false;
 	bool green_crafted = false;
 	bool purple_crafted = false;
