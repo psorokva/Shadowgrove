@@ -1416,7 +1416,7 @@ void WorldSystem::restart_game() {
 	registry.inventory.emplace(player);
 	registry.inventory.get(player) = i;
 
-	registry.inventory.get(player).holding = { torch, nullval, nullval, nullval, nullval };
+	//registry.inventory.get(player).holding = { torch, nullval, nullval, nullval, nullval };
 
 	
     //save_state.loadInventory();
