@@ -123,7 +123,7 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	window = glfwCreateWindow(window_width_px, window_height_px, "Chicken Game Assignment", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "Shadowgrove", nullptr, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
@@ -178,8 +178,8 @@ GLFWwindow* WorldSystem::create_window() {
             audio_path("player_death.wav").c_str(),
             audio_path("inventory_full.wav").c_str(),
 			audio_path("player_hit.wav").c_str(),
-      audio_path("rooster.wav").c_str(),
-      audio_path("torch.wav").c_str(),
+            audio_path("rooster.wav").c_str(),
+            audio_path("torch.wav").c_str(),
 			audio_path("page_turn.wav").c_str(),
 			audio_path("menu_close.wav").c_str());
 
