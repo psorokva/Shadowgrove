@@ -2033,7 +2033,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             } else if (!already_paused) {
                 game_paused = false;
             }
-        } else if (!registry.tutorialSequence.components[0].visible) {
+         } else if (registry.tutorialSequence.components.size() == 0 || !registry.tutorialSequence.components[0].visible) {
             std::cout << "EXIT GAME" << std::endl;
             glfwSetWindowShouldClose(window, true);
         }

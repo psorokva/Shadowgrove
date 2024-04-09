@@ -156,7 +156,7 @@ struct Inventory {
 	unsigned int size = 0;
 	std::vector<Item> holding;
 	vec2 crafted;
-	unsigned int select_state = 0;
+	int select_state = 0;
 	bool is_open = false;
 	std::vector<Item> inUI;
 	std::vector<unsigned int> index;
