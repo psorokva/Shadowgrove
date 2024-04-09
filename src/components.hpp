@@ -12,6 +12,7 @@ struct Chunk {
 	float offset_y = 0;
 	float campos_x = 0;
 	float campos_y = 0;
+	bool keeper_spawned_here = false;
 	int grid[MAZE_SIZE][MAZE_SIZE] = {
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
 	{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
@@ -74,10 +75,11 @@ struct Impenetrable {
 
 // Player component
 struct Player {
-	unsigned int health;
+	int health;
     int alive = 1;
     int hit = 0;
 	bool moving = false;
+    int won = 0;
 };
 
 struct Daytime {
@@ -95,6 +97,11 @@ struct Enemy {
 	//std::set<Direction> last_possible_directions;
 	Direction last_direction = Direction::NONE;
 	Entity e_id;
+};
+
+// Floating Enemy component
+struct FloatingEnemy {
+	unsigned int attack = 10;
 };
 
 enum Item {
@@ -128,7 +135,7 @@ struct Escaper {
 };
 
 struct Torches {
-	float t_timer = 20000.0;
+	float t_timer = TORCH_LENGTH;
 };
 
 struct Invincibility {
@@ -163,6 +170,15 @@ struct HitTimer {
     float counter_ms = 3000;
 };
 
+struct SpeechTimer {
+    float counter_ms = 500;
+    int timestamp = 0;
+};
+
+struct TextTimer {
+    float counter_ms = 2000;
+};
+
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };
@@ -176,12 +192,52 @@ struct Immobile {
 	vec2 position = { 0, 0 };
 	vec2 scale = { 10, 10 };
 	vec2 camera_position = { 0, 0 };
+	bool on_screen = true;
+	float angle = 0;
 };
+
+struct Oscilation {
+	//bool rotates = false;
+	//bool stretches = false;
+	float base = 0.0;
+	float max = 5.0;
+	float min = -3.0;
+	float amount = 0.02;
+	float current = 0.0;
+	float direction = 1.0;
+};
+
+struct Dance {
+	float base = 0.0;
+	float max = 0.03;
+	float min = -0.04;
+	float amount = 0.0004;
+	float current = 0.0;
+	float direction = 1.0;
+};
+
 
 struct UIComp {
 	vec2 position = { 0, 0 };
 	vec2 scale = { 10, 10 };
+	int potion_type = -1;
 };
+
+struct Permanent {
+    float counter_ms = 200;
+};
+
+struct Rotator {
+	float angle = 0;
+	//float speed = 360 LENGTH OF NIGHT_ms   
+};
+
+
+struct Paired {
+	Entity other;
+};
+
+//std::vector<Item> inUI;
 
 // Stucture to store collision information
 struct Collision {
@@ -211,6 +267,18 @@ enum Game_screens {
     game_screen_day,
     game_screen_game_over,
     game_screen_win,
+    cut_scene_0,
+    cut_scene_1,
+    cut_scene_2,
+    cut_scene_3,
+    cut_scene_4,
+    cut_scene_warning,
+    cut_scene_too_late,
+    cut_scene_win0,
+    cut_scene_win1,
+    cut_scene_orange,
+    cut_scene_green,
+    cut_scene_purple,
 };
 
 // Sets the brightness of the screen
@@ -220,10 +288,12 @@ struct ScreenState {
 	int torch_mode = 0;
 	int torch_anim = 0;
 	float night_counter_ms = 0;
+	float torch_timer_ms = 0.0;
 };
 
 struct HelpScreen {
     int help = 0;
+    int craftingList = 0;
 };
 
 // A struct to refer to debugging graphics in the ECS
@@ -233,12 +303,13 @@ struct DebugComponent {
 
 // A timer that will be associated to dying player
 struct DeathTimer {
-	float counter_ms = 3000;
+	float counter_ms = 1500;
 };
 
 // A timer that will switch from night to day
 struct NightTimer {
 	float counter_ms = NIGHT_DURATION;
+	bool rooster_played = false;
 };
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & chicken.vs.glsl)
@@ -403,20 +474,31 @@ enum class TEXTURE_ASSET_ID {
 	PLANT_29 = PLANT_28 + 1,
 	PLANT_30 = PLANT_29 + 1,
 	PLANT_31 = PLANT_30 + 1,
-	DAY_SCREEN = PLANT_31 + 1,
-    HELP_SCREEN = DAY_SCREEN +1,
+	PORTRAIT0 = PLANT_31 + 1,
+	PORTRAIT1 = PORTRAIT0 + 1,
+	PORTRAIT2 = PORTRAIT1 + 1,
+	DOG_PORTRAIT0 = PORTRAIT2 + 1,
+	DOG_PORTRAIT1 = DOG_PORTRAIT0 + 1,
+	BUBBLE0 = DOG_PORTRAIT1 + 1,
+	BUBBLE1 = BUBBLE0 +1,
+	DAY_SCREEN = BUBBLE1 + 1,
+	END_SCREEN = DAY_SCREEN + 1,
+	INTRO_SCREEN = END_SCREEN + 1,
+    HELP_SCREEN = INTRO_SCREEN +1,
     SIGN_01 = HELP_SCREEN + 1,
     SIGN_02 = SIGN_01 +1,
 	TORCHLIGHT_00 = SIGN_02 + 1,
 	TORCHLIGHT_01 = TORCHLIGHT_00 + 1,
 	TORCHLIGHT_02 = TORCHLIGHT_01 + 1,
-	SHADOW_00 = TORCHLIGHT_02 + 1,
+	TORCHLIGHT_05 = TORCHLIGHT_02 + 1,
+	TORCHLIGHT_06 = TORCHLIGHT_05 + 1,
+	SHADOW_00 = TORCHLIGHT_06 + 1,
 	SHADOW_01 = SHADOW_00 + 1,
 	MIDNIGHT_00 = SHADOW_01 + 1,
 	MIDNIGHT_01 = MIDNIGHT_00 + 1,
-	TORCH_00 = MIDNIGHT_01 + 1,
-	CRAFTING = TORCH_00 + 1,
-	HELPNIGHT = CRAFTING + 1,
+	CRAFTING = MIDNIGHT_01 + 1,
+    CRAFTINGLIST = CRAFTING + 1,
+	HELPNIGHT = CRAFTINGLIST + 1,
 	HELPTORCH = HELPNIGHT + 1,
     LOGO_00 = HELPTORCH + 1,
     LOGO_01 = LOGO_00 + 1,
@@ -427,7 +509,36 @@ enum class TEXTURE_ASSET_ID {
 	OC = BORDER + 1,
 	GC = OC + 1,
 	PC = GC + 1,
-	TEXTURE_COUNT = PC + 1
+	TUT1 = PC + 1,
+	TUT2 = TUT1 + 1,
+	TUT3 = TUT2 + 1,
+	TUT4 = TUT3 + 1,
+	TUT5 = TUT4 + 1,
+	SPARK0 = TUT5 + 1,
+	SPARK1 = SPARK0 + 1,
+	SPARK2 = SPARK1 + 1,
+	SPARK3 = SPARK2 + 1,
+	SPARK4 = SPARK3 + 1,
+	SPARK5 = SPARK4 + 1,
+	SPARK6 = SPARK5 + 1,
+	SPARK7 = SPARK6 + 1,
+	BSPARK0 = SPARK7 + 1,
+	BSPARK1 = BSPARK0 + 1,
+	BSPARK2 = BSPARK1 + 1,
+	BSPARK3 = BSPARK2 + 1,
+	BSPARK4 = BSPARK3 + 1,
+	BSPARK5 = BSPARK4 + 1,
+	BSPARK6 = BSPARK5 + 1,
+	BSPARK7 = BSPARK6 + 1,
+	TORCH_OFF0 = BSPARK7 + 1,
+	TORCH_OFF1 = TORCH_OFF0 + 1,
+	TORCH_OFF2 = TORCH_OFF1 + 1,
+	TORCH_00 = TORCH_OFF2 + 1,
+	TORCH_01 = TORCH_00 + 1,
+	TORCH_02 = TORCH_01 + 1,
+	DAYNIGHT0 = TORCH_02 + 1,
+	DAYNIGHT1 = DAYNIGHT0 + 1,
+	TEXTURE_COUNT = DAYNIGHT1 + 1,
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -461,6 +572,13 @@ struct TextRenderRequest {
 	vec3 color = vec3(1.0f, 1.0f, 1.0f); // default white
 };
 
+struct SpeechRenderRequest {
+    std::string text = "";
+    vec2 position = vec2(1.0f, 1.0f);
+    float scale = 0.6f;
+    vec3 color = vec3(0.0f, 0.0f, 0.0f); // default black
+};
+
 struct ChunkStitch {
 	int ch1x = 0;
 	int ch2x = 0;
@@ -468,4 +586,88 @@ struct ChunkStitch {
 	int ch2y = 0;
 	int location = 0;
 };
+
+struct AnimatedTorchOn {
+	uint size = 3;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[3] = {
+		TEXTURE_ASSET_ID::TORCH_00,
+		TEXTURE_ASSET_ID::TORCH_01,
+		TEXTURE_ASSET_ID::TORCH_02,
+	};
+};
+
+
+struct AnimatedTorchOff {
+	uint size = 3;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[3] = {
+		TEXTURE_ASSET_ID::TORCH_OFF0,
+		TEXTURE_ASSET_ID::TORCH_OFF1,
+		TEXTURE_ASSET_ID::TORCH_OFF2,
+	};
+};
+
+
+struct AnimatedSparkle {
+	uint size = 8;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[8] = {
+		TEXTURE_ASSET_ID::SPARK0, TEXTURE_ASSET_ID::SPARK1, TEXTURE_ASSET_ID::SPARK2, TEXTURE_ASSET_ID::SPARK3,
+		TEXTURE_ASSET_ID::SPARK4, TEXTURE_ASSET_ID::SPARK5, TEXTURE_ASSET_ID::SPARK6, TEXTURE_ASSET_ID::SPARK7,
+	};
+};
+
+struct AnimatedPlayerSparkle {
+	uint size = 8;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[8] = {
+		TEXTURE_ASSET_ID::BSPARK0, TEXTURE_ASSET_ID::BSPARK1, TEXTURE_ASSET_ID::BSPARK2, TEXTURE_ASSET_ID::BSPARK3,
+		TEXTURE_ASSET_ID::BSPARK4, TEXTURE_ASSET_ID::BSPARK5, TEXTURE_ASSET_ID::BSPARK6, TEXTURE_ASSET_ID::BSPARK7,
+	};
+};
+
+
+
+//TEXTURE_ASSET_ID base_asset = TEXTURE_ASSET_ID::PORTRAIT0;
+//int base = (int)base_asset;
+struct AnimatedFaceOject {
+	uint size = 32;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[32] = {
+		TEXTURE_ASSET_ID::PORTRAIT2, TEXTURE_ASSET_ID::PORTRAIT2, TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT2,
+		TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT2,
+		TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT2,
+		TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT2, TEXTURE_ASSET_ID::PORTRAIT2,
+		TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT2,
+		TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT0,
+		TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT0, TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT1,
+		TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT1, TEXTURE_ASSET_ID::PORTRAIT1,
+	};
+};
+
+struct AnimatedDogFace {
+	uint size = 32;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[32] = {
+		TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1,
+		TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1,
+		TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1,
+		TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1,
+		TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT1,
+		TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT0,
+		TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT1, TEXTURE_ASSET_ID::DOG_PORTRAIT0,
+		TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT0, TEXTURE_ASSET_ID::DOG_PORTRAIT1,
+	};
+};
+
+struct TutorialSequence {
+	bool visible = false;
+	uint size = 5;
+	uint current_page = 0;
+	TEXTURE_ASSET_ID pages[5] = {
+		TEXTURE_ASSET_ID::TUT1, TEXTURE_ASSET_ID::TUT2, TEXTURE_ASSET_ID::TUT3, TEXTURE_ASSET_ID::TUT4, TEXTURE_ASSET_ID::TUT5,
+	};
+};
+
 

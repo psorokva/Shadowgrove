@@ -129,11 +129,18 @@ void RenderSystem::drawTexturedStaticMesh(Entity entity, const mat3& projection)
 	// thus ORDER IS IMPORTANT
 	Transform transform;
     if (screen.game_screen == game_screen_night) {
+		if (!immobile.on_screen)
+		{
+			return;
+		}
         transform.translate(immobile.camera_position);
     } else {
         transform.translate(immobile.position);
     }
 	transform.scale(immobile.scale);
+	
+	transform.rotate(immobile.angle);
+
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest& render_request = registry.renderRequests.get(entity);
@@ -302,13 +309,21 @@ void RenderSystem::drawToScreen() {
     GLuint hit = glGetUniformLocation(night_program, "hit");
     glUniform1i(hit, player.hit);
 
+	int torches = registry.torches.size();
+	GLuint active_torches = glGetUniformLocation(night_program, "active_torches");
+	glUniform1i(active_torches, torches);
     
 	if (registry.helpScreen.size() > 0) {
 		GLuint help = glGetUniformLocation(night_program, "help");
 		HelpScreen& help_screen = registry.helpScreen.components[0];
 		glUniform1i(help, help_screen.help);
+
+        GLuint crafting = glGetUniformLocation(night_program, "crafting");
+        HelpScreen& crafting_screen = registry.helpScreen.components[1];
+        glUniform1i(crafting, crafting_screen.craftingList);
 	}
-   
+	GLuint torch_timer = glGetUniformLocation(night_program, "torch_timer");
+	glUniform1f(torch_timer, screen.torch_timer_ms);
 
 	GLuint torch_mode = glGetUniformLocation(night_program, "torch_mode");
 	glUniform1i(torch_mode, screen.torch_mode);
@@ -363,6 +378,17 @@ void RenderSystem::drawToScreen() {
 	GLuint helptorch = glGetUniformLocation(night_program, "helptorch");
 	glUniform1i(helptorch, 9);
 	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::HELPTORCH]);
+
+	glActiveTexture(GL_TEXTURE10);
+	GLuint light_05 = glGetUniformLocation(night_program, "light_05");
+	glUniform1i(light_05, 10);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_05]);
+
+	glActiveTexture(GL_TEXTURE11);
+	GLuint light_06 = glGetUniformLocation(night_program, "light_06");
+	glUniform1i(light_06, 11);
+	glBindTexture(GL_TEXTURE_2D, texture_gl_handles[(GLuint)TEXTURE_ASSET_ID::TORCHLIGHT_06]);
+
 	gl_has_errors();
 	//glUniform1i(shad_00, 0);
 
@@ -398,6 +424,7 @@ void RenderSystem::draw() {
 							  // sprites back to front
 	gl_has_errors();
 	mat3 projection_2D = createProjectionMatrix();
+    glm::mat4 trans = glm::mat4(1.0f);
 
     ScreenState &screen = registry.screenStates.components[0];
 
@@ -426,7 +453,7 @@ void RenderSystem::draw() {
             for (Entity entity: registry.renderRequests.entities) {
                 if (registry.motions.has(entity)) {
                     if (!registry.debugComponents.has(entity)) {
-                        if (!registry.helpScreen.has(entity)) {
+                        if (!registry.helpScreen.has(entity) && !registry.tutorialSequence.has(entity)) {
                             drawTexturedMesh(entity, projection_2D);
                         }
                     }
@@ -438,7 +465,7 @@ void RenderSystem::draw() {
                     }
                 }
 
-                // Note, its not very efficient to access elements indirectly via the entity
+                // Note, it's not very efficient to access elements indirectly via the entity
                 // albeit iterating through all Sprites in sequence. A good point to optimize
             }
             // render inventory lines last?
@@ -448,21 +475,29 @@ void RenderSystem::draw() {
                 }
             }
 
- 
-		Motion& player_motion = registry.motions.get(player);
 		drawTexturedMesh(player, projection_2D);
 
-		// render help screen
-		if (registry.helpScreen.size() > 0) {
-			HelpScreen& help = registry.helpScreen.components[0];
-			if (help.help == 1) {
-				//printf("got here");
-				for (Entity entity : registry.renderRequests.entities) {
-					if (registry.helpScreen.has(entity)) {
-						drawTexturedMesh(entity, projection_2D);
-					}
-				}
+		for (Entity entity : registry.renderRequests.entities) {
+			if (registry.uicomps.has(entity)) {
+                if (!registry.permanents.has(entity)) {
+                    drawTexturedUIMesh(entity, projection_2D);
+                }
 			}
+		}
+
+		// render help + crafting screens
+		if (registry.helpScreen.size() > 1) {
+            Entity craft = registry.helpScreen.entities[1];
+            HelpScreen& craft_screen = registry.helpScreen.get(craft);
+            if (craft_screen.craftingList == 1) {
+                drawTexturedMesh(craft, projection_2D);
+            }
+
+            Entity help = registry.helpScreen.entities[0];
+            HelpScreen& help_screen = registry.helpScreen.get(help);
+            if (help_screen.help == 1) {
+                drawTexturedMesh(help, projection_2D);
+            }
 		}
 
     }
@@ -477,6 +512,19 @@ void RenderSystem::draw() {
         // render danger sign 3rd
         Entity sign2 = registry.daytimes.entities[3];
         drawTexturedStaticMesh(sign2, projection_2D);
+
+        // render dog potions
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.uicomps.has(entity)) {
+                drawTexturedUIMesh(entity, projection_2D);
+            }
+        }
+        // dog potion sparkles
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.sparkle_animation.has(entity)) {
+                drawTexturedMesh(entity, projection_2D);
+            }
+        }
 
         // render player 2nd last
         drawTexturedMesh(player, projection_2D);
@@ -503,7 +551,7 @@ void RenderSystem::draw() {
                 }
             }
         }
-
+        // render help screen
 		if (registry.helpScreen.size() > 0) {
 			HelpScreen& help = registry.helpScreen.components[0];
 			if (help.help == 1) {
@@ -511,16 +559,27 @@ void RenderSystem::draw() {
 				drawTexturedStaticMesh(helpScreen, projection_2D);
 			}
 		}
+
+		if (registry.tutorialSequence.size() > 0) {
+			TutorialSequence& tutorial = registry.tutorialSequence.components[0];
+			if (tutorial.visible) {
+				Entity tutorialWindow = registry.tutorialSequence.entities[0];
+					drawTexturedMesh(tutorialWindow, projection_2D);
+			}
+		}
        
     }
     else if (screen.game_screen == game_screen_game_over) {
+        Entity background = registry.daytimes.entities[0];
+        drawTexturedStaticMesh(background, projection_2D);
+
         for (Entity entity: registry.renderRequests.entities) {
             if (registry.enemies.has(entity)) {
                 Motion& keeper_motion = registry.motions.get(entity);
                 keeper_motion.position = { window_width_px / 2, window_height_px / 2 };
                 keeper_motion.scale = {200, 400};
                 keeper_motion.velocity = {0,0};
-                 drawTexturedMesh(entity, projection_2D);
+                drawTexturedMesh(entity, projection_2D);
             }
         }
     }
@@ -534,10 +593,70 @@ void RenderSystem::draw() {
             }
         }
 
+        for (Entity entity : registry.speechRenderRequests.entities)
+        {
+            SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
+            renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+
+        }
+
 //		drawTexturedMesh(&win_dance, projection_2D);
     }
+    else if (screen.game_screen == cut_scene_0 || screen.game_screen == cut_scene_1
+            || screen.game_screen == cut_scene_2 || screen.game_screen == cut_scene_3
+            || screen.game_screen == cut_scene_4 || screen.game_screen == cut_scene_orange
+            || screen.game_screen == cut_scene_green || screen.game_screen == cut_scene_purple
+            || screen.game_screen == cut_scene_warning || screen.game_screen == cut_scene_too_late
+            || screen.game_screen == cut_scene_win0 || screen.game_screen == cut_scene_win1) {
+        Entity background = registry.daytimes.entities[0];
+        drawTexturedStaticMesh(background, projection_2D);
 
-	glm::mat4 trans = glm::mat4(1.0f);
+        if (registry.daytimes.entities.size() >0 ) {
+            Entity background = registry.daytimes.entities[0];
+            drawTexturedStaticMesh(background, projection_2D);
+        }
+        if (registry.uicomps.entities.size() >0 ) {
+            for (Entity entity : registry.uicomps.entities) {
+                drawTexturedUIMesh(entity, projection_2D);
+            }
+        }
+
+        for (Entity entity : registry.speechRenderRequests.entities)
+        {
+            SpeechRenderRequest request = registry.speechRenderRequests.get(entity);
+            renderSpeechText(request.text, request.position.x, request.position.y, request.scale, request.color, trans);
+
+        }
+
+        for (Entity entity: registry.renderRequests.entities) {
+            if (registry.immobiles.has(entity) && registry.healers.has(entity)) {
+                drawTexturedStaticMesh(entity, projection_2D);
+            }
+        }
+
+    }
+
+//	// FOR INTRO ANIMATIONS
+//	if (screen.game_screen == game_screen_introduction ) { //|| screen.game_screen == game_screen_day) {
+//		if (registry.daytimes.entities.size() >0 ) {
+//			Entity background = registry.daytimes.entities[0];
+//			drawTexturedStaticMesh(background, projection_2D);
+//		}
+//		if (registry.uicomps.entities.size() >0 ) {
+//			for (Entity entity : registry.uicomps.entities) {
+//				// UIComp& ui_comp = registry.uicomps.get(entity);
+//				drawTexturedUIMesh(entity, projection_2D);
+//			}
+//		}
+//	 // Then render text after
+//	 //for (text ..) {
+//	 // TODO: print dialogue;
+//	 //}
+//	}
+
+
+
+//	glm::mat4 trans = glm::mat4(1.0f);
 	// Might need to use rotation and scaling in the future
 	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
 	//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 1.0));
@@ -560,6 +679,7 @@ void RenderSystem::draw() {
 	gl_has_errors();
 }
 
+
 mat3 RenderSystem::createProjectionMatrix() {
 	// Fake projection matrix, scales with respect to window coordinates
 	float left = 0.f;
@@ -575,6 +695,101 @@ mat3 RenderSystem::createProjectionMatrix() {
 	float ty = -(top + bottom) / (top - bottom);
 	return {{sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f}};
 }
+
+void RenderSystem::drawTexturedUIMesh(Entity entity, const mat3& projection) {
+	UIComp& ui_comp = registry.uicomps.get(entity);
+	ScreenState& screen = registry.screenStates.components[0];
+	Transform transform;
+	transform.translate(ui_comp.position);
+	transform.scale(ui_comp.scale);
+	if (registry.rotators.has(entity)) {
+		Rotator& rotator = registry.rotators.get(entity);
+		transform.rotate(rotator.angle);
+	}
+
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+	const GLuint used_effect_enum = (GLuint)render_request.used_effect;
+	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	// Input data location as in the vertex buffer
+	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED) {
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		assert(in_position_loc >= 0);
+		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+		gl_has_errors();
+		assert(in_texcoord_loc >= 0);
+		glBindVertexArray(vao);
+		glEnableVertexAttribArray(in_position_loc);
+		gl_has_errors();
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)0);
+		gl_has_errors();
+		glEnableVertexAttribArray(in_texcoord_loc);
+		glVertexAttribPointer(in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex), (void*)sizeof(vec3));
+		// note the stride to skip the preceeding vertex position
+		// Enabling and binding texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id = texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+		gl_has_errors();
+	}
+	else if (render_request.used_effect == EFFECT_ASSET_ID::INVENTORY_LINE) {
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		GLint in_color_loc = glGetAttribLocation(program, "in_color");
+		gl_has_errors();
+		glBindVertexArray(vao);
+		glEnableVertexAttribArray(in_position_loc);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,sizeof(ColoredVertex), (void*)0);
+		gl_has_errors();
+		glEnableVertexAttribArray(in_color_loc);
+		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,sizeof(ColoredVertex), (void*)sizeof(vec3));
+		gl_has_errors();
+	} else {
+		assert(false && "Type of render request not supported");
+	}
+	// Getting uniform locations for glUniform* calls
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	gl_has_errors();
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+
+
+
 
 //void RenderSystem::renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans) {
 //

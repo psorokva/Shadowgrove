@@ -1,66 +1,110 @@
-#include "save_state.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
 
-SaveState::SaveState() {
-    loaded = 0;
-}
+//#include "world_init.hpp"
+#include "world_system.hpp"
+#include "save_state.hpp"
 
-void SaveState::saveInventory() {
-    // Open the file in output mode
+
+void SaveState::saveGame(GameState state) 
+{
     std::ofstream outputFile(filePath);
 
     // Check if the file is opened successfully
-    if (outputFile.is_open()) {
-        // Write some content to the file
-        //registry.inventory
-        for (Item item : registry.inventory.components[0].holding) {
+    if (outputFile.is_open()) 
+    {
+
+        // --- player inventory ---
+        for (Item item : state.player_inventory) {
             outputFile << static_cast<int>(item) << std::endl;
         }
 
+        // --- crafted potions ---
+        outputFile << state.orange_crafted << std::endl;
+        outputFile << state.green_crafted << std::endl;
+        outputFile << state.purple_crafted << std::endl;
+
+        // --- level ---
+        outputFile << state.level << std::endl;
+
         // Close the file
         outputFile.close();
-
-        std::cout << "File written successfully at path: " << filePath << std::endl;
+        std::cout << "Game State saved successfully at: " << filePath << std::endl;
     }
-    else {
+
+    else 
+    {
         std::cerr << "Unable to open the file for writing!" << std::endl;
     }
 }
 
-void SaveState::loadInventory() {
-    if (loaded >= 2) {
-        return;
-    }
-    // Open the file in input mode
+
+GameState SaveState::loadGame() 
+{
+    GameState state;
+
     std::ifstream inputFile(filePath);
 
     // Check if the file is opened successfully
-    if (inputFile.is_open()) {
+    if (inputFile.is_open()) 
+    {
         int itemValue;
-        Inventory& inventory = registry.inventory.components[0];
-        int i = 0;
-        // Read and convert each integer value to enum
-        while (inputFile >> itemValue) {
-            // Cast the integer to enum and output its value
-            if (i >= inventory.holding.size()) {
-                break;
-            }
+        // --- player inventory ---
+        for (int i = 0; i < inventory_size; i++)
+        {
+            inputFile >> itemValue;
             Item item = static_cast<Item>(itemValue);
-            inventory.holding[i] = item;
-            i++;
+            state.player_inventory[i] = item;
+        }
+
+        // --- crafted potions ---
+        // TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default
+        bool potion_crafted;
+        for (int i = 0; i < potions_size; i++)
+        {
+            //std::cout << "potionType: " << potionType << std::endl;
+            inputFile >> potion_crafted;
+            if (i == 0 && potion_crafted)
+            {
+                state.orange_crafted = true;
+            }
+            else if (i == 1 && potion_crafted)
+            {
+                state.green_crafted = true;
+            }
+            else if (i == 2 && potion_crafted)
+            {
+                state.purple_crafted = true;
+            }
+        }
+
+        int level;
+        for (int i = 0; i < levels_size; i++)
+        {
+            inputFile >> level;
+            state.level = level;
         }
 
         // Close the file
         inputFile.close();
-
-        std::cout << "Enum values read successfully from the file at path: " << filePath << std::endl;
+        std::cout << "Game State read successfully at: " << filePath << std::endl;
     }
-    else {
+    else 
+    {
         std::cerr << "Unable to open the file for reading!" << std::endl;
     }
 
-    loaded++;
+    return state;
+}
 
+
+void SaveState::clearSave() 
+{
+    // Delete everything in file
+    std::ofstream outputFile(filePath, std::ofstream::out | std::ofstream::trunc);
+
+    GameState state;
+
+    saveGame(state);
 }

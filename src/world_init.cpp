@@ -30,9 +30,58 @@ Entity createPlayer(RenderSystem* renderer, vec2 pos) {
 }
 
 
+Entity createSpeechBubble(RenderSystem* renderer, vec2 pos, bool direction) {
+	auto entity = Entity();
+	UIComp& ui_comp = registry.uicomps.emplace(entity);
+	ui_comp.position = pos;
+	ui_comp.scale = vec2(540.0, 130.0 );
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BUBBLE0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
 
+Entity createPortrait(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	UIComp& ui_comp = registry.uicomps.emplace(entity);
+	ui_comp.position = pos;
+	ui_comp.scale = vec2(250.0, 300.0);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::PORTRAIT0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	AnimatedFaceOject& animation = registry.face_animation.emplace(entity);
+	return entity;
+}
+
+Entity createDogPortrait(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	UIComp& ui_comp = registry.uicomps.emplace(entity);
+	ui_comp.position = pos;
+	ui_comp.scale = vec2(250.0, 300.0);
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::DOG_PORTRAIT0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	AnimatedDogFace& animation = registry.dog_face_animation.emplace(entity);
+	return entity;
+}
+
+Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
+	// TYPE: 0 = GREEN , PURPLE = 1,  ORANGE = default
+	auto entity = Entity();
+    registry.permanents.emplace(entity);
+	UIComp& ui_comp = registry.uicomps.emplace(entity);
+	ui_comp.position = pos;
+	ui_comp.scale = vec2(50, 50.0);
+	ui_comp.potion_type = type;
+	if (type == 0) {
+		// GREEN
+		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_02, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	} else if (type == 1) {
+		// PURPLE
+		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_03, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	} else {
+		// ORANGE
+		registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::POTION_04, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	}
+	return entity;
+}
 
 Entity createKeeper(RenderSystem* renderer, vec2 pos) {
+	std::cout << "creating normal keeper" << std::endl;
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
@@ -48,8 +97,43 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 
 	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
 	auto& enemy = registry.enemies.emplace(entity);
-	enemy.attack = 50;
+
+	// adjust these as needed for game balance
+	unsigned int lower_bound_damage = 10;
+	unsigned int upper_bound_damage = 30;
+	enemy.attack = rand() % (upper_bound_damage - lower_bound_damage + 1) + lower_bound_damage;
+
 	enemy.e_id = entity;
+	registry.deadlys.emplace(entity); // Do we still need this?
+	// TEXTURE_COUNT indicates that no texture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createFloatingKeeper(RenderSystem* renderer, vec2 pos) {
+	std::cout << "creating floating keeper" << std::endl;
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	// Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
+	// registry.meshPtrs.emplace(entity, &mesh);
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ KEEPER_WIDTH, KEEPER_HEIGHT * 2 });
+
+	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
+	auto& enemy = registry.floating_enemies.emplace(entity);
+
+	// adjust these as needed for game balance
+	unsigned int lower_bound_damage = 5;
+	unsigned int upper_bound_damage = 10;
+	enemy.attack = rand() % (upper_bound_damage - lower_bound_damage + 1) + lower_bound_damage;
+
 	registry.deadlys.emplace(entity); // Do we still need this?
 	// TEXTURE_COUNT indicates that no texture is needed
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
@@ -71,6 +155,17 @@ Entity createPlant(RenderSystem* renderer, vec2 position, int biome_type, int pl
 	fixed.position = position;
 	fixed.scale = vec2({ STD_PLANT_WIDTH, STD_PLANT_HEIGHT });
 	
+	Oscilation& osc = registry.oscilations.emplace(entity);
+	osc.base = fixed.scale.y;
+	//osc.y = fixed.y;
+	osc.max += (float)(rand() % 6);
+	osc.min -= (float)(rand() % 5);
+
+	Dance& dance = registry.dances.emplace(entity);
+	dance.base = fixed.angle;
+	dance.max += 0.01 * (float)(rand() % 4);
+	dance.min -= 0.01 * (float)(rand() % 4);
+
 	auto& wall = registry.impenetrables.emplace(entity);
 	wall.position = position;
 	wall.scale = fixed.scale;
@@ -393,11 +488,50 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 			break;
 		case (8):
 			registry.healers.get(entity).item_name = torch;
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_OFF0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.torch_off_animation.emplace(entity);
 			break;
 	}
-	
+	Entity other = createSparkle(renderer, position);
+	Paired& pair = registry.pairs.emplace(entity);
+	pair.other = other;
+	return entity;
+}
 
+Entity createSparkle(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos; // +vec2(0.0, -10.0);
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ MUSHROOM_SIZE*1.3, MUSHROOM_SIZE * 1.3 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::SPARK0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	AnimatedSparkle& spark = registry.sparkle_animation.emplace(entity);
+	return entity;
+}
+
+Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	UIComp& motion = registry.uicomps.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_HEIGHT *1.5, PLAYER_HEIGHT * 1.5 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BSPARK0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	AnimatedPlayerSparkle& spark = registry.player_sparkle_animation.emplace(entity);
+	return entity;
+}
+
+Entity createSunMoonSpinner(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	auto entityBG = Entity();
+	UIComp& motion = registry.uicomps.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_HEIGHT * 2., PLAYER_HEIGHT * 2.0 });
+	Rotator& rot = registry.rotators.emplace(entity);
+	UIComp& uibg = registry.uicomps.emplace(entityBG);
+	uibg.position = pos;
+	uibg.scale = vec2({ PLAYER_HEIGHT * 2., PLAYER_HEIGHT * 2.0 });
+	registry.renderRequests.insert(entityBG, { TEXTURE_ASSET_ID::DAYNIGHT0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::DAYNIGHT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
 
@@ -425,7 +559,6 @@ Entity createCraftingUI(vec2 position) {
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::CRAFTING, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;
 }
-
 
 Entity createCheck(vec2 position) {
 	auto entity = Entity();
@@ -607,7 +740,8 @@ Entity createInventoryPotion(Item& item, vec2 position) {
 			break;
 		case torch:
 			registry.healers.get(entity).item_name = torch;
-			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_00, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TORCH_OFF0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+			registry.torch_off_animation.emplace(entity);
 			break; 
     }
 
@@ -616,6 +750,42 @@ Entity createInventoryPotion(Item& item, vec2 position) {
 }
 
 Entity createDay() {
+	auto entity = Entity();
+
+	auto& day = registry.screenStates.emplace(entity);
+	Daytime& sign = registry.daytimes.emplace(entity);
+
+	auto& fixed = registry.immobiles.emplace(entity);
+	//    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
+	fixed.position = { window_width_px / 2, 0.5 * window_height_px };
+	fixed.scale = { window_width_px, window_height_px };
+	//    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
+
+		// TEXTURE_COUNT indicates that no txture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createIntroScreen() {
+	auto entity = Entity();
+
+	auto& day = registry.screenStates.emplace(entity);
+	Daytime& sign = registry.daytimes.emplace(entity);
+
+	auto& fixed = registry.immobiles.emplace(entity);
+	//    fixed.position = { window_width_px / 2, 0.75 * window_height_px };
+	fixed.position = { window_width_px / 2, 0.5 * window_height_px };
+	fixed.scale = { window_width_px, window_height_px };
+	//    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
+
+		// TEXTURE_COUNT indicates that no txture is needed
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::INTRO_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createEnd() {
     auto entity = Entity();
 
     auto& day = registry.screenStates.emplace(entity);
@@ -628,7 +798,7 @@ Entity createDay() {
 //    fixed.camera_position = { window_width_px / 2, window_height_px / 2 };
 
     // TEXTURE_COUNT indicates that no txture is needed
-    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::DAY_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::END_SCREEN, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
     return entity;
 }
@@ -694,6 +864,39 @@ Entity createHelp() {
     return entity;
 }
 
+Entity createCraftingList() {
+    auto entity = Entity();
+
+    HelpScreen& help = registry.helpScreen.emplace(entity);
+
+    Motion& motion = registry.motions.emplace(entity);
+    motion.scale = {0.5 * window_width_px, 0.5 * window_height_px};
+    motion.camera_position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+
+    auto &fixed = registry.immobiles.emplace(entity);
+    fixed.position = {window_width_px / 2 + 1.0, 0.5 * window_height_px};
+    fixed.scale = {0.5 * window_width_px +2.0, 0.5 * window_height_px};
+    // TEXTURE_COUNT indicates that no txture is needed
+    registry.renderRequests.insert( entity,	{ TEXTURE_ASSET_ID::CRAFTINGLIST, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+    return entity;
+}
+
+Entity createTutorial() {
+	auto entity = Entity();
+
+	Motion& tutorial_motion = registry.motions.emplace(entity);
+	tutorial_motion.scale = vec2({ 600, 600 });
+	//tutorial_motion.scale = { 0.75 * window_width_px, 0.75 * window_height_px };
+	tutorial_motion.position = { window_width_px / 2, window_height_px / 2 };
+
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::TUT1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	TutorialSequence& tutorial = registry.tutorialSequence.emplace(entity);
+
+	return entity;
+}
+
 Entity createShadowOverlay(RenderSystem* renderer) {
 	auto entity = Entity();
 	Motion& motion = registry.motions.emplace(entity);
@@ -726,6 +929,10 @@ Entity createDog(vec2 position) {
     immobile.position = position;
     immobile.scale = vec2({ 1.6 * 135, 1.6 * 60 });
     immobile.camera_position = { window_width_px / 4, window_height_px / 4 };
+
+	Oscilation& osc = registry.oscilations.emplace(entity);
+	osc.base = immobile.scale.y;
+
 
     Daytime& dog = registry.daytimes.emplace(entity);
 

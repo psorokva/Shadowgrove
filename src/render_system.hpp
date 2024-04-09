@@ -147,19 +147,30 @@ class RenderSystem {
 			textures_path("plant_29.png"),
 			textures_path("plant_30.png"),
 			textures_path("plant_31.png"),
+			textures_path("face00.png"),
+			textures_path("face01.png"),
+			textures_path("face02.png"),
+			textures_path("dogface00.png"),
+			textures_path("dogface01.png"),
+			textures_path("text_bubble_brown_big.png"),
+			textures_path("text_bubble_brown_small.png"),
 			textures_path("daytimescreen.png"),
+			textures_path("endscreen.png"),
+			textures_path("introscreen.png"),
             textures_path("helpscreen.png"),
             textures_path("sign.png"),
             textures_path("sign2.png"),
 			textures_path("Torchlight_00.png"),
 			textures_path("Torchlight_01.png"),
 			textures_path("Torchlight_03.png"),
+			textures_path("Torchlight_07_dim.png"),
+			textures_path("Torchlight_08_dim.png"),
 			textures_path("ShadowOverlay_00.png"),
 			textures_path("ShadowOverlay_01.png"),
 			textures_path("MidnightOverlay_00.png"),
 			textures_path("MidnightOverlay_01.png"),
-			textures_path("torch_00.png"),
 			textures_path("CRAFTING2.png"),
+            textures_path("craftingList.png"),
 			textures_path("NightHelpOverlay.png"),
 			textures_path("NightHelpTorchlight.png"),
             textures_path("logo_00.png"),
@@ -171,6 +182,35 @@ class RenderSystem {
 			textures_path("oc.png"),
 			textures_path("gc.png"),
 			textures_path("pc.png"),
+			textures_path("tutorial_page1.png"),
+			textures_path("tutorial_page2.png"),
+			textures_path("tutorial_page3.png"),
+			textures_path("tutorial_page4.png"),
+			textures_path("tutorial_page5.png"),
+			textures_path("spark_00.png"),
+			textures_path("spark_01.png"),
+			textures_path("spark_02.png"),
+			textures_path("spark_03.png"),
+			textures_path("spark_04.png"),
+			textures_path("spark_05.png"),
+			textures_path("spark_06.png"),
+			textures_path("spark_07.png"),
+			textures_path("blue_spark_00.png"),
+			textures_path("blue_spark_01.png"),
+			textures_path("blue_spark_02.png"),
+			textures_path("blue_spark_03.png"),
+			textures_path("blue_spark_04.png"),
+			textures_path("blue_spark_05.png"),
+			textures_path("blue_spark_06.png"),
+			textures_path("blue_spark_07.png"),
+			textures_path("torch_03.png"),
+			textures_path("torch_04.png"),
+			textures_path("torch_05.png"),
+			textures_path("torch_00.png"),
+			textures_path("torch_01.png"),
+			textures_path("torch_02.png"),
+			textures_path("daynight0.png"),
+			textures_path("daynight1.png"),
 
 	}; //textures_path("bush_06.png"), etc... TODO: convert to tilesets and save on file loading
 
@@ -209,9 +249,11 @@ public:
 
 	// Initialize fonts to output text to the screen
 	bool initializeFonts(unsigned int font_default_size);
+    bool initializeSpeech(unsigned int font_default_size);
 
 	// Print text to the screen
 	void renderText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
+    void renderSpeechText(const std::string& text, float x, float y, float scale, const glm::vec3& color, const glm::mat4& trans);
 
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
@@ -229,6 +271,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawTexturedStaticMesh(Entity entity, const mat3& projection);
+	void drawTexturedUIMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
 	Entity * win_dance;
 	// Window handle

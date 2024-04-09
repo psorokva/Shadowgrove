@@ -18,6 +18,8 @@
 #include "physics_system.hpp"
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods
+
+
 class WorldSystem {
 public:
 	WorldSystem();
@@ -51,8 +53,10 @@ private:
 	void on_key(int key, int, int action, int mod);
 	void on_mouse_move(vec2 pos);
 	void on_mouse_click(int button, int action, int mods);
-	void draw_chunk_borders();
+	void on_scroll(double x_offset, double y_offset);
 
+	void draw_chunk_borders();
+	
 	// restart level
 	void restart_game(bool from_init);
 
@@ -75,6 +79,7 @@ private:
 	float current_speed;
 	Entity player;
 	Entity help;
+    Entity craftingList;
 	Entity win_dance;
 	Immobile* compass_immobile;
     int inventory;
@@ -90,6 +95,10 @@ private:
     Mix_Chunk* player_death_sound;
     Mix_Chunk* inventory_full_sound;
 	Mix_Chunk* player_hit_sound;
+	Mix_Chunk* rooster_sound;
+	Mix_Chunk* torch_sound;
+	Mix_Chunk* page_turn_sound;
+	Mix_Chunk* menu_close_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;
