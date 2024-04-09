@@ -18,6 +18,7 @@ void RenderSystem::drawTexturedMesh(Entity entity, const mat3 &projection) {
         transform.translate(motion.position);
     }
 	transform.scale(motion.scale);
+	transform.rotate(motion.angle);
 
 	assert(registry.renderRequests.has(entity));
 	const RenderRequest &render_request = registry.renderRequests.get(entity);

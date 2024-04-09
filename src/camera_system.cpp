@@ -12,11 +12,38 @@ void CameraSystem::step() {
 		if (player == entity) {
 			continue;
 		}
-		Motion& motion = motion_registry.components[i];
+		Motion& motion = motion_registry.get(entity);
 		float xDiff = player_motion.position[0] - motion.position[0];
 		float yDiff = player_motion.position[1] - motion.position[1];
 
 		motion.camera_position = { player_motion.camera_position[0] - xDiff, player_motion.camera_position[1] - yDiff };
+		//if (registry.oscilations.has(entity)) {
+		//	Oscilation& osc = registry.oscilations.get(entity);
+		//	osc.current += osc.amount * osc.direction;
+		//	if (osc.current > osc.max) {
+		//		osc.direction *= -1.0;
+		//		osc.current = osc.max;
+		//	} else if (osc.current < osc.min) {
+		//		osc.direction *= -1.0;
+		//		osc.current = osc.min;
+		//	}
+		//	motion.scale = { osc.base_x - osc.current, osc.base + osc.current };
+		//	
+		//}
+		//if (registry.dances.has(entity)) {
+		//	Dance& dance = registry.dances.get(entity);
+		//	dance.current += dance.amount * dance.direction;
+		//	if (dance.current > dance.max) {
+		//		dance.direction *= -1.0;
+		//		dance.current = dance.max;
+		//	} else if (dance.current < dance.min) {
+		//		dance.direction *= -1.0;
+		//		dance.current = dance.min;
+		//	}
+		//	motion.angle = dance.base + dance.current;
+
+		//}
+
 	}
 
 	// For walls placement, might need to change

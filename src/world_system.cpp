@@ -321,6 +321,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 
+		if (sparkle_slowdown == 0 && registry.player_hurtsparkle_animation.entities.size() > 0) {
+			// also do for dog
+			for (Entity& animated_entity : registry.player_hurtsparkle_animation.entities) {
+				AnimatedPlayerHurtSparkle& face = registry.player_hurtsparkle_animation.get(animated_entity);
+				// No need to check if render request since should always have a render request
+				RenderRequest& anim_rr = registry.renderRequests.get(animated_entity);
+				face.current_cell++;
+				if (face.current_cell >= face.size) {
+					face.current_cell = 0;
+				}
+				anim_rr.used_texture = face.cells[face.current_cell];
+			}
+		}
+
 		if (registry.torch_off_animation.entities.size() > 0) {
 			// also do for dog
 			for (Entity& animated_entity : registry.torch_off_animation.entities) {
@@ -445,11 +459,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	auto& enemies = registry.enemies.components;
 	for (int i = 0; i < enemies.size(); i++ ) {
 		RenderRequest& r = registry.renderRequests.get( enemies[i].e_id );
-		if (animation_cycle % 2 == 1) {
-			r.used_texture = TEXTURE_ASSET_ID::KEEPER2;
-		} else {
-			r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
-		}
+		if (!registry.oscilations.has(enemies[i].e_id)) {
+			if (animation_cycle % 2 == 1) {
+				r.used_texture = TEXTURE_ASSET_ID::KEEPER2;
+			} else {
+				r.used_texture = TEXTURE_ASSET_ID::KEEPER1;
+			}
+		} 
+
+		
 	}
 
 	// debugging maze tiles
@@ -822,8 +840,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             player_component.hit = 0;
             registry.invincibles.remove(entity);
             registry.hitTimers.remove(entity);
-            while (registry.player_sparkle_animation.entities.size() > 0)
-                registry.remove_all_components_of(registry.player_sparkle_animation.entities.back());
+            while (registry.player_hurtsparkle_animation.entities.size() > 0)
+                registry.remove_all_components_of(registry.player_hurtsparkle_animation.entities.back());
             return true;
         }
     }
@@ -1674,18 +1692,20 @@ void WorldSystem::restart_game() {
 			keeper_rate -= 0.8;
 			KEEPER_SPAWN_FREQ = keeper_rate * 1000.0;
 		}
-		for (int k = 0; k < level + 2; k++) {
+		for (int k = 0; k < level + 3; k++) {
 			vec2 spawn_point = registry.get_empty_spawn_keeper_location();
-			printf("KeeperSpawn at %f, %f\n", spawn_point.x, spawn_point.y);
+			//printf("KeeperSpawn at %f, %f\n", spawn_point.x, spawn_point.y);
 			createKeeper(renderer, spawn_point);
 		}
-		for (int num_keepers = 0; num_keepers < level; num_keepers++) {
-			createKeeper(renderer, registry.get_empty_spawn_location());
+		//rare big keeper
+		for (int num_keepers = 0; num_keepers < level -4; num_keepers++) {
+			createKeeperBoss(renderer, registry.get_empty_spawn_location());
+            // createKeeper(renderer, registry.get_empty_spawn_location());
 		}
-		for (Entity& e : registry.enemies.entities) {
-			Motion& spawn_point = registry.motions.get(e);
-			printf("Keeperat %f, %f\n", spawn_point.position.x, spawn_point.position.y);
-		}
+		//for (Entity& e : registry.enemies.entities) {
+		//	Motion& spawn_point = registry.motions.get(e);
+		//	printf("Keeperat %f, %f\n", spawn_point.position.x, spawn_point.position.y);
+		//}
     }
 
 	if (screen.game_screen == game_screen_night) 	{
@@ -1761,7 +1781,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
                         if (!registry.hitTimers.has(entity))
                         {
                             registry.hitTimers.emplace(entity);
-                            createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
+                            createPlayerHurtSparkle(renderer, registry.motions.get(player).camera_position);
                         }
 
 						// Move enemy slightly back after collision (so that player doesn't die instantly)

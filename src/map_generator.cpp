@@ -175,7 +175,7 @@ bool MapGen::createWorldMap() {
 	}
 	//printf("stitching_jobs begin\n");
 	std::vector<ChunkStitch> stitching_jobs = std::vector<ChunkStitch>();
-	getStitchingVector(stitching_jobs, rows, cols, 2);
+	getStitchingVector(stitching_jobs, rows, cols, 3);
 	//printf("stitching_jobs complete\n");
 	//printf("stitching_jobs size %d \n", stitching_jobs.size());
 	for (ChunkStitch& job : stitching_jobs) {

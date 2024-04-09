@@ -182,9 +182,9 @@ struct TextTimer {
 // All data relevant to the shape and motion of entities
 struct Motion {
 	vec2 position = { 0, 0 };
-	float angle = 0;
+	float angle = 0.0;
 	vec2 velocity = { 0, 0 };
-	vec2 scale = { 10, 10 };
+	vec2 scale = { 10.0, 10.0 };
 	vec2 camera_position = { 0, 0 };
 };
 
@@ -197,21 +197,20 @@ struct Immobile {
 };
 
 struct Oscilation {
-	//bool rotates = false;
-	//bool stretches = false;
+	float base_x = 0.0;
 	float base = 0.0;
 	float max = 5.0;
-	float min = -3.0;
-	float amount = 0.02;
+	float min = -5.0;
+	float amount = 0.025;
 	float current = 0.0;
 	float direction = 1.0;
 };
 
 struct Dance {
 	float base = 0.0;
-	float max = 0.03;
-	float min = -0.04;
-	float amount = 0.0004;
+	float max = 0.05;
+	float min = -0.05;
+	float amount = 0.0005;
 	float current = 0.0;
 	float direction = 1.0;
 };
@@ -530,7 +529,15 @@ enum class TEXTURE_ASSET_ID {
 	BSPARK5 = BSPARK4 + 1,
 	BSPARK6 = BSPARK5 + 1,
 	BSPARK7 = BSPARK6 + 1,
-	TORCH_OFF0 = BSPARK7 + 1,
+	RSPARK0 = BSPARK7 + 1,
+	RSPARK1 = RSPARK0 + 1,
+	RSPARK2 = RSPARK1 + 1,
+	RSPARK3 = RSPARK2 + 1,
+	RSPARK4 = RSPARK3 + 1,
+	RSPARK5 = RSPARK4 + 1,
+	RSPARK6 = RSPARK5 + 1,
+	RSPARK7 = RSPARK6 + 1,
+	TORCH_OFF0 = RSPARK7 + 1,
 	TORCH_OFF1 = TORCH_OFF0 + 1,
 	TORCH_OFF2 = TORCH_OFF1 + 1,
 	TORCH_00 = TORCH_OFF2 + 1,
@@ -627,6 +634,14 @@ struct AnimatedPlayerSparkle {
 	};
 };
 
+struct AnimatedPlayerHurtSparkle {
+	uint size = 8;
+	uint current_cell = 0;
+	TEXTURE_ASSET_ID cells[8] = {
+		TEXTURE_ASSET_ID::RSPARK0, TEXTURE_ASSET_ID::RSPARK1, TEXTURE_ASSET_ID::RSPARK2, TEXTURE_ASSET_ID::RSPARK3,
+		TEXTURE_ASSET_ID::RSPARK4, TEXTURE_ASSET_ID::RSPARK5, TEXTURE_ASSET_ID::RSPARK6, TEXTURE_ASSET_ID::RSPARK7,
+	};
+};
 
 
 //TEXTURE_ASSET_ID base_asset = TEXTURE_ASSET_ID::PORTRAIT0;
