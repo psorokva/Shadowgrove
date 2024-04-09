@@ -804,19 +804,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	}
 
+    // TODO: this will crash if 2 blue poptions are drank and removed same tick 
 	for (Entity e : registry.invincibility.entities) {
 		Invincibility& inv = registry.invincibility.get(e);
 		inv.i_timer -= elapsed_ms_since_last_update;
-		if (inv.i_timer > 0) {
-			registry.players.components[0].health = 100;
-		}
-		else if (screen.game_screen == game_screen_day) {
-			registry.invincibility.remove(e);
-		}
-		else {
-			registry.invincibility.remove(e);
-		}
-
+		//if (inv.i_timer > 0) {
+        // // NO invincible not regeneration
+		//	registry.players.components[0].health = 100;
+		//}
+        if (inv.i_timer <= 0) {
+            registry.invincibility.remove(e);
+            while (registry.player_sparkle_animation.entities.size() > 0) {
+                registry.remove_all_components_of(registry.player_sparkle_animation.entities.back());
+            }
+        }
 	}
 
 	// reduce window brightness if any of the present is dying
@@ -842,6 +843,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             registry.hitTimers.remove(entity);
             while (registry.player_hurtsparkle_animation.entities.size() > 0)
                 registry.remove_all_components_of(registry.player_hurtsparkle_animation.entities.back());
+
             return true;
         }
     }
@@ -1403,6 +1405,18 @@ void WorldSystem::restart_game() {
 		registry.remove_all_components_of(registry.torches.entities.back());
     while (registry.uicomps.entities.size() > 0)
         registry.remove_all_components_of(registry.uicomps.entities.back());
+
+    ScreenState& screen = registry.screenStates.components[0];
+    //if (screen.game_screen != game_screen_night) {
+        // TODO : add invincibility and sparkle removal here for player drinks potion in day? // 
+    //}
+    while (registry.player_sparkle_animation.entities.size() > 0) 
+        registry.remove_all_components_of(registry.player_sparkle_animation.entities.back());
+    while (registry.player_hurtsparkle_animation.entities.size() > 0)
+        registry.remove_all_components_of(registry.player_hurtsparkle_animation.entities.back());
+    while (registry.invincibility.entities.size() > 0)
+        registry.remove_all_components_of(registry.invincibility.entities.back());
+
     for (Entity entity : registry.textRenderRequests.entities)
     {
         if (!registry.pauses.has(entity)) {
@@ -1457,7 +1471,7 @@ void WorldSystem::restart_game() {
 	registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
     Player& player_component = registry.players.components[0];
-    ScreenState &screen = registry.screenStates.components[0];
+
 
     if (screen.game_screen == game_screen_game_over) {
         createEnd();
@@ -1766,7 +1780,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 			if (registry.enemies.has(entity_other)) {
 				Enemy& e = registry.enemies.get(entity_other);
 				// initiate death unless already dying
-				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && player_component.alive == 1) {
+				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && !registry.invincibility.has(entity) && player_component.alive == 1) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
 					p.health = p.health - e.attack;
 					if (p.health > 0) {
@@ -1805,7 +1819,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 			else if (registry.floating_enemies.has(entity_other)) {
 				FloatingEnemy& e = registry.floating_enemies.get(entity_other);
 				// initiate death unless already dying
-				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && player_component.alive == 1) {
+				if (!registry.deathTimers.has(entity) && !registry.invincibles.has(entity) && !registry.invincibility.has(entity) && player_component.alive == 1) {
 					Motion& enemy_motion = registry.motions.get(entity_other);
 					p.health = p.health - e.attack;
 					if (p.health > 0) {
@@ -2153,9 +2167,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                        yellow_potion) {
                 screen.torch_mode = 1;
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
-            } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] ==
-                       blue_potion) {
-                registry.interactables.emplace(player);
+            } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == blue_potion) {
+                registry.invincibility.emplace(player);
+                // TODO : this may mess things up if drank in daytime and we don't delete the sparks// 
+                createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
             } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch && screen.game_screen == game_screen_night) {
                 Entity torch_entity = Entity();

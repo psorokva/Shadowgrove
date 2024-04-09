@@ -113,12 +113,12 @@ enum Item {
 	magical_carrot,
 	red_lotus,
 	white_lotus,
-	red_potion,
+	red_potion, // 8
 	green_potion,
 	purple_potion,
 	orange_potion,
-	blue_potion,
-	yellow_potion,
+	blue_potion, //12
+	yellow_potion, //13
 	torch,
 	nullval
 };
@@ -139,7 +139,7 @@ struct Torches {
 };
 
 struct Invincibility {
-	float i_timer = 60000.0;
+	float i_timer = 10000.0;
 };
 
 struct Deadly {
