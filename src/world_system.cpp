@@ -663,7 +663,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				createGC({ pos.x - 410, pos.y + 527 });
 			}
 			if (purple_crafted) {
-				createPC({ pos.x - 410, pos.y + 590 });
+				createPC({ pos.x - 410, pos.y + 600 });
 			}
             for (int i = 0; i < registry.inventory.get(player).inUI.size(); i++) {
                 Item item = registry.inventory.get(player).inUI[i];
@@ -1601,25 +1601,25 @@ void WorldSystem::restart_game() {
 
         auto credit1 = Entity();
         registry.textTimers.emplace(credit1);
-        registry.speechRenderRequests.insert(credit1, {"Super Awesome Game By", vec2(350, -50)});
+        registry.speechRenderRequests.insert(credit1, {"Super Awesome Game By", vec2(390, -50)});
         auto credit2 = Entity();
         registry.textTimers.emplace(credit2);
-        registry.speechRenderRequests.insert(credit2, {"Madeleine", vec2(435, -130)});
+        registry.speechRenderRequests.insert(credit2, {"Madeleine", vec2(475, -130)});
         auto credit3 = Entity();
         registry.textTimers.emplace(credit3);
-        registry.speechRenderRequests.insert(credit3, {"Peter", vec2(460, -200)});
+        registry.speechRenderRequests.insert(credit3, {"Peter", vec2(500, -200)});
         auto credit4 = Entity();
         registry.textTimers.emplace(credit4);
-        registry.speechRenderRequests.insert(credit4, {"Polina", vec2(455, -270)});
+        registry.speechRenderRequests.insert(credit4, {"Polina", vec2(495, -270)});
         auto credit5 = Entity();
         registry.textTimers.emplace(credit5);
-        registry.speechRenderRequests.insert(credit5, {"Luka", vec2(465, -340)});
+        registry.speechRenderRequests.insert(credit5, {"Luka", vec2(505, -340)});
         auto credit6 = Entity();
         registry.textTimers.emplace(credit6);
-        registry.speechRenderRequests.insert(credit6, {"Aviral", vec2(455, -410)});
+        registry.speechRenderRequests.insert(credit6, {"Aviral", vec2(495, -410)});
         auto credit7 = Entity();
         registry.textTimers.emplace(credit7);
-        registry.speechRenderRequests.insert(credit7, {"thanks for playing!", vec2(355, -500)});
+        registry.speechRenderRequests.insert(credit7, {"thanks for playing!", vec2(395, -500)});
     }
     else if (screen.game_screen == game_screen_night) {
         //printf("in game night screen\n");
@@ -1905,13 +1905,18 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
             }
         }
         else if (y_pos < half_height) {
-            screen.game_screen = game_screen_night;
-			for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
-				registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
-			}
-			registry.inventory.get(registry.players.entities[0]).index = {};
-			registry.inventory.get(registry.players.entities[0]).inUI = {};
-            restart_game();
+            Player &player_component = registry.players.components[0];
+            if (player_component.won == 0){
+                screen.game_screen = game_screen_night;
+                for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
+                    registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(registry.players.entities[0]).index[i]] = registry.inventory.get(registry.players.entities[0]).inUI[i];
+                }
+                registry.inventory.get(registry.players.entities[0]).index = {};
+                registry.inventory.get(registry.players.entities[0]).inUI = {};
+                restart_game();
+            } else {
+                player_motion.position.y = half_height;
+            }
         }
         // check bottom
         else if (y_pos > bottom) {
@@ -2080,7 +2085,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         restart_game();
     }
 
-    if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE) {
+    if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE && (screen.game_screen == game_screen_day || screen.game_screen == game_screen_night)) {
         int selected_inv_state = registry.inventory.get(registry.players.entities[0]).select_state;
         if (registry.inventory.get(registry.players.entities[0]).is_open == false) {
             if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == magical_mushroom) {
@@ -2132,7 +2137,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                        blue_potion) {
                 registry.interactables.emplace(player);
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
-            } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch) {
+            } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch && screen.game_screen == game_screen_night) {
                 Entity torch_entity = Entity();
                 registry.torches.emplace(torch_entity);
                 UIComp &torch_ui = registry.uicomps.emplace(torch_entity);
