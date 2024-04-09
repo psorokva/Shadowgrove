@@ -58,7 +58,7 @@ private:
 	void draw_chunk_borders();
 	
 	// restart level
-	void restart_game(bool from_init);
+	void restart_game();
 
 	// OpenGL window handle
 	GLFWwindow* window;
