@@ -111,6 +111,35 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createKeeperBoss(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2((float)KEEPER_WIDTH*3.0, (float)KEEPER_HEIGHT*1.8 );
+	auto& enemy = registry.enemies.emplace(entity);
+	unsigned int lower_bound_damage = 20;
+	unsigned int upper_bound_damage = 45;
+	enemy.attack = rand() % (upper_bound_damage - lower_bound_damage + 1) + lower_bound_damage;
+	enemy.e_id = entity;
+	Oscilation& osc = registry.oscilations.emplace(entity);
+	osc.base = (float)KEEPER_HEIGHT * 1.8; //motion.scale.y;
+	osc.base_x = (float)KEEPER_WIDTH * 3.0; // motion.scale.x;
+	osc.max = 30.0f;
+	osc.min = -30.0f;
+	osc.amount = 0.05;
+	Dance& dance = registry.dances.emplace(entity);
+	dance.base = motion.angle;
+	dance.max = 0.05;
+	dance.min = 0.05;
+	dance.amount = 0.005;
+	registry.deadlys.emplace(entity); // Do we still need this?
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 Entity createFloatingKeeper(RenderSystem* renderer, vec2 pos) {
 	std::cout << "creating floating keeper" << std::endl;
 	auto entity = Entity();
@@ -517,6 +546,16 @@ Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos) {
 	motion.scale = vec2({ PLAYER_HEIGHT *1.5, PLAYER_HEIGHT * 1.5 });
 	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::BSPARK0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 	AnimatedPlayerSparkle& spark = registry.player_sparkle_animation.emplace(entity);
+	return entity;
+}
+
+Entity createPlayerHurtSparkle(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+	UIComp& motion = registry.uicomps.emplace(entity);
+	motion.position = pos;
+	motion.scale = vec2({ PLAYER_HEIGHT * 1.1, PLAYER_HEIGHT * 1.1 });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::RSPARK0, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	AnimatedPlayerHurtSparkle& spark = registry.player_hurtsparkle_animation.emplace(entity);
 	return entity;
 }
 

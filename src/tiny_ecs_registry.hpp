@@ -51,6 +51,7 @@ public:
 	ComponentContainer<TutorialSequence> tutorialSequence;
 	ComponentContainer<AnimatedSparkle> sparkle_animation;
 	ComponentContainer<AnimatedPlayerSparkle> player_sparkle_animation;
+	ComponentContainer<AnimatedPlayerHurtSparkle> player_hurtsparkle_animation;
 	ComponentContainer<AnimatedTorchOn> torch_on_animation;
 	ComponentContainer<AnimatedTorchOff> torch_off_animation;
 	ComponentContainer<Paired> pairs;
@@ -99,6 +100,7 @@ public:
 		registry_list.push_back(&tutorialSequence);
 		registry_list.push_back(&sparkle_animation);
 		registry_list.push_back(&player_sparkle_animation);
+		registry_list.push_back(&player_hurtsparkle_animation);
 		registry_list.push_back(&torch_on_animation);
 		registry_list.push_back(&torch_off_animation);
 		registry_list.push_back(&pairs);
