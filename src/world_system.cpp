@@ -1048,16 +1048,16 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
             }
             if (counter.counter_ms < 0) {
                 if (counter.timestamp == 1) {
-                    registry.speechRenderRequests.insert(Entity(),{"I made the purple potion!", player_line2});
+                    registry.speechRenderRequests.insert(Entity(),{"I made the purple potion!", player_line1});
                 } if (counter.timestamp == 2) {
                     if (!green_crafted && orange_crafted) {
-                        registry.speechRenderRequests.insert(Entity(), {"Only the green potion to go!", player_line3});
+                        registry.speechRenderRequests.insert(Entity(), {"Only the green potion to go!", player_line2});
                     } else if (!orange_crafted && green_crafted) {
-                        registry.speechRenderRequests.insert(Entity(), {"Only the orange potion to go!", player_line3});
+                        registry.speechRenderRequests.insert(Entity(), {"Only the orange potion to go!", player_line2});
                     } else if (!orange_crafted && !green_crafted) {
-                        registry.speechRenderRequests.insert(Entity(), {"On to the orange and green!", player_line3});
+                        registry.speechRenderRequests.insert(Entity(), {"On to the orange and green!", player_line2});
                     } else {
-                        registry.speechRenderRequests.insert(Entity(), {"That's all of them", player_line3});
+                        registry.speechRenderRequests.insert(Entity(), {"That's all of them", player_line2});
                     }
                 } if (counter.timestamp == 3) {
                     registry.speechRenderRequests.insert(Entity(), {"woof woof", dog_line1});
