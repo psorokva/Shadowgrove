@@ -138,6 +138,10 @@ struct Torches {
 	float t_timer = TORCH_LENGTH;
 };
 
+struct Invincibility {
+	float i_timer = 60000.0;
+};
+
 struct Deadly {
 
 };
@@ -501,7 +505,11 @@ enum class TEXTURE_ASSET_ID {
 	WIN0 = LOGO_01 + 1,
 	WIN1 = WIN0 + 1,
 	CHECK = WIN1 + 1,
-	TUT1 = CHECK + 1,
+	BORDER = CHECK + 1,
+	OC = BORDER + 1,
+	GC = OC + 1,
+	PC = GC + 1,
+	TUT1 = PC + 1,
 	TUT2 = TUT1 + 1,
 	TUT3 = TUT2 + 1,
 	TUT4 = TUT3 + 1,
