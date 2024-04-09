@@ -2217,11 +2217,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				playerDirection = UP;
 				moving_y = true;
 				motion.velocity.y -= CHARACTER_SPEED;
+				if (moving_x) motion.velocity.y -= CHARACTER_SPEED / 2;
 			}
 			else if (!go_up_key_pressed && go_down_key_pressed) {
 				playerDirection = DOWN;
 				moving_y = true;
 				motion.velocity.y += CHARACTER_SPEED;
+				if (moving_x) motion.velocity.y += CHARACTER_SPEED / 2;
 			}
 			else {
 				moving_y = false;
@@ -2233,9 +2235,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				playerDirection = RIGHT;
 				moving_x = true;
 				motion.velocity.x += CHARACTER_SPEED;
+				if (moving_y) motion.velocity.x += CHARACTER_SPEED / 2;
 				if (screen.game_screen == game_screen_day) {
 					motion.scale = vec2(2 * -PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
-				} else {
+				}
+				else {
 					motion.scale = vec2(-PLAYER_WIDTH, PLAYER_HEIGHT);
 				}
 			}
@@ -2243,6 +2247,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				playerDirection = LEFT;
 				moving_x = true;
 				motion.velocity.x -= CHARACTER_SPEED;
+				if (moving_y) motion.velocity.x -= CHARACTER_SPEED / 2;
 				if (screen.game_screen == game_screen_day) {
 					motion.scale = vec2(2 * PLAYER_WIDTH, 2 * PLAYER_HEIGHT);
 				}
@@ -2254,7 +2259,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 				moving_x = false;
 				motion.velocity.x = 0.f;
 			}
-	
+
 			motion.velocity.x = fmax(fmin(motion.velocity.x, CHARACTER_SPEED), -CHARACTER_SPEED);
 			motion.velocity.y = fmax(fmin(motion.velocity.y, CHARACTER_SPEED), -CHARACTER_SPEED);
 		}
