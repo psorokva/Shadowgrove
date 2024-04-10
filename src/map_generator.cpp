@@ -925,9 +925,9 @@ void MapGen::initPaths() {
 	for (const auto& row : path_var_s0) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	path_var_only_s.push_back(temp);
 	temp = std::vector < std::vector<int> >();
-	for (const auto& row : path_var_s1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
-	path_var_only_s.push_back(temp);
-	temp = std::vector < std::vector<int> >();
+	//for (const auto& row : path_var_s1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	//path_var_only_s.push_back(temp);
+	//temp = std::vector < std::vector<int> >();
 	for (const auto& row : path_var_s2) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	path_var_only_s.push_back(temp);
 
@@ -935,9 +935,9 @@ void MapGen::initPaths() {
 	for (const auto& row : path_var_n0) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	path_var_only_n.push_back(temp);
 	temp = std::vector < std::vector<int> >();
-	for (const auto& row : path_var_n1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
-	path_var_only_n.push_back(temp);
-	temp = std::vector < std::vector<int> >();
+	//for (const auto& row : path_var_n1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	//path_var_only_n.push_back(temp);
+	//temp = std::vector < std::vector<int> >();
 	for (const auto& row : path_var_n2) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	path_var_only_n.push_back(temp);
 
@@ -945,9 +945,9 @@ void MapGen::initPaths() {
 	for (const auto& row : path_var_w0) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	path_var_only_w.push_back(temp);
 	temp = std::vector < std::vector<int> >();
-	for (const auto& row : path_var_w1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
-	path_var_only_w.push_back(temp);
-	temp = std::vector < std::vector<int> >();
+	//for (const auto& row : path_var_w1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	//path_var_only_w.push_back(temp);
+	//temp = std::vector < std::vector<int> >();
 	for (const auto& row : path_var_w2) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	path_var_only_w.push_back(temp);
 
@@ -955,9 +955,9 @@ void MapGen::initPaths() {
 	for (const auto& row : path_var_e0) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	path_var_only_e.push_back(temp);
 	temp = std::vector < std::vector<int> >();
-	for (const auto& row : path_var_e1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
-	path_var_only_e.push_back(temp);
-	temp = std::vector < std::vector<int> >();
+	//for (const auto& row : path_var_e1) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
+	//path_var_only_e.push_back(temp);
+	//temp = std::vector < std::vector<int> >();
 	for (const auto& row : path_var_e2) { temp.push_back(std::vector<int>(std::begin(row), std::end(row))); }
 	path_var_only_e.push_back(temp);
 
