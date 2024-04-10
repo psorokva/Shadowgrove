@@ -104,7 +104,7 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	float attack_percent = (float) (attack - 10) / (float) (upper_bound_damage - lower_bound_damage);
 
 	//std::cout << "attack percent: " << attack_percent << std::endl;
-	float smallest_keeper_scale_down = 0.7;
+	float smallest_keeper_scale_down = 0.8;
 
 
 	// Setting initial motion values

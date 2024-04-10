@@ -1835,7 +1835,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 						if (!registry.hitTimers.has(entity))
 						{
 							registry.hitTimers.emplace(entity);
-							createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
+                            createPlayerHurtSparkle(renderer, registry.motions.get(player).camera_position);
 						}
 
 						// Move enemy slightly back after collision (so that player doesn't die instantly)
