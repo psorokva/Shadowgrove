@@ -60,6 +60,8 @@ public:
 	ComponentContainer<Oscilation> oscilations;
 	ComponentContainer<Dance> dances;
 	ComponentContainer<FloatingEnemy> floating_enemies;
+	ComponentContainer<Grabbable> grabbables;
+
 	// constructor that adds all containers for looping over them
 	// IMPORTANT: Don't forget to add any newly added containers!
 	ECSRegistry() {
@@ -108,7 +110,8 @@ public:
 		registry_list.push_back(&oscilations);
 		registry_list.push_back(&dances);
         registry_list.push_back(&permanents);
-		registry_list.push_back(&floating_enemies);
+		registry_list.push_back(&floating_enemies); 
+		registry_list.push_back(&grabbables);
 	}
 
 	void clear_all_components() {

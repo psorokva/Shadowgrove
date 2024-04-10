@@ -488,7 +488,7 @@ Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> rand
 	motion.scale = vec2({ MUSHROOM_SIZE, MUSHROOM_SIZE });
 
 	registry.healers.emplace(entity);
-
+	registry.grabbables.emplace(entity);
 	// TEXTURE_COUNT indicates that no txture is needed
 	int randomizer_size = randomizer.size();
 	std::random_device rd;

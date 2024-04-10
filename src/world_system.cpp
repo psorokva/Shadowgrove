@@ -578,8 +578,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				}
 			}
 
-			vec2 spawn_pos = registry.get_empty_spawn_location();
-			createPotion(renderer, spawn_pos, randomizer);
+			// vec2 spawn_pos = registry.get_empty_spawn_location();
+			createPotion(renderer, registry.get_empty_spawn_location(), randomizer);
 			//for (size_t i = 0; i < randomizer.size(); ++i) {
 			//	printf("%d ", randomizer[i]);
 			//}
@@ -1863,7 +1863,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 
 			}
 			// Checking Player - Eatable collisions
-			else if (registry.healers.has(entity_other)) {
+			else if ( registry.healers.has(entity_other) && registry.grabbables.has(entity_other)) {
 				Inventory& player_inv = registry.inventory.get(entity);
 				if (player_inv.holding[0] == nullval) {
 					player_inv.holding[0] = registry.healers.get(entity_other).item_name;

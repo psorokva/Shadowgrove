@@ -123,6 +123,9 @@ enum Item {
 	nullval
 };
 
+struct Grabbable {
+
+};
 
 // Healing Potions component
 struct Healer {
