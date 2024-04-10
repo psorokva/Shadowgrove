@@ -2239,7 +2239,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 registry.players.get(registry.players.entities[0]).health = 100;
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
             } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] ==
-                       yellow_potion && screen.game_screen == game_screen_night) {
+                       yellow_potion && screen.game_screen == game_screen_night && registry.torches.size() == 0) {
                 screen.torch_mode = 1;
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
             } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == blue_potion && screen.game_screen == game_screen_night) {
@@ -2248,7 +2248,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
             } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] 
-                == torch && screen.game_screen == game_screen_night && registry.torches.size() == 0) {
+                == torch && screen.game_screen == game_screen_night && registry.torches.size() == 0 && screen.torch_mode != 1) {
                 Entity torch_entity = Entity();
                 registry.torches.emplace(torch_entity);
                 UIComp &torch_ui = registry.uicomps.emplace(torch_entity);

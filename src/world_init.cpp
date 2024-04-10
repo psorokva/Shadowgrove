@@ -150,7 +150,7 @@ Entity createKeeperBoss(RenderSystem* renderer, vec2 pos) {
 	dance.min = 0.05;
 	dance.amount = 0.005;
 	registry.deadlys.emplace(entity); // Do we still need this?
-	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER1, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
+	registry.renderRequests.insert(entity, { TEXTURE_ASSET_ID::KEEPER3, EFFECT_ASSET_ID::TEXTURED, GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }
