@@ -1413,7 +1413,8 @@ void WorldSystem::restart_game() {
 		registry.remove_all_components_of(registry.torches.entities.back());
     while (registry.uicomps.entities.size() > 0)
         registry.remove_all_components_of(registry.uicomps.entities.back());
-
+    //while (registry.grabbables.entities.size() > 0)
+    //    registry.remove_all_components_of(registry.grabbables.entities.back());
     ScreenState& screen = registry.screenStates.components[0];
     //if (screen.game_screen != game_screen_night) {
         // TODO : add invincibility and sparkle removal here for player drinks potion in day? // 
@@ -2246,7 +2247,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 // TODO : this may mess things up if drank in daytime and we don't delete the sparks// 
                 createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
-            } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == torch && screen.game_screen == game_screen_night) {
+            } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] 
+                == torch && screen.game_screen == game_screen_night && registry.torches.size() == 0) {
                 Entity torch_entity = Entity();
                 registry.torches.emplace(torch_entity);
                 UIComp &torch_ui = registry.uicomps.emplace(torch_entity);
