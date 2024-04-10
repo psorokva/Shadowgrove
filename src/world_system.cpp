@@ -809,10 +809,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	for (Entity e : registry.invincibility.entities) {
 		Invincibility& inv = registry.invincibility.get(e);
 		inv.i_timer -= elapsed_ms_since_last_update;
-		if (inv.i_timer > 0) {
+		//if (inv.i_timer > 0) {
              // NO invincible not regeneration
-			registry.players.components[0].health = localHealth;
-		}
+		//	registry.players.components[0].health = localHealth;
+		//}
         if (inv.i_timer <= 0) {
             registry.invincibility.remove(e);
             while (registry.player_sparkle_animation.entities.size() > 0) {
