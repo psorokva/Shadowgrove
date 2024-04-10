@@ -2397,7 +2397,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         auto &motion = registry.motions.get(player);
 
         ScreenState &screen = registry.screenStates.components[0];
-        if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day) {
+        if (screen.game_screen == game_screen_night || screen.game_screen == game_screen_day && (registry.inventory.components.size() == 0 || !registry.inventory.components[0].is_open)) {
 
             // Character movement
             if (key == GLFW_KEY_UP || key == GLFW_KEY_W) {
