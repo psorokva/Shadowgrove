@@ -1811,7 +1811,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 						Mix_PlayChannel(-1, player_death_sound, 0);
 
 						// clear the save file if the player died
-						save_state.clearSave();
+						//save_state.clearSave();
 					}
 				}
 			
@@ -1850,7 +1850,7 @@ void WorldSystem::handle_collisions(float elapsed_ms) {
 						Mix_PlayChannel(-1, player_death_sound, 0);
 
 						// clear the save file if the player died
-						save_state.clearSave();
+						//save_state.clearSave();
 					}
 				}
 
@@ -2555,12 +2555,15 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
             screen.game_screen = game_screen_main_menu;
             screen.torch_mode = 0;
             screen.night_counter_ms = 0;
-            NightTimer &night_counter = registry.nightTimer.components[0];
-            night_counter.counter_ms = 0;
+            //NightTimer &night_counter = registry.nightTimer.components[0];
+            //night_counter.counter_ms = 0;
             registry.nightTimer.clear();
             orange_crafted = false;
             green_crafted = false;
             purple_crafted = false;
+
+            // clear the save if we lose
+            save_state.clearSave();
 
             while (registry.renderRequests.entities.size() > 0)
                 registry.remove_all_components_of(registry.renderRequests.entities.back());
