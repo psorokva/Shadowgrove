@@ -2239,10 +2239,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 registry.players.get(registry.players.entities[0]).health = 100;
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
             } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] ==
-                       yellow_potion) {
+                       yellow_potion && screen.game_screen == game_screen_night) {
                 screen.torch_mode = 1;
                 registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] = nullval;
-            } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == blue_potion) {
+            } else if (registry.inventory.get(registry.players.entities[0]).holding[selected_inv_state] == blue_potion && screen.game_screen == game_screen_night) {
                 registry.invincibility.emplace(player);
                 // TODO : this may mess things up if drank in daytime and we don't delete the sparks// 
                 createPlayerSparkle(renderer, registry.motions.get(player).camera_position);
