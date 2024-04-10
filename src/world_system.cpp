@@ -42,7 +42,7 @@ bool purple_crafted = false;
 bool game_paused = false;
 bool is_in_debug = false;
 bool already_paused = false;
-
+int localHealth = 100;
 bool moving_x = false;
 bool moving_y = false;
 
@@ -810,8 +810,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		Invincibility& inv = registry.invincibility.get(e);
 		inv.i_timer -= elapsed_ms_since_last_update;
 		//if (inv.i_timer > 0) {
-        // // NO invincible not regeneration
-		//	registry.players.components[0].health = 100;
+             // NO invincible not regeneration
+		//	registry.players.components[0].health = localHealth;
 		//}
         if (inv.i_timer <= 0) {
             registry.invincibility.remove(e);
