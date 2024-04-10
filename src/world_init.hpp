@@ -16,6 +16,7 @@ const float MUSHROOM_SIZE = 50.0f;
 // the player
 Entity createPlayer(RenderSystem* renderer, vec2 pos);
 Entity createKeeper(RenderSystem* renderer, vec2 pos);
+Entity createKeeperBoss(RenderSystem* renderer, vec2 pos);
 Entity createFloatingKeeper(RenderSystem* renderer, vec2 pos);
 Entity createWinDance(RenderSystem* renderer, vec2 pos);
 Entity createCompass(vec2 position);
@@ -27,6 +28,7 @@ Entity createDogPortrait(RenderSystem* renderer, vec2 pos);
 Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type);
 Entity createSparkle(RenderSystem* renderer, vec2 pos);
 Entity createPlayerSparkle(RenderSystem* renderer, vec2 pos);
+Entity createPlayerHurtSparkle(RenderSystem* renderer, vec2 pos);
 Entity createSunMoonSpinner(RenderSystem* renderer, vec2 pos);
 //Entity createMapChunk(vec2 position);
 Entity createPotion(RenderSystem* renderer, vec2 position, std::vector<int> randomizer = { 0,1,2,3,4,5,6,7,8,9,10 });
