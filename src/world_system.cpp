@@ -418,10 +418,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (keeper_spawn_time > KEEPER_SPAWN_FREQ && screen.game_screen == game_screen_night) {
 		keeper_spawn_time = 0.0;
 		vec2 spawn_pos = registry.get_empty_spawn_keeper_location();
-
 		// between 0 and 1
 		float rand_num = uniform_dist(rng);
         float prob = ((float)level / (float)max_level) * 0.5;
+        std::cout << "PROB: " << prob << std::endl;
         if (rand_num > prob)
         {
             createKeeper(renderer, spawn_pos);
@@ -1975,7 +1975,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
     HelpScreen &craft_screen = registry.helpScreen.components[1];
     ScreenState &screen = registry.screenStates.components[0];
 
-    if (action == GLFW_RELEASE && key == GLFW_KEY_F1) {
+    if (action == GLFW_RELEASE && key == GLFW_KEY_F1 && is_in_debug) {
         GameState state = {
                 registry.inventory.get(registry.players.entities[0]).holding,
                 orange_crafted,
@@ -1986,16 +1986,17 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         save_state.saveGame(state);
     }
 
-    if (action == GLFW_RELEASE && key == GLFW_KEY_F2) {
+    if (action == GLFW_RELEASE && key == GLFW_KEY_F2 && is_in_debug) {
         GameState state = save_state.loadGame();
         registry.inventory.get(registry.players.entities[0]).holding = state.player_inventory;
         orange_crafted = state.orange_crafted;
         green_crafted = state.green_crafted;
         purple_crafted = state.purple_crafted;
         level = state.level;
+        keeper_rate -= 0.8 * level;
     }
 
-    if (action == GLFW_RELEASE && key == GLFW_KEY_F3) {
+    if (action == GLFW_RELEASE && key == GLFW_KEY_F3 && is_in_debug) {
         save_state.clearSave();
     }
 
@@ -2509,6 +2510,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 green_crafted = state.green_crafted;
                 purple_crafted = state.purple_crafted;
                 level = state.level;
+                // make sure keeper_rate is correct for the level
+                keeper_rate -= 0.8 * level;
 
                 restart_game();
                 registry.tutorialSequence.components[0].visible = true;
@@ -2678,7 +2681,7 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 //		vec2 spawn_pos = registry.get_empty_spawn_location();
 //		printf("Spawning object at x %f  y %f\n", spawn_pos.x , spawn_pos.y);
 //		createPotion(renderer, camera.adjust_to_player(spawn_pos));
-		createFloatingKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
+		createKeeper(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//if (points <= 5) {
 		//	createPotion(renderer, camera.adjust_to_player(vec2{ xpos, ypos }));
 		//}

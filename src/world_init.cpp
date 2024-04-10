@@ -88,12 +88,6 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	// Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::CHICKEN);
 	// registry.meshPtrs.emplace(entity, &mesh);
 
-	// Setting initial motion values
-	Motion& motion = registry.motions.emplace(entity);
-	motion.position = pos;
-	motion.angle = 0.f;
-	motion.velocity = { 0.f, 0.f };
-	motion.scale = vec2({ KEEPER_WIDTH, KEEPER_HEIGHT });
 
 	// Keeper is an enemy starting with 50 points of attack (adjust as needed)
 	auto& enemy = registry.enemies.emplace(entity);
@@ -101,7 +95,28 @@ Entity createKeeper(RenderSystem* renderer, vec2 pos) {
 	// adjust these as needed for game balance
 	unsigned int lower_bound_damage = 10;
 	unsigned int upper_bound_damage = 30;
-	enemy.attack = rand() % (upper_bound_damage - lower_bound_damage + 1) + lower_bound_damage;
+	unsigned int attack = rand() % (upper_bound_damage - lower_bound_damage + 1) + lower_bound_damage;
+	enemy.attack = attack;
+
+	//std::cout << "attack: " << attack << std::endl;
+
+	// adjust size based off attack damage
+	float attack_percent = (float) (attack - 10) / (float) (upper_bound_damage - lower_bound_damage);
+
+	//std::cout << "attack percent: " << attack_percent << std::endl;
+	float smallest_keeper_scale_down = 0.7;
+
+
+	// Setting initial motion values
+	Motion& motion = registry.motions.emplace(entity);
+	motion.position = pos;
+	motion.angle = 0.f;
+	motion.velocity = { 0.f, 0.f };
+	motion.scale = vec2({ KEEPER_WIDTH * smallest_keeper_scale_down + KEEPER_WIDTH * attack_percent * (1 - smallest_keeper_scale_down),
+		KEEPER_HEIGHT * smallest_keeper_scale_down + KEEPER_HEIGHT * attack_percent * (1 - smallest_keeper_scale_down) });
+
+	//std::cout << "motion.scale.x: " << motion.scale.x << " motion.scale.y: " << motion.scale.y << std::endl;
+
 
 	enemy.e_id = entity;
 	registry.deadlys.emplace(entity); // Do we still need this?
