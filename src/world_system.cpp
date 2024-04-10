@@ -407,10 +407,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 		// between 0 and 1
 		float rand_num = uniform_dist(rng);
-		if (rand_num > (level / max_level) * 0.5)
-		{
-			createKeeper(renderer, spawn_pos);
-		}
+        float prob = ((float)level / (float)max_level) * 0.5;
+        if (rand_num > prob)
+        {
+            createKeeper(renderer, spawn_pos);
+        }
 		else
 		{
 			createFloatingKeeper(renderer, spawn_pos);
