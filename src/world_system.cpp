@@ -1369,6 +1369,13 @@ void WorldSystem::restart_game() {
 		localHealth = 100;
 	}
 
+    go_down_key_pressed = false;
+    go_up_key_pressed = false;
+    go_left_key_pressed = false;
+    go_right_key_pressed = false;
+    moving_x = false;
+    moving_y = false;
+
 	printf("Restarting\n");
 	morning_warning = false;
     game_paused = false;
