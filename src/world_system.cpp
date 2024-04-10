@@ -2040,32 +2040,88 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
     // Exiting game
     if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
-        if (registry.inventory.get(registry.players.entities[0]).is_open) {
-            vec2 craft = registry.inventory.get(registry.players.entities[0]).crafted;
-            if (craft.x == 1) {
-                registry.inventory.get(registry.players.entities[0]).holding[craft.y] = red_potion;
-                registry.inventory.get(registry.players.entities[0]).crafted = {};
-            } else if (craft.x == 2) {
-                registry.inventory.get(registry.players.entities[0]).holding[craft.y] = yellow_potion;
-                registry.inventory.get(registry.players.entities[0]).crafted = {};
-            } else if (craft.x == 3) {
-                registry.inventory.get(registry.players.entities[0]).holding[craft.y] = blue_potion;
-                registry.inventory.get(registry.players.entities[0]).crafted = {};
-            } else if (craft.x == 4) {
-                registry.inventory.get(registry.players.entities[0]).holding[craft.y] = orange_potion;
-                registry.inventory.get(registry.players.entities[0]).crafted = {};
-            } else if (craft.x == 5) {
-                registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
-                registry.inventory.get(registry.players.entities[0]).crafted = {};
-            } else if (craft.x == 6) {
-                registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
-                registry.inventory.get(registry.players.entities[0]).crafted = {};
+
+
+        if ( registry.screenStates.components[0].game_screen == game_screen_day && registry.inventory.components.size() > 0 && registry.inventory.components[0].is_open) {
+            if (registry.inventory.get(registry.players.entities[0]).is_open) {
+                vec2 craft = registry.inventory.get(registry.players.entities[0]).crafted;
+                if (craft.x == 1) {
+                    registry.inventory.get(registry.players.entities[0]).holding[craft.y] = red_potion;
+                    registry.inventory.get(registry.players.entities[0]).crafted = {};
+                }
+                else if (craft.x == 2) {
+                    registry.inventory.get(registry.players.entities[0]).holding[craft.y] = yellow_potion;
+                    registry.inventory.get(registry.players.entities[0]).crafted = {};
+                }
+                else if (craft.x == 3) {
+                    registry.inventory.get(registry.players.entities[0]).holding[craft.y] = blue_potion;
+                    registry.inventory.get(registry.players.entities[0]).crafted = {};
+                }
+                else if (craft.x == 4) {
+                    //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = orange_potion;
+                    registry.inventory.get(registry.players.entities[0]).crafted = {};
+                    //                vec2 orange_potion_pos = {850, 660 };
+                    //                Entity orange = createConversationPotion(renderer, orange_potion_pos, 2);
+                    orange_crafted = true;
+                    screen.game_screen = cut_scene_orange;
+                    restart_game();
+                }
+                else if (craft.x == 5) {
+                    //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
+                    registry.inventory.get(registry.players.entities[0]).crafted = {};
+                    //                vec2 green_potion_pos = {900, 660 };
+                    //                Entity green = createConversationPotion(renderer, green_potion_pos, 0);
+                    green_crafted = true;
+                    screen.game_screen = cut_scene_green;
+                    restart_game();
+                }
+                else if (craft.x == 6) {
+                    //				registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
+                    registry.inventory.get(registry.players.entities[0]).crafted = {};
+                    //                vec2 purple_potion_pos = {950, 660};
+                    //                Entity purple = createConversationPotion(renderer, purple_potion_pos, 1);
+                    purple_crafted = true;
+                    screen.game_screen = cut_scene_purple;
+                    restart_game();
+                }
             }
+            registry.inventory.get(registry.players.entities[0]).is_open = !registry.inventory.get(
+                registry.players.entities[0]).is_open;
+            for (int i = 0; i < registry.inventory.get(registry.players.entities[0]).index.size(); i++) {
+                registry.inventory.get(registry.players.entities[0]).holding[registry.inventory.get(
+                    registry.players.entities[0]).index[i]] = registry.inventory.get(
+                        registry.players.entities[0]).inUI[i];
+            }
+            registry.inventory.get(registry.players.entities[0]).index = {};
+            registry.inventory.get(registry.players.entities[0]).inUI = {};
         }
-        if (registry.inventory.components[0].is_open) {
+
+        //if (registry.inventory.get(registry.players.entities[0]).is_open) {
+        //    vec2 craft = registry.inventory.get(registry.players.entities[0]).crafted;
+        //    if (craft.x == 1) {
+        //        registry.inventory.get(registry.players.entities[0]).holding[craft.y] = red_potion;
+        //        registry.inventory.get(registry.players.entities[0]).crafted = {};
+        //    } else if (craft.x == 2) {
+        //        registry.inventory.get(registry.players.entities[0]).holding[craft.y] = yellow_potion;
+        //        registry.inventory.get(registry.players.entities[0]).crafted = {};
+        //    } else if (craft.x == 3) {
+        //        registry.inventory.get(registry.players.entities[0]).holding[craft.y] = blue_potion;
+        //        registry.inventory.get(registry.players.entities[0]).crafted = {};
+        //    } else if (craft.x == 4) {
+        //        registry.inventory.get(registry.players.entities[0]).holding[craft.y] = orange_potion;
+        //        registry.inventory.get(registry.players.entities[0]).crafted = {};
+        //    } else if (craft.x == 5) {
+        //        registry.inventory.get(registry.players.entities[0]).holding[craft.y] = green_potion;
+        //        registry.inventory.get(registry.players.entities[0]).crafted = {};
+        //    } else if (craft.x == 6) {
+        //        registry.inventory.get(registry.players.entities[0]).holding[craft.y] = purple_potion;
+        //        registry.inventory.get(registry.players.entities[0]).crafted = {};
+        //    }
+        //}
+/*        if (registry.inventory.components[0].is_open) {
             registry.inventory.components[0].is_open = false;
             game_paused = false;
-        } else if (help_screen.help == 1) {
+        }*/ else if (help_screen.help == 1) {
             help_screen.help = 0;
             // craft screen == 2 means its on standby for when help closes, so dont unpause
             if (craft_screen.help == 2) {
@@ -2097,13 +2153,22 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
     // Pausing game
     if (action == GLFW_RELEASE && key == GLFW_KEY_P) {
-        if (!game_paused) {
-            already_paused = true;
-            pause_game();
-        } else {
-            already_paused = false;
-            resume_game();
+        if (registry.screenStates.components.size() > 0)
+        {
+            ScreenState& screen = registry.screenStates.components[0];
+            if (screen.game_screen == game_screen_night)
+            {
+                if (!game_paused) {
+                    already_paused = true;
+                    pause_game();
+                }
+                else {
+                    already_paused = false;
+                    resume_game();
+                }
+            }
         }
+
     }
 
     // Changing game scene to day
