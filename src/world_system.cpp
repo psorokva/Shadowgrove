@@ -779,6 +779,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			registry.inventory.components[0].inUI = {};
 			registry.inventory.components[0].index = {};
 			registry.inventory.components[0].holding = {};
+            keeper_rate = 8.0;
+            level = 0;
             player_component.alive = 0;
             restart_game();
 			return true;
@@ -2676,6 +2678,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 }
             } else {
                 screen.game_screen = game_screen_win;
+                keeper_rate = 8.0;
+                level = 0;
                 restart_game();
             }
         }
