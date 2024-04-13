@@ -36,6 +36,7 @@ private:
 	std::vector< std::vector< std::vector<int> > > path_var_only_e;
 
 public:
+	bool gen_once = false;
 	int** bignoise;
 	int** biome_filter;
 	int rows;

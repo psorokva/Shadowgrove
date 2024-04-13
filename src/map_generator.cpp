@@ -12,6 +12,10 @@
 #include <iostream>
 
 void MapGen::clearMap() {
+	//for (int i = chunks.size() - 1; i >= 0; i--) {
+	//	Chunk* chunk = chunks.at(i);
+	//	delete chunk;
+	//}
 	chunks.clear();
 }
 
@@ -22,6 +26,9 @@ void MapGen::makeNoise(int level) {
 	const int BIG_WIDTH = cols * MAZE_SIZE;
 	const int BIG_HEIGHT = rows * MAZE_SIZE;
 	for (int i = 0; i < BIG_HEIGHT; ++i) {
+		if (gen_once && bignoise[i] != nullptr) {
+			delete bignoise[i];
+		}
 		bignoise[i] = new int[BIG_WIDTH];
 		for (int j = 0; j < BIG_WIDTH; ++j) {
 			bignoise[i][j] = rand() % NOISE_LEVELS; //random number between 0 and 4 incl
@@ -30,6 +37,9 @@ void MapGen::makeNoise(int level) {
 		//printf("\n");
 	}
 	for (int i = 0; i < BIG_HEIGHT; ++i) {
+		if (gen_once && biome_filter[i] != nullptr) {
+			delete biome_filter[i];
+		}
 		biome_filter[i] = new int[BIG_WIDTH];
 		for (int j = 0; j < BIG_WIDTH; ++j) {
 			biome_filter[i][j] = level;
@@ -84,6 +94,7 @@ void MapGen::makeNoise(int level) {
 			
 		}
 	}
+	gen_once = true;
 }
 
 
@@ -187,9 +198,11 @@ bool MapGen::createWorldMap() {
 		chunk2->x = -1;
 		for (Chunk& chunk: chunks) {
 			if (chunk.x == job.ch1x && chunk.y == job.ch1y) {
+				delete chunk1;
 				chunk1 = &chunk;
 			}
 			if (chunk.x == job.ch2x && chunk.y == job.ch2y) {
+				delete chunk2;
 				chunk2 = &chunk;
 			}
 		}
@@ -230,7 +243,8 @@ bool MapGen::createWorldMap() {
 			//	printf("Invalid JOB\n");
 			//}
 		}
-
+		// delete chunk2;
+		// delete chunk1;
 		//printf("END createWorldMap\n");
 
 	}
