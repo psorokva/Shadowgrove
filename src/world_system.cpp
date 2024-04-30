@@ -161,11 +161,11 @@ GLFWwindow* WorldSystem::create_window() {
     mushroom_sound = Mix_LoadWAV(audio_path("mushroom.wav").c_str());
     player_death_sound = Mix_LoadWAV(audio_path("player_death.wav").c_str());
     inventory_full_sound = Mix_LoadWAV(audio_path("inventory_full.wav").c_str());
-	  player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
+	player_hit_sound = Mix_LoadWAV(audio_path("player_hit.wav").c_str());
   	rooster_sound = Mix_LoadWAV(audio_path("rooster.wav").c_str());
     torch_sound = Mix_LoadWAV(audio_path("torch.wav").c_str());
-	  page_turn_sound = Mix_LoadWAV(audio_path("page_turn.wav").c_str());
-	  menu_close_sound = Mix_LoadWAV(audio_path("menu_close.wav").c_str());
+	page_turn_sound = Mix_LoadWAV(audio_path("page_turn.wav").c_str());
+	menu_close_sound = Mix_LoadWAV(audio_path("menu_close.wav").c_str());
 
 	if (night_music == nullptr || day_music == nullptr || bird_sounds == nullptr || mushroom_sound == nullptr ||
         player_death_sound == nullptr || inventory_full_sound == nullptr || rooster_sound == nullptr || torch_sound == nullptr
