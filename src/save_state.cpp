@@ -35,7 +35,7 @@ void SaveState::saveGame(GameState state)
 
     else 
     {
-        std::cerr << "Unable to open the file for writing!" << std::endl;
+        //std::cerr << "Unable to open the file for writing!" << std::endl;
     }
 }
 
@@ -92,7 +92,7 @@ GameState SaveState::loadGame()
     }
     else 
     {
-        std::cerr << "Unable to open the file for reading!" << std::endl;
+        //std::cerr << "Unable to open the file for reading!" << std::endl;
     }
 
     return state;

@@ -75,16 +75,16 @@ void print_directions(std::vector<Direction> directions)
 		switch (direction)
 		{
 		case Direction::RIGHT:
-			std::cout << "RIGHT" << std::endl;
+			//std::cout << "RIGHT" << std::endl;
 			break;
 		case Direction::LEFT:
-			std::cout << "LEFT" << std::endl;
+			//std::cout << "LEFT" << std::endl;
 			break;
 		case Direction::UP:
-			std::cout << "UP" << std::endl;
+			//std::cout << "UP" << std::endl;
 			break;
 		case Direction::DOWN:
-			std::cout << "DOWN" << std::endl;
+			//std::cout << "DOWN" << std::endl;
 			break;
 		}
 	}

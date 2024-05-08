@@ -388,7 +388,7 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
     GLint project_location = glGetUniformLocation(m_font_shaderProgram, "projection");
     assert(project_location > -1);
-    std::cout << "project_location: " << project_location << std::endl;
+    //std::cout << "project_location: " << project_location << std::endl;
     glUniformMatrix4fv(project_location, 1, GL_FALSE, glm::value_ptr(projection));
 
     // init FreeType fonts
@@ -500,7 +500,7 @@ bool RenderSystem::initializeSpeech(unsigned int font_default_size) {
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
     GLint project_location = glGetUniformLocation(m_font_shaderProgram, "projection");
     assert(project_location > -1);
-    std::cout << "project_location: " << project_location << std::endl;
+    //std::cout << "project_location: " << project_location << std::endl;
     glUniformMatrix4fv(project_location, 1, GL_FALSE, glm::value_ptr(projection));
 
     // init FreeType fonts

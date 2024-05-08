@@ -421,7 +421,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		// between 0 and 1
 		float rand_num = uniform_dist(rng);
         float prob = ((float)level / (float)max_level) * 0.5;
-        std::cout << "PROB: " << prob << std::endl;
+        // std::cout << "PROB: " << prob << std::endl;
         if (rand_num > prob)
         {
             createKeeper(renderer, spawn_pos);
@@ -1378,7 +1378,7 @@ void WorldSystem::restart_game() {
     moving_x = false;
     moving_y = false;
 
-	printf("Restarting\n");
+	// printf("Restarting\n");
 	morning_warning = false;
     game_paused = false;
 	// Reset the game speed
@@ -1739,7 +1739,7 @@ void WorldSystem::restart_game() {
 		Entity spinner = createSunMoonSpinner(renderer, vec2(window_width_px*0.5, window_height_px));
 	}
 
-	registry.list_all_components();
+	//registry.list_all_components();
 
 }
 
@@ -2141,7 +2141,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
                 game_paused = false;
             }
          } else if (registry.tutorialSequence.components.size() == 0 || !registry.tutorialSequence.components[0].visible) {
-            std::cout << "EXIT GAME" << std::endl;
+            // std::cout << "EXIT GAME" << std::endl;
             glfwSetWindowShouldClose(window, true);
         }
     }
@@ -2506,12 +2506,12 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
         if (action == GLFW_RELEASE && key == GLFW_KEY_T &&
             registry.screenStates.components[0].game_screen == game_screen_day) {
             if (!tutorial.visible) {
-                printf("T key pressed, opening tutorial screen\n");
+                // printf("T key pressed, opening tutorial screen\n");
                 tutorial.visible = true;
                 game_paused = true;
                 Mix_PlayChannel(-1, page_turn_sound, 0);
             } else {
-                printf("T key pressed, closing tutorial screen\n");
+               // printf("T key pressed, closing tutorial screen\n");
                 tutorial.visible = false;
                 game_paused = false;
                 Mix_PlayChannel(-1, menu_close_sound, 0);
@@ -2773,8 +2773,8 @@ void WorldSystem::on_mouse_click(int button, int action, int mods) {
 
 void WorldSystem::on_scroll(double x_offset, double y_offset)
 {
-	std::cout << "in scroll function" << std::endl;
-	std::cout << "xoffset: " << x_offset << " yoffset: " << y_offset << std::endl;
+	// std::cout << "in scroll function" << std::endl;
+	// std::cout << "xoffset: " << x_offset << " yoffset: " << y_offset << std::endl;
 	Inventory& inventory = registry.inventory.get(registry.players.entities[0]);
 	if (y_offset == -1)
 	{
