@@ -81,7 +81,7 @@ Entity createConversationPotion(RenderSystem* renderer, vec2 pos, int type) {
 }
 
 Entity createKeeper(RenderSystem* renderer, vec2 pos) {
-	std::cout << "creating normal keeper" << std::endl;
+	// std::cout << "creating normal keeper" << std::endl;
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
@@ -156,7 +156,7 @@ Entity createKeeperBoss(RenderSystem* renderer, vec2 pos) {
 }
 
 Entity createFloatingKeeper(RenderSystem* renderer, vec2 pos) {
-	std::cout << "creating floating keeper" << std::endl;
+	// std::cout << "creating floating keeper" << std::endl;
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object

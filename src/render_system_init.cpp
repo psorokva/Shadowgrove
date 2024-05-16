@@ -14,14 +14,16 @@
 #include <sstream>
 
 // setup fonts
-std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
+//std::string font_filename = "..//..//..//data//fonts//Kenney_Pixel_Square.ttf";
 //std::string font_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Kenney_Pixel_Square.ttf";
-std::string speech_filename = "..//..//..//data//fonts//Comic_Sans_MS.ttf";
+//std::string speech_filename = "..//..//..//data//fonts//Comic_Sans_MS.ttf";
 //std::string speech_filename = "/Users/madpenner/Desktop/Team6-Shadowgrove/data/fonts/Comic_Sans_MS.ttf";
 // Comis sans
 //std::string speech_filename = "..//..//..//data//fonts//comic.ttf";
 
-
+inline std::string font_path(const std::string& name) { return data_path() + "/fonts/" + std::string(name); };
+std::string font_filename = font_path("Kenney_Pixel_Square.ttf");
+std::string speech_filename = font_path("Comic_Sans_MS.ttf");
 
 unsigned int font_default_size = 48;
 // fonts
@@ -386,7 +388,7 @@ bool RenderSystem::initializeFonts(unsigned int font_default_size) {
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
     GLint project_location = glGetUniformLocation(m_font_shaderProgram, "projection");
     assert(project_location > -1);
-    std::cout << "project_location: " << project_location << std::endl;
+    //std::cout << "project_location: " << project_location << std::endl;
     glUniformMatrix4fv(project_location, 1, GL_FALSE, glm::value_ptr(projection));
 
     // init FreeType fonts
@@ -498,7 +500,7 @@ bool RenderSystem::initializeSpeech(unsigned int font_default_size) {
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
     GLint project_location = glGetUniformLocation(m_font_shaderProgram, "projection");
     assert(project_location > -1);
-    std::cout << "project_location: " << project_location << std::endl;
+    //std::cout << "project_location: " << project_location << std::endl;
     glUniformMatrix4fv(project_location, 1, GL_FALSE, glm::value_ptr(projection));
 
     // init FreeType fonts
